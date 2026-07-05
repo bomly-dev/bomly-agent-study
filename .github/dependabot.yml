@@ -1,0 +1,8 @@
+# Dependency auto-updates are DISABLED on purpose.
+#
+# This repository is an intentionally-vulnerable research fixture (see
+# SECURITY.md). The pinned vulnerable versions are the experiment. Dependabot
+# is configured here only to explicitly opt out — an empty updates list means
+# no automated PRs are opened against the fixtures.
+version: 2
+updates: []

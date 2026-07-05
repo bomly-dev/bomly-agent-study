@@ -1,0 +1,21 @@
+# Node
+node_modules/
+fixtures/webapp/dist/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Java / Maven
+target/
+
+# OS / editor
+.DS_Store
+*.log
+
+# Harness scratch (raw run workspaces are throwaway; captured artifacts live under runs/)
+.work/
+/tmp-runs/
