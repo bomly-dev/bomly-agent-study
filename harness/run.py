@@ -164,6 +164,13 @@ def main() -> int:
     ap.add_argument("condition", choices=["bare", "mcp"])
     ap.add_argument("run_number", type=int)
     ap.add_argument("--scope", default="all", choices=["all", "webapp", "service", "api-java"])
+    ap.add_argument(
+        "--pilot", action="store_true",
+        help="Write output under runs-pilot/ instead of runs/. Pilot runs shake out harness bugs "
+             "and are published, but per the pre-registered design they are NEVER pooled into the "
+             "final dataset — aggregate.py only ever reads runs/, so this keeps that separation "
+             "structural rather than relying on remembering not to mix directories.",
+    )
     ap.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_SECONDS)
     ap.add_argument("--work-root", default=None, help="Scratch root for the throwaway workspace (default: a temp dir)")
     ap.add_argument("--keep-workspace", action="store_true", help="Don't delete the workspace after capture (debugging)")
@@ -179,7 +186,8 @@ def main() -> int:
     fixture_sha = run_capture(["git", "-C", str(REPO_ROOT), "rev-parse", "--short", fixture_ref]).stdout.strip()
     harness_sha = run_capture(["git", "-C", str(REPO_ROOT), "rev-parse", "--short", "HEAD"]).stdout.strip()
 
-    run_dir = REPO_ROOT / "runs" / args.agent / args.condition / str(args.run_number)
+    runs_root = "runs-pilot" if args.pilot else "runs"
+    run_dir = REPO_ROOT / runs_root / args.agent / args.condition / str(args.run_number)
     run_dir.mkdir(parents=True, exist_ok=True)
 
     work_root_auto_created = args.work_root is None
@@ -193,6 +201,7 @@ def main() -> int:
         "agent": args.agent,
         "condition": args.condition,
         "run_number": args.run_number,
+        "pilot": args.pilot,
         "scope": args.scope,
         "fixture_ref": fixture_ref,
         "fixture_sha": fixture_sha,

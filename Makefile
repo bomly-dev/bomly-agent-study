@@ -30,17 +30,23 @@ clean: ## Remove build artifacts and virtualenvs
 	rm -rf fixtures/api-java/target
 
 # --- Harness targets ---
-# AGENT/CONDITION/SCOPE select the run; RUN_NUMBER lets pilot/full runs coexist.
+# AGENT/CONDITION/SCOPE select the run; RUN_NUMBER numbers repeats within a
+# cell. PILOT=1 writes to runs-pilot/ instead of runs/ — pilot runs are
+# published but, per the pre-registered design, never pooled into the final
+# dataset; aggregate (below) only reads runs/ unless --pilot is passed.
 AGENT ?= claude
 CONDITION ?= mcp
 SCOPE ?= webapp
 RUN_NUMBER ?= 1
+PILOT ?=
 
-reproduce-one: ## Run one agent+condition end to end in Docker, then score it. Needs an API key (ANTHROPIC_API_KEY or OPENAI_API_KEY) in the environment.
-	./harness/run.sh $(AGENT) $(CONDITION) $(RUN_NUMBER) --scope $(SCOPE)
+PILOT_FLAG := $(if $(PILOT),--pilot,)
+
+reproduce-one: ## Run one agent+condition end to end in Docker, then score it. Needs a credential (see CREDENTIALS.md). Add PILOT=1 for a pilot run.
+	./harness/run.sh $(AGENT) $(CONDITION) $(RUN_NUMBER) --scope $(SCOPE) $(PILOT_FLAG)
 
 verify-only: ## Re-score an already-published run, no API key needed:  make verify-only RUN=runs/claude/mcp/1
 	./harness/verify.sh $(RUN)
 
-aggregate: ## Roll per-run result.json files into analysis/results.csv
-	$(PYTHON) harness/aggregate.py
+aggregate: ## Roll per-run result.json files into analysis/results.csv (or results-pilot.csv with PILOT=1)
+	$(PYTHON) harness/aggregate.py $(PILOT_FLAG)

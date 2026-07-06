@@ -5,17 +5,21 @@ One row per (run, slot) — i.e. a run against all 10 slots produces 10 rows —
 plus the run-level fields (wall time, tool calls, timeout, regressions)
 repeated on each of that run's rows so the CSV stays flat and pivotable in any
 spreadsheet tool without a join.
+
+Reads ONLY runs/ by default — never runs-pilot/. Per the pre-registered
+design, pilot runs are published but never pooled into the final dataset;
+pass --pilot to aggregate runs-pilot/ instead, into a separate
+analysis/results-pilot.csv, for inspecting pilot behavior on its own.
 """
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-RUNS_DIR = REPO_ROOT / "runs"
-OUT_PATH = REPO_ROOT / "analysis" / "results.csv"
 
 FIELDS = [
     "agent", "condition", "run_number", "scope",
@@ -58,26 +62,33 @@ def rows_for_result(result_path: Path) -> list[dict]:
 
 
 def main() -> int:
-    if not RUNS_DIR.exists():
-        print("no runs/ directory yet — nothing to aggregate", file=sys.stderr)
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--pilot", action="store_true", help="Aggregate runs-pilot/ instead of runs/")
+    args = ap.parse_args()
+
+    runs_dir = REPO_ROOT / ("runs-pilot" if args.pilot else "runs")
+    out_path = REPO_ROOT / "analysis" / ("results-pilot.csv" if args.pilot else "results.csv")
+
+    if not runs_dir.exists():
+        print(f"no {runs_dir.name}/ directory yet — nothing to aggregate", file=sys.stderr)
         return 0
 
     all_rows = []
-    for result_path in sorted(RUNS_DIR.glob("*/*/*/result.json")):
+    for result_path in sorted(runs_dir.glob("*/*/*/result.json")):
         all_rows.extend(rows_for_result(result_path))
 
     if not all_rows:
-        print("no result.json files found under runs/", file=sys.stderr)
+        print(f"no result.json files found under {runs_dir.name}/", file=sys.stderr)
         return 0
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(OUT_PATH, "w", newline="") as f:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)
         writer.writeheader()
         writer.writerows(all_rows)
 
-    n_runs = len(list(RUNS_DIR.glob("*/*/*/result.json")))
-    print(f"wrote {len(all_rows)} rows from {n_runs} runs to {OUT_PATH}")
+    n_runs = len(list(runs_dir.glob("*/*/*/result.json")))
+    print(f"wrote {len(all_rows)} rows from {n_runs} runs to {out_path}")
     return 0
 
 
