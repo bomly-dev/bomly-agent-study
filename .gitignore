@@ -19,3 +19,4 @@ target/
 # Harness scratch (raw run workspaces are throwaway; captured artifacts live under runs/)
 .work/
 /tmp-runs/
+harness/.venv/

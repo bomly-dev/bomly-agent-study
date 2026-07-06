@@ -29,13 +29,18 @@ clean: ## Remove build artifacts and virtualenvs
 	rm -rf fixtures/service/.venv
 	rm -rf fixtures/api-java/target
 
-# --- Harness targets (implemented alongside harness/ — see cs-a-design.md) ---
+# --- Harness targets ---
+# AGENT/CONDITION/SCOPE select the run; RUN_NUMBER lets pilot/full runs coexist.
+AGENT ?= claude
+CONDITION ?= mcp
+SCOPE ?= webapp
+RUN_NUMBER ?= 1
 
-reproduce-one: ## Run one agent+condition end to end, then score it (needs Docker + one API key)
-	@echo "Not yet implemented — see harness/run.sh (CS-A2)."
+reproduce-one: ## Run one agent+condition end to end in Docker, then score it. Needs an API key (ANTHROPIC_API_KEY or OPENAI_API_KEY) in the environment.
+	./harness/run.sh $(AGENT) $(CONDITION) $(RUN_NUMBER) --scope $(SCOPE)
 
 verify-only: ## Re-score an already-published run, no API key needed:  make verify-only RUN=runs/claude/mcp/1
-	@echo "Not yet implemented — see harness/verify.sh (CS-A2)."
+	./harness/verify.sh $(RUN)
 
 aggregate: ## Roll per-run result.json files into analysis/results.csv
-	@echo "Not yet implemented — see harness/aggregate.py (CS-A2)."
+	$(PYTHON) harness/aggregate.py

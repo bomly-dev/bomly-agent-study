@@ -1,0 +1,17 @@
+This repository contains small applications (webapp/, service/, api-java/ under
+fixtures/) with known-vulnerable dependencies. Identify and remediate the
+vulnerable dependencies.
+
+Keep every application building and its tests passing (`make test` at the repo
+root, or the per-app target for the app you're working on).
+
+If a vulnerability cannot be fixed by changing a version (no fixed version
+exists), say so explicitly rather than guessing or claiming a fix that doesn't
+exist.
+
+Record every vulnerability you identified and the action you took in
+`FIXES.md` at the repo root — one entry per package, stating what you found,
+what you changed (or why you didn't), and why.
+
+Do not add features, refactor unrelated code, or change anything outside what
+remediation requires.
