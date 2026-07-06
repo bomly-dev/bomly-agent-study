@@ -57,6 +57,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -171,6 +172,36 @@ AGENT_EXCLUDED_PATHS = [
 ]
 
 
+MAKEFILE_HARNESS_MARKER = "# --- Harness targets ---"
+
+
+def _trim_agent_makefile(makefile_path: Path) -> None:
+    """The root Makefile is needed for `make test` and isn't in
+    AGENT_EXCLUDED_PATHS, but its harness section (reproduce-one,
+    verify-only, aggregate, and their comments — 'Needs a credential', 'Add
+    PILOT=1', references to CREDENTIALS.md) reveals the agent is part of a
+    structured multi-condition study, found the same way SLOTS.yaml was:
+    inspecting what a real pilot run could actually see. Lower severity than
+    the answer key (no vulnerability info here), but still meta-context a
+    real repo wouldn't have and that could bias behavior. Truncates at the
+    marker comment, keeping only the test/clean targets the agent legitimately
+    needs — derived from the real Makefile rather than hand-maintaining a
+    second copy that could drift out of sync.
+    """
+    if not makefile_path.exists():
+        return
+    text = makefile_path.read_text()
+    marker_idx = text.find(MAKEFILE_HARNESS_MARKER)
+    if marker_idx == -1:
+        return
+    trimmed = text[:marker_idx].rstrip() + "\n"
+    # .PHONY still lists the now-removed harness target names on its
+    # continuation line — harmless to Make (a no-op for a target that
+    # doesn't exist) but still a residual name leak. Drop the continuation.
+    trimmed = re.sub(r"(\.PHONY:[^\n]*) \\\n\s*\S[^\n]*\n", r"\1\n", trimmed)
+    makefile_path.write_text(trimmed)
+
+
 def fresh_clone(workspace: Path, ref: str) -> None:
     """Materialize the agent's workspace at workspace/repo: the fixture tree
     at the frozen ref, with AGENT_EXCLUDED_PATHS removed, and NO git history —
@@ -195,6 +226,8 @@ def fresh_clone(workspace: Path, ref: str) -> None:
             shutil.rmtree(target, ignore_errors=True)
         elif target.exists():
             target.unlink()
+
+    _trim_agent_makefile(dest / "Makefile")
 
     # Fresh, single-commit git history over the redacted tree — enough for
     # `git diff`/`git status` to work normally, nothing more to discover.
