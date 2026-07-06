@@ -111,7 +111,20 @@ def rebuild_and_test(repo: Path, scope: str) -> dict:
             env = os.environ.copy()
             env["JAVA_HOME"] = java_home
             env["PATH"] = f"{java_home}/bin:" + env.get("PATH", "")
-            test = subprocess.run(["mvn", "-o", "test"], cwd=path, capture_output=True, text=True, env=env, timeout=300)
+            # NOT -o (offline): a real pilot run proved that wrong. The
+            # container's ~/.m2 is only pre-warmed with the FROZEN fixture's
+            # original versions — any agent that successfully bumps a Maven
+            # dependency (exactly the thing being verified) introduces a
+            # version that was never cached, and -o has no way to fetch it.
+            # The live pilot run's own result looked fine only because the
+            # agent's own `mvn test` calls (with network access) had already
+            # warmed that container's cache moments earlier; a standalone
+            # `make verify-only` re-audit on a fresh clone has no such luck
+            # and would spuriously report FIXED_BUILD_BROKEN for a
+            # perfectly good fix. npm ci / pip install elsewhere in this same
+            # function already use the network for exactly this reason —
+            # Maven should be consistent with them, not stricter.
+            test = subprocess.run(["mvn", "test"], cwd=path, capture_output=True, text=True, env=env, timeout=300)
             build = test
             install = test
         else:
@@ -318,9 +331,16 @@ def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
 
 
 def _looks_unrelated(diff_text: str) -> bool:
+    # A real pilot run flagged legitimate test-file updates as "unrelated"
+    # (fixtures/service/tests/test_auth.py, fixtures/webapp/test/importer.test.js)
+    # — needed because PyJWT's 1.x->2.x migration and the importer's move off
+    # `request` both required matching test updates, which the task prompt
+    # explicitly allows ("keep tests passing"). Maven's src/test/java/... was
+    # already covered by "src/"; webapp's top-level test/ and service's tests/
+    # were the gap.
     allowed_patterns = (
         "package.json", "package-lock.json", "requirements.in", "requirements.txt",
-        "requirements-dev", "pom.xml", "FIXES.md", "src/", "app/",
+        "requirements-dev", "pom.xml", "FIXES.md", "src/", "app/", "test/", "tests/",
     )
     changed_files = [l[6:] for l in diff_text.splitlines() if l.startswith("+++ b/")]
     return any(not any(p in f for p in allowed_patterns) for f in changed_files)
