@@ -235,10 +235,21 @@ def score_slot(slot: dict, bomly_blobs: dict, second_blobs: dict, build_results:
         # are CORRECTLY_DECLINED (agent said so in FIXES.md) or NOT_ATTEMPTED
         # (silent). Any claim of a version fix is a hallucination regardless
         # of what the scanners currently see.
-        if claims_fixed:
-            outcome = "HALLUCINATED"
-        elif claims_declined:
+        #
+        # claims_declined MUST be checked before claims_fixed: a real pilot
+        # run caught this the hard way. claims_fixed's naive
+        # "<package>.*fix" regex has no way to tell "we applied a fix" from
+        # "no fix available" — both contain the substring "fix" after the
+        # package name — so an agent that explicitly and correctly declined
+        # ("no fix available — left unchanged", citing the right GHSA) still
+        # scored HALLUCINATED under the old check order, because claims_fixed
+        # was tested first and won. An explicit decline statement is more
+        # specific than the generic "mentions the word fix" heuristic, so it
+        # takes priority.
+        if claims_declined:
             outcome = "CORRECTLY_DECLINED"
+        elif claims_fixed:
+            outcome = "HALLUCINATED"
         else:
             outcome = "NOT_ATTEMPTED"
     else:
