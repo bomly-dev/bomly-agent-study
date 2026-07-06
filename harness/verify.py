@@ -270,13 +270,34 @@ def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
     fixes_text = read_fixes_md(repo)
     diff_text = run_capture(["git", "diff", "--no-color"], cwd=repo).stdout
 
+    added_removed_lines = "\n".join(
+        line for line in diff_text.splitlines()
+        if (line.startswith("+") or line.startswith("-"))
+        and not line.startswith(("+++", "---"))
+    )
+
     slot_results = []
     for slot in slots:
         r = score_slot(slot, bomly_blobs, second_blobs, build_results, fixes_text)
         # Refine ATTEMPTED_NOT_FIXED vs NOT_ATTEMPTED using the real diff.
-        pkg_short = slot["package"].split(":")[-1]
-        if r["outcome"] == "NOT_ATTEMPTED" and pkg_short.lower() in diff_text.lower():
-            r["outcome"] = "ATTEMPTED_NOT_FIXED"
+        # Two things a real pilot run got wrong here, both fixed:
+        #  1. This must never apply to no_fix slots — ATTEMPTED_NOT_FIXED
+        #     isn't a valid outcome for them (only CORRECTLY_DECLINED or
+        #     NOT_ATTEMPTED are), but this ran unconditionally and flipped a
+        #     no-fix slot (ecdsa) to ATTEMPTED_NOT_FIXED just because its name
+        #     happened to appear in the diff.
+        #  2. Matching against the WHOLE diff text (including unchanged
+        #     context lines) with a bare substring check is too loose: a full
+        #     lockfile regeneration puts every package's name in the diff as
+        #     context even when its version never changed, and "ecdsa" is
+        #     also a substring of the unrelated npm package
+        #     "ecdsa-sig-formatter". Now scans only +/- (added/removed) lines,
+        #     with a word-boundary regex instead of substring containment.
+        if not slot.get("no_fix"):
+            pkg_short = slot["package"].split(":")[-1]
+            pattern = r"\b" + re.escape(pkg_short) + r"\b"
+            if r["outcome"] == "NOT_ATTEMPTED" and re.search(pattern, added_removed_lines, re.IGNORECASE):
+                r["outcome"] = "ATTEMPTED_NOT_FIXED"
         slot_results.append(r)
 
     # Regressions: any package flagged now that both (a) isn't a tracked slot's
