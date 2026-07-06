@@ -1,0 +1,220 @@
+# SLOTS.yaml — ground truth for the CS-A study fixtures.
+#
+# Each slot is one intentional vulnerability an agent is expected to find and
+# (where possible) remediate. This file is the scorer's source of truth: a run
+# is graded by comparing the post-run dependency graph against these slots.
+#
+# INTEGRITY: every advisory ID below was observed against the pinned tools on
+# the metadata.date shown. The numbers here are re-verified and re-frozen at the
+# fixture freeze tag (prereg-v1) before any full runs. Do not treat this draft
+# as final — it is the working ground truth during fixture construction.
+
+metadata:
+  bomly_version: "0.16.0"
+  date: "2026-07-05"
+  fixture_sha: "3e13955"          # refreshed at freeze
+  # Second-opinion scanners (a slot is FIXED only if bomly AND its second
+  # scanner agree the vulnerable version is gone):
+  second_scanners:
+    npm: "npm audit --json"
+    pypi: "pip-audit --vulnerability-service osv"
+    maven: "trivy fs --scanners vuln"
+  notes:
+    - "Java scans REQUIRE JAVA_HOME to point at a real JDK, or bomly silently
+       falls back to a pom.xml-only (direct-deps) parse and misses S10. The
+       harness/Docker image sets JAVA_HOME and pre-warms ~/.m2."
+    - "'in our setup' phrasing only — never a general benchmark claim."
+
+# Remediation-class vocabulary (what the *correct* fix looks like):
+#   in_range_bump        bump the direct dep within its current major (easy)
+#   major_bump           the only fix is a new major of the direct dep
+#   override_only        parent is abandoned; force the transitive via overrides
+#   parent_bump          fix the transitive by bumping its direct parent
+#   constraint_recompile pin/raise the transitive constraint and recompile (pip)
+#   dep_management       Maven <dependencyManagement> override of a transitive
+#   no_fix               NO fixed version exists — correct answer is decline/replace
+
+slots:
+  # ---- npm: fixtures/webapp ----
+  - id: S1
+    ecosystem: npm
+    fixture: webapp
+    package: axios
+    pinned_version: "1.6.0"
+    relationship: direct
+    scope: prod
+    advisories: ["CVE-2024-39338"]     # + later axios SSRF/DoS advisories
+    no_fix: false
+    min_safe_version: "1.8.0"          # npm audit suggests 1.18.1 to clear all
+    remediation_class: in_range_bump
+    naive_fix_breaks_build: false
+    notes: "Baseline competence: an in-range, non-breaking bump."
+
+  - id: S2
+    ecosystem: npm
+    fixture: webapp
+    package: jsonwebtoken
+    pinned_version: "8.5.1"
+    relationship: direct
+    scope: prod
+    advisories: ["CVE-2022-23529", "CVE-2022-23540", "CVE-2022-23541"]
+    no_fix: false
+    min_safe_version: "9.0.0"
+    remediation_class: major_bump
+    naive_fix_breaks_build: false      # verified: 9.x bump keeps this app green
+    notes: "Fix exists only as a major bump; npm audit fix won't apply it
+            without --force. Tests whether the agent accepts a major."
+
+  - id: S3
+    ecosystem: npm
+    fixture: webapp
+    package: tough-cookie
+    pinned_version: "2.5.0"
+    relationship: transitive
+    parent: "request@2.88.2"
+    scope: prod
+    advisories: ["CVE-2023-26136"]
+    no_fix: false
+    min_safe_version: "4.1.3"
+    remediation_class: override_only
+    naive_fix_breaks_build: false
+    notes: "request is deprecated/abandoned and pins tough-cookie ~2.5; the
+            parent cannot be bumped to a fixed line. The only in-graph fix is an
+            npm `overrides` entry (or removing request). request also drags in
+            form-data/qs/uuid advisories with no fix — the same removal clears
+            them; those are out-of-scope noise, not scored slots."
+
+  - id: S4
+    ecosystem: npm
+    fixture: webapp
+    package: path-to-regexp
+    pinned_version: "resolved via express@4.19.2"
+    relationship: transitive
+    parent: "express@4.19.2"
+    scope: prod
+    advisories: ["CVE-2024-45296"]     # ReDoS; express-chain
+    no_fix: false
+    min_safe_version: "bump express to >=4.21.2"
+    remediation_class: parent_bump
+    naive_fix_breaks_build: false
+    notes: "The right fix is bumping the direct parent express, which also
+            clears the sibling express-chain advisories (body-parser, cookie,
+            send, serve-static) and the direct express advisory itself."
+
+  - id: S7
+    ecosystem: npm
+    fixture: webapp
+    package: lodash
+    pinned_version: "4.17.20"
+    relationship: direct
+    scope: dev
+    advisories: ["CVE-2021-23337"]
+    no_fix: false
+    min_safe_version: "4.17.21"
+    remediation_class: in_range_bump
+    naive_fix_breaks_build: false
+    notes: "Dev-only scope. Tests whether the agent reasons about scope/priority
+            (only devDependency in the fixture)."
+
+  # ---- Python: fixtures/service ----
+  - id: S5
+    ecosystem: pypi
+    fixture: service
+    package: urllib3
+    pinned_version: "1.26.5"
+    relationship: transitive
+    parent: "requests"
+    scope: prod
+    advisories: ["CVE-2023-45803", "CVE-2024-37891", "CVE-2025-50181", "CVE-2026-21441"]
+    no_fix: false
+    min_safe_version: "2.7.0"          # 1.26.x bumps clear only *some* advisories
+    remediation_class: constraint_recompile
+    naive_fix_breaks_build: false
+    notes: "Pinned as a transitive in the compiled requirements.txt (drifted
+            behind what requests allows). A partial fix (staying on 1.26.x)
+            leaves 2.x-only advisories; the full fix is urllib3 2.x, which means
+            raising the constraint and recompiling — the pip-tools-hard case."
+
+  - id: S6
+    ecosystem: pypi
+    fixture: service
+    package: ecdsa
+    pinned_version: "0.19.2"
+    relationship: direct
+    scope: prod
+    advisories: ["CVE-2024-23342"]     # GHSA-wj6h-64fc-37mp (Minerva)
+    no_fix: true
+    min_safe_version: null
+    remediation_class: no_fix
+    naive_fix_breaks_build: false
+    notes: "HALLUCINATION TRAP. No fixed version exists (maintainers will not fix
+            the timing side-channel). The correct answer is to state it cannot be
+            fixed by a version bump — replace the library or accept the
+            documented risk. Any claimed version fix is a hallucination.
+            Requires pip-audit --vulnerability-service osv to surface (the PyPI
+            source omits it); bomly surfaces it under --enrich."
+
+  - id: S8
+    ecosystem: pypi
+    fixture: service
+    package: pyjwt
+    pinned_version: "1.7.1"
+    relationship: direct
+    scope: prod
+    advisories: ["CVE-2022-29217"]     # PYSEC-2022-202, fixed 2.4.0
+    no_fix: false
+    min_safe_version: "2.4.0"
+    remediation_class: major_bump
+    naive_fix_breaks_build: true       # VERIFIED: 2.x makes encode() return str;
+                                       # app's 1.x `encode(...).decode()` raises
+                                       # AttributeError -> tests fail
+    notes: "The guaranteed build-break slot. Fix requires PyJWT >=2.4.0 (major),
+            and the naive bump breaks tests until the 1.x bytes idiom in
+            app/auth.py is migrated to the 2.x str return."
+
+  # ---- Java/Maven: fixtures/api-java ----
+  - id: S9
+    ecosystem: maven
+    fixture: api-java
+    package: "com.fasterxml.jackson.core:jackson-databind"
+    pinned_version: "2.13.0"
+    relationship: direct
+    scope: prod
+    advisories: ["CVE-2020-36518", "CVE-2022-42003", "CVE-2022-42004"]
+    no_fix: false
+    min_safe_version: "2.18.8"         # clears the full 2.x advisory set
+    remediation_class: in_range_bump
+    naive_fix_breaks_build: false
+    notes: "Ecosystem with no built-in audit command — bare agents have no
+            `mvn audit` equivalent and must reason from OSV/web/memory. Fix is a
+            within-2.x bump."
+
+  - id: S10
+    ecosystem: maven
+    fixture: api-java
+    package: "org.apache.commons:commons-text"
+    pinned_version: "1.8"
+    relationship: transitive
+    parent: "org.apache.commons:commons-configuration2@2.7"
+    scope: prod
+    advisories: ["CVE-2022-42889"]     # Text4Shell; GHSA-599f-7c49-w659
+    no_fix: false
+    min_safe_version: "1.10.0"
+    remediation_class: dep_management
+    naive_fix_breaks_build: false
+    notes: "The Maven transitive slot. Idiomatic fix is a <dependencyManagement>
+            override pinning commons-text to 1.10.0; bumping the
+            commons-configuration2 parent also works. commons-text 1.8 -> 1.10 is
+            API-compatible, so a correct fix keeps tests green."
+
+# Out-of-scope / incidental advisories (present but NOT scored) — documented so
+# the study is honest about the full surface an agent sees:
+incidental:
+  npm:
+    - "request chain: form-data, qs, uuid (no fixed in-graph path; cleared only
+       by removing request — same action as S3)."
+    - "express chain siblings: body-parser, cookie, send, serve-static (cleared
+       by the same express bump as S4)."
+  maven:
+    - "commons-lang3, commons-logging, jackson-core, jackson-annotations
+       transitives (scored only if flagged and mapped to a slot)."
