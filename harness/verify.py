@@ -50,6 +50,41 @@ def load_slots() -> list[dict]:
 FIXTURE_DIR = {"npm": "webapp", "pypi": "service", "maven": "api-java"}
 
 
+def resolve_java_home() -> str:
+    """Find a JDK 17+ home directory, portably.
+
+    Inside harness/Dockerfile, JAVA_HOME is always set via ENV, so this only
+    matters for local/bare-host use (e.g. `make verify-only` outside the
+    container). Tries, in order: the JAVA_HOME env var (any OS); macOS's
+    `/usr/libexec/java_home` (a no-op error, not a crash, on other OSes); the
+    common Linux JVM install glob. No hardcoded package-manager path is used
+    as a silent fallback — if nothing is found, this raises a clear,
+    actionable error instead of guessing a path that may not exist on the
+    caller's machine.
+    """
+    env_value = os.environ.get("JAVA_HOME")
+    if env_value:
+        return env_value
+
+    mac = run_capture(["/usr/libexec/java_home"])
+    if mac.returncode == 0 and mac.stdout.strip():
+        return mac.stdout.strip()
+
+    for candidate in sorted(Path("/usr/lib/jvm").glob("*"), reverse=True) if Path("/usr/lib/jvm").is_dir() else []:
+        if (candidate / "bin" / "java").exists():
+            return str(candidate)
+
+    raise SystemExit(
+        "JAVA_HOME is not set and no JDK could be auto-detected.\n"
+        "Set it explicitly, e.g.:\n"
+        "  macOS (Homebrew):  export JAVA_HOME=\"$(/usr/libexec/java_home)\"\n"
+        "  Linux:             export JAVA_HOME=/usr/lib/jvm/<your-jdk-17>\n"
+        "  Windows (WSL):     same as Linux, inside the WSL shell\n"
+        "Inside harness/Dockerfile this is always pre-set — this error should "
+        "only appear when running verify.py/run.py directly on the bare host."
+    )
+
+
 def rebuild_and_test(repo: Path, scope: str) -> dict:
     """Fresh-install rebuild + test each in-scope fixture. Returns pass/fail per app."""
     results = {}
@@ -72,7 +107,7 @@ def rebuild_and_test(repo: Path, scope: str) -> dict:
             test = run_capture([str(venv / "bin" / "pytest"), "-q"], cwd=path, timeout=180) if install.returncode == 0 else install
             build = install
         elif d == "api-java":
-            java_home = os.environ.get("JAVA_HOME") or run_capture(["/usr/libexec/java_home"]).stdout.strip() or "/opt/homebrew/opt/openjdk"
+            java_home = resolve_java_home()
             env = os.environ.copy()
             env["JAVA_HOME"] = java_home
             env["PATH"] = f"{java_home}/bin:" + env.get("PATH", "")
@@ -95,7 +130,7 @@ def bomly_scan(repo: Path, fixture_dir: str) -> dict:
     path = repo / "fixtures" / fixture_dir
     env = os.environ.copy()
     if fixture_dir == "api-java":
-        java_home = env.get("JAVA_HOME") or run_capture(["/usr/libexec/java_home"]).stdout.strip() or "/opt/homebrew/opt/openjdk"
+        java_home = resolve_java_home()
         env["JAVA_HOME"] = java_home
         env["PATH"] = f"{java_home}/bin:" + env.get("PATH", "")
     p = subprocess.run(

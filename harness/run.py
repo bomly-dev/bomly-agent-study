@@ -15,8 +15,19 @@ Isolation, per fixture (see ../cs-a-design.md and TRACKER CS-A2):
     use the stdio transport, so the AGENT CLI ITSELF spawns `bomly mcp serve`
     as its own child subprocess for the duration of that one invocation. It
     cannot outlive the run or be shared across runs — the client owns it.
-  - Credentials are passed via environment variables only (ANTHROPIC_API_KEY /
-    OPENAI_API_KEY), never written to any file under the workspace or repo.
+  - Credentials, two supported modes (see ../CREDENTIALS.md):
+      1. Subscription-based: harness/run.sh mounts a dedicated, external
+         credential directory READ-ONLY into the container at /creds/claude
+         and/or /creds/codex (populated once, outside this repo, via
+         `claude setup-token` / `codex login`). This script copies only the
+         known credential file(s) from there into THIS run's fresh, empty
+         config dir before invoking the adapter — the read-only mount means
+         no run can ever write back into the template, and the template is
+         never used to run an actual agent session itself, so it never
+         accumulates conversation history to begin with.
+      2. API key: ANTHROPIC_API_KEY / OPENAI_API_KEY environment variables,
+         inherited as-is, never written to any file under the workspace.
+    If a /creds mount is present for an agent, it takes precedence.
 
 Usage:
   run.py <claude|codex> <bare|mcp> <run-number> [--scope webapp|service|api-java]
@@ -38,6 +49,59 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURE_TAG_ENV = "BOMLY_STUDY_FIXTURE_REF"  # set at freeze; defaults to HEAD pre-freeze
 DEFAULT_TIMEOUT_SECONDS = 45 * 60
+
+# Fixed mount points harness/run.sh uses for the read-only credential
+# template directories (see CREDENTIALS.md). Not configurable here — the
+# container-internal path is an implementation detail; what's configurable is
+# where run.sh mounts FROM on the host (BOMLY_STUDY_*_CREDS_DIR).
+CLAUDE_CREDS_MOUNT = Path("/creds/claude")
+CODEX_CREDS_MOUNT = Path("/creds/codex")
+
+# Codex's OAuth/API credential file is well-documented and stable — copy just
+# this one file, never the whole directory, so a stray config.toml in the
+# template (if one ever exists there) can't collide with the MCP-server
+# registration `codex mcp add` writes into THIS run's fresh CODEX_HOME below.
+CODEX_CRED_FILES = ["auth.json"]
+
+# Claude Code's exact credential filename for `claude setup-token` output
+# hasn't been confirmed against a real template directory yet (first real
+# pilot run should confirm and this list should be tightened accordingly).
+# Try known/likely candidates first; if none match, fall back to copying the
+# whole template tree so auth still works, but flag that fallback in
+# meta.json (credential_copy_mode) so it's visible and auditable rather than
+# silently uncertain.
+CLAUDE_CRED_FILES = [".credentials.json", ".claude.json"]
+
+
+def copy_credentials(mount_point: Path, known_files: list[str], dest: Path) -> str:
+    """Copy only known credential file(s) from a read-only template mount
+    into this run's fresh config dir. Returns a mode string recorded in
+    meta.json: 'none' (no mount present — falling back to API key env vars),
+    'known-files' (copied only the expected credential file(s)), or
+    'full-tree-fallback' (none of the known filenames were found; copied
+    everything as a functional fallback — should be tightened once verified).
+    """
+    if not mount_point.is_dir():
+        return "none"
+    matched = [f for f in known_files if (mount_point / f).exists()]
+    if matched:
+        for name in matched:
+            src = mount_point / name
+            if src.is_dir():
+                shutil.copytree(src, dest / name, dirs_exist_ok=True)
+            else:
+                shutil.copy(src, dest / name)
+        return "known-files"
+    # Fallback: copy everything. Safe because mount_point is read-only and
+    # (for Claude) is expected to only ever hold setup-token output, never a
+    # real session's history.
+    for item in mount_point.iterdir():
+        dest_item = dest / item.name
+        if item.is_dir():
+            shutil.copytree(item, dest_item, dirs_exist_ok=True)
+        else:
+            shutil.copy(item, dest_item)
+    return "full-tree-fallback"
 
 
 def now_iso() -> str:
@@ -142,6 +206,7 @@ def main() -> int:
         "timeout": False,
         "exit_code": None,
         "mcp_tool_errors": [],
+        "credential_copy_mode": None,
     }
 
     bomly_path = shutil.which("bomly")
@@ -168,8 +233,10 @@ def main() -> int:
         env = os.environ.copy()
         if args.agent == "claude":
             env["CLAUDE_CONFIG_DIR"] = str(agent_config_dir)
+            meta["credential_copy_mode"] = copy_credentials(CLAUDE_CREDS_MOUNT, CLAUDE_CRED_FILES, agent_config_dir)
         elif args.agent == "codex":
             env["CODEX_HOME"] = str(agent_config_dir)
+            meta["credential_copy_mode"] = copy_credentials(CODEX_CREDS_MOUNT, CODEX_CRED_FILES, agent_config_dir)
             if args.condition == "mcp":
                 # Codex has no per-invocation --mcp-config flag; it reads MCP
                 # servers from $CODEX_HOME/config.toml. `codex mcp add` writes
