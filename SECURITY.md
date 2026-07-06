@@ -9,8 +9,7 @@ can measure how coding agents remediate them. This is by design.
 - **Do not deploy** any application in this repository.
 - **Do not copy** its dependency manifests or pinned versions into real projects.
 - The vulnerabilities here are **already public** (each is tracked by an OSV /
-  CVE / GHSA advisory, recorded in [`fixtures/SLOTS.yaml`](fixtures/SLOTS.yaml)).
-  Nothing here is a new or undisclosed weakness.
+  CVE / GHSA advisory). Nothing here is a new or undisclosed weakness.
 
 Every package we pin is a *vulnerable* release of an otherwise-legitimate
 package. We do **not** include malicious or compromised packages, install-time

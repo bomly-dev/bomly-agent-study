@@ -20,15 +20,12 @@
   </properties>
 
   <dependencies>
-    <!-- S9: direct, known-vulnerable jackson-databind (fix is an in-range bump). -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.13.0</version>
     </dependency>
 
-    <!-- S10: pulls commons-text transitively (the vulnerable one). The clean
-         Maven fix is a dependencyManagement override of commons-text. -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-configuration2</artifactId>

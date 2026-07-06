@@ -169,7 +169,41 @@ AGENT_EXCLUDED_PATHS = [
     "CREDENTIALS.md",
     "METHODOLOGY.md",
     "LIMITATIONS.md",
+    # Found in the same pass as the above, checking what a real pilot run
+    # could actually see: the root README.md describes the entire study
+    # design in plain English (harness/ and prompts/ layout, "the ground-
+    # truth SLOTS.yaml", the scoring rubric, credential setup) — arguably as
+    # informative as the excluded directories themselves. scripts/ is a
+    # maintainer-only dev tool (verify-fixtures.sh) that also names
+    # SLOTS.yaml directly.
+    "README.md",
+    "scripts",
 ]
+
+# General mechanism for files that mix legitimate agent-facing content with
+# sensitive detail (e.g. fixtures/api-java/README.md's practical JAVA_HOME
+# setup vs. its "Vulnerability slots" section, which is answer-key-equivalent
+# for that fixture specifically) — whole-file exclusion would throw away the
+# legitimate part too. Anything between these HTML-comment markers is
+# stripped from every text file in the agent's workspace.
+AGENT_EXCLUDE_BEGIN = "<!-- AGENT-EXCLUDE:BEGIN -->"
+AGENT_EXCLUDE_END = "<!-- AGENT-EXCLUDE:END -->"
+
+
+def _strip_excluded_sections(root: Path) -> None:
+    pattern = re.compile(
+        re.escape(AGENT_EXCLUDE_BEGIN) + r".*?" + re.escape(AGENT_EXCLUDE_END) + r"\n?",
+        re.DOTALL,
+    )
+    for path in root.rglob("*"):
+        if not path.is_file() or path.is_relative_to(root / ".git"):
+            continue
+        try:
+            text = path.read_text()
+        except (UnicodeDecodeError, ValueError):
+            continue  # binary file, nothing to strip
+        if AGENT_EXCLUDE_BEGIN in text:
+            path.write_text(pattern.sub("", text))
 
 
 MAKEFILE_HARNESS_MARKER = "# --- Harness targets ---"
@@ -228,16 +262,25 @@ def fresh_clone(workspace: Path, ref: str) -> None:
             target.unlink()
 
     _trim_agent_makefile(dest / "Makefile")
+    _strip_excluded_sections(dest)
 
     # Fresh, single-commit git history over the redacted tree — enough for
     # `git diff`/`git status` to work normally, nothing more to discover.
+    # Generic identity/message: the ORIGINAL version used "bomly-agent-study"
+    # as the commit author name, which a `git log`/`git show` inspection
+    # would surface even with history otherwise squashed to one commit —
+    # naming the study in its own git metadata.
     subprocess.run(["git", "-C", str(dest), "init", "--quiet"], check=True)
     subprocess.run(["git", "-C", str(dest), "add", "-A"], check=True)
     subprocess.run(
-        ["git", "-C", str(dest), "-c", "user.email=study@bomly.dev", "-c", "user.name=bomly-agent-study",
-         "commit", "--quiet", "-m", "baseline"],
+        ["git", "-C", str(dest), "-c", "user.email=fixture@example.com", "-c", "user.name=fixture",
+         "commit", "--quiet", "-m", "Initial commit"],
         check=True,
     )
+    # `git commit` writes reflog entries (.git/logs/) even for this one
+    # commit, carrying the same author/message metadata again — belt and
+    # suspenders, drop them; reflogs aren't needed for git diff/status.
+    shutil.rmtree(dest / ".git" / "logs", ignore_errors=True)
 
 
 def write_condition_files(dest: Path, condition: str) -> None:

@@ -1,9 +1,10 @@
 # api-java fixture
 
-A small Java 17 + Maven service (`report-api`) used in the study. Intentionally
+A small Java 17 + Maven service (`report-api`). Intentionally
 vulnerable — see [../../SECURITY.md](../../SECURITY.md).
 
-## Vulnerability slots
+<!-- AGENT-EXCLUDE:BEGIN -->
+## Vulnerability slots (ground truth — not agent-visible)
 
 - **S9 — jackson-databind 2.13.0** (direct). Known CVEs; the fix is an in-range
   bump within the 2.x line (e.g. to a current 2.18+/2.19+ release).
@@ -11,6 +12,7 @@ vulnerable — see [../../SECURITY.md](../../SECURITY.md).
   Text4Shell, CVE-2022-42889. The idiomatic Maven fix is a
   `<dependencyManagement>` override pinning `commons-text` to `1.10.0`
   (bumping the `commons-configuration2` parent also works).
+<!-- AGENT-EXCLUDE:END -->
 
 ## Requirements to build, test, and scan
 
@@ -19,8 +21,8 @@ vulnerable — see [../../SECURITY.md](../../SECURITY.md).
   Maven detector runs `mvn dependency:tree` to resolve the full transitive
   graph, and that step only runs when a JDK is discoverable. If `JAVA_HOME` is
   unset, bomly silently falls back to a pom.xml-only parse that sees **direct
-  dependencies only** — so the transitive slot (S10) would be missed. Always
-  scan this fixture with `JAVA_HOME` set:
+  dependencies only** — transitive dependencies would be missed entirely.
+  Always scan this fixture with `JAVA_HOME` set:
 
   ```bash
   # macOS with a JDK registered via /usr/libexec/java_home (e.g. Oracle/Temurin installers):
@@ -38,15 +40,12 @@ vulnerable — see [../../SECURITY.md](../../SECURITY.md).
   bomly scan --path . --enrich --audit
   ```
 
-  `harness/verify.py`'s `resolve_java_home()` tries `JAVA_HOME`, then
-  `/usr/libexec/java_home` (macOS), then a `/usr/lib/jvm/*` glob (common
-  Linux layout) — but never guesses a specific path silently. If none of
-  those resolve, it raises a clear error rather than picking one machine's
-  path at random (that used to be a bug here: an earlier version hardcoded
-  the Apple-Silicon-Homebrew path as a fallback, which is wrong on every
-  other machine).
-
-The study's Docker image (`harness/Dockerfile`) sets `JAVA_HOME` itself and
-pre-warms `~/.m2` with `mvn dependency:go-offline` at build time, so scans
-*inside the container* are deterministic and need no local JDK setup at all —
-the guidance above is only for running this fixture directly on your host.
+  This fixture's own tooling resolves `JAVA_HOME` the same way: env var
+  first, then `/usr/libexec/java_home` (macOS), then a `/usr/lib/jvm/*` glob
+  (common Linux layout) — never a hardcoded guess, since that's wrong on
+  most machines.
+<!-- AGENT-EXCLUDE:BEGIN -->
+  (Internal note: `harness/verify.py`'s `resolve_java_home()` and
+  `harness/Dockerfile`'s pre-warmed `~/.m2` implement this — not relevant
+  outside this repo's own tooling.)
+<!-- AGENT-EXCLUDE:END -->
