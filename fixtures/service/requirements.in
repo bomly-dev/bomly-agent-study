@@ -1,0 +1,10 @@
+# Top-level runtime dependencies. Compile to requirements.txt with:
+#   pip-compile requirements.in
+# (requirements.txt is the pinned, installed-from file — see the note there
+# about the urllib3 pin.)
+fastapi
+uvicorn
+requests
+jinja2
+pyjwt==1.7.1
+ecdsa
