@@ -1,8 +1,11 @@
-# bomly-agent-study — top-level tasks.
+# Top-level build/test tasks.
 #
 # `make test` rebuilds every fixture from clean installs and runs its test
-# suite. A run's fixes are judged against these same commands, so "the fix broke
-# the build" is mechanically detectable.
+# suite.
+# <!-- AGENT-EXCLUDE:BEGIN -->
+# (Internal note: a run's fixes are judged against these same commands, so
+# "the fix broke the build" is mechanically detectable.)
+# <!-- AGENT-EXCLUDE:END -->
 
 PYTHON ?= python3.12
 
