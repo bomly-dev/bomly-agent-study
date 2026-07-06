@@ -5,11 +5,20 @@
 #
 # Every binary version here is pinned and recorded in each run's meta.json.
 # This image is where --permission-mode bypassPermissions (Claude Code) and
-# --dangerously-bypass-approvals-and-sandbox (Codex, only if ever enabled)
-# are allowed to execute — harness/adapters/*.py refuse to use those modes
-# unless BOTH /.dockerenv exists AND BOMLY_STUDY_IN_CONTAINER=1 is set (set
-# below), so an unattended, unrestricted agent never runs on the operator's
-# bare host.
+# --dangerously-bypass-approvals-and-sandbox (Codex) are allowed to execute —
+# harness/adapters/*.py refuse to use those modes unless BOTH /.dockerenv
+# exists AND BOMLY_STUDY_IN_CONTAINER=1 is set (set below), so an unattended,
+# unrestricted agent never runs on the operator's bare host.
+#
+# Both bypass modes are load-bearing here, confirmed via real pilot runs, not
+# assumed: Codex's own internal `workspace-write` sandbox uses bubblewrap to
+# create a Linux user namespace, which Docker's default container profile
+# blocks outright ("bwrap: No permissions to create a new namespace") —
+# irrelevant to root vs. non-root, since this container already IS the
+# sandbox boundary Codex's docs say that flag is "intended solely for."
+# Claude Code's bypassPermissions, separately, refuses to run at all as root
+# ("cannot be used with root/sudo privileges for security reasons") — that's
+# why this image creates and runs as a non-root user below.
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -69,9 +78,22 @@ RUN curl -fsSL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib
 COPY harness/requirements.txt /tmp/harness-requirements.txt
 RUN pip3 install --break-system-packages --quiet -r /tmp/harness-requirements.txt
 
+# --- Non-root user ---
+# Confirmed via a real pilot run, not assumed: Claude Code refuses
+# `--permission-mode bypassPermissions` outright when running as root/sudo
+# ("cannot be used with root/sudo privileges for security reasons"). Reusing
+# the `ubuntu` user the base image already ships (UID/GID 1000, home
+# /home/ubuntu) rather than creating a new one — `useradd --uid 1000` failed
+# here with "UID 1000 is not unique" on a first real build, since Ubuntu
+# 24.04 provisions that account itself.
+USER ubuntu
+ENV HOME=/home/ubuntu
+
 # --- Pre-warm Maven's local repo so the api-java scan/build is fully offline
-#     inside the container (see fixtures/api-java/README.md) ---
-COPY fixtures/api-java/pom.xml /tmp/warm-pom/pom.xml
+#     inside the container (see fixtures/api-java/README.md). Done as the
+#     `ubuntu` user (not root) so it warms $HOME/.m2 under the same account
+#     that will actually run `mvn` at study time.
+COPY --chown=ubuntu:ubuntu fixtures/api-java/pom.xml /tmp/warm-pom/pom.xml
 RUN cd /tmp/warm-pom && mvn -q dependency:go-offline && rm -rf /tmp/warm-pom
 
 WORKDIR /work

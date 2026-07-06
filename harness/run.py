@@ -216,6 +216,7 @@ def main() -> int:
         "timeout": False,
         "exit_code": None,
         "mcp_tool_errors": [],
+        "stderr_tail": None,
         "credential_copy_mode": None,
     }
 
@@ -277,6 +278,7 @@ def main() -> int:
                 "mcp_calls": 0,
                 "mcp_tool_errors": [],
                 "normalized_events": [],
+                "stderr_tail": None,
             }
         else:
             result = adapter_mod.run(
@@ -301,6 +303,7 @@ def main() -> int:
                 "timeout": result.get("timeout", False),
                 "exit_code": result.get("exit_code"),
                 "mcp_tool_errors": result.get("mcp_tool_errors", []),
+                "stderr_tail": result.get("stderr_tail"),
             }
         )
 

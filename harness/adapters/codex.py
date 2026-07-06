@@ -5,19 +5,21 @@ Isolation notes specific to this adapter:
     empty per-run directory — never the operator's real ~/.codex.
   - No `codex exec resume` is ever used. Every invocation starts a brand new
     session with no memory of any other run.
-  - Sandbox: `-s workspace-write` is Codex's own OS-level sandbox, scoped to
-    the workspace, and is documented as safe for unattended/agentic use
-    without needing external containment — unlike Claude Code's
-    bypassPermissions, this does NOT require the container guard by default.
-    `sandbox_workspace_write.network_access=true` is set because the task
-    needs package-registry access (npm/pip installs), matching the "full
-    egress in both conditions" isolation note in cs-a-design.md.
-  - `--dangerously-bypass-approvals-and-sandbox` is NOT used by default. It
-    exists only as an escape hatch if workspace-write proves insufficient,
-    and if ever enabled it must go through the same `_require_container()`
-    guard as Claude's bypassPermissions, per Ahmed's decision — Codex's own
-    docs describe that flag as "intended solely for running in environments
-    that are externally sandboxed."
+  - Sandbox: `--dangerously-bypass-approvals-and-sandbox` is the default here
+    (Ahmed's decision, 2026-07-06), behind the same `_require_container()`
+    guard as Claude's bypassPermissions. This was NOT the original design —
+    `-s workspace-write` (Codex's own internal sandbox) was tried first, on
+    the theory that it's documented as safe for unattended use without
+    needing external containment. A real pilot run proved that wrong inside
+    Docker specifically: workspace-write shells out through bubblewrap to
+    create a Linux user namespace, and Docker's default container security
+    profile blocks that outright ("bwrap: No permissions to create a new
+    namespace"), regardless of root vs. non-root — every command failed
+    before running. Since this container already IS the external sandbox
+    boundary (network and filesystem scoped, ephemeral, never reused across
+    runs), asking Codex to also nest its own sandbox inside it was redundant
+    even before it broke — matching what Codex's own docs say the
+    dangerous-bypass flag is "intended solely for."
 
 Schema note: Codex's `--json` JSONL event schema is less well-established here
 than Claude's; this parser is defensive (buckets unrecognized event types
@@ -57,7 +59,10 @@ def run(
     raw_transcript_path: Path,
     mcp_config_path: Path | None,
 ) -> dict:
-    use_dangerous_bypass = os.environ.get("BOMLY_STUDY_CODEX_DANGEROUS_BYPASS") == "1"
+    # Default ON (Ahmed's 2026-07-06 decision) — set to "0" to force Codex's
+    # own workspace-write sandbox instead (known broken under Docker, kept
+    # only for comparison/debugging on a host where it might actually work).
+    use_dangerous_bypass = os.environ.get("BOMLY_STUDY_CODEX_DANGEROUS_BYPASS", "1") == "1"
     if use_dangerous_bypass:
         _require_container()
 
@@ -94,7 +99,11 @@ def run(
     timed_out = False
     raw_lines: list[str] = []
     exit_code = None
-    with open(raw_transcript_path, "w") as raw_f:
+    stderr_text = ""
+    stderr_path = raw_transcript_path.with_suffix(raw_transcript_path.suffix + ".stderr.log")
+    # See claude.py for why this is always captured: a fast, silent failure
+    # writes nothing useful to stdout, and stderr used to be discarded here.
+    with open(raw_transcript_path, "w") as raw_f, open(stderr_path, "w") as err_f:
         try:
             proc = subprocess.run(
                 cmd,
@@ -106,6 +115,8 @@ def run(
             )
             raw_f.write(proc.stdout)
             raw_lines = proc.stdout.splitlines()
+            stderr_text = proc.stderr
+            err_f.write(stderr_text)
             exit_code = proc.returncode
         except subprocess.TimeoutExpired as e:
             timed_out = True
@@ -113,6 +124,9 @@ def run(
                 out = e.stdout if isinstance(e.stdout, str) else e.stdout.decode("utf-8", "replace")
                 raw_f.write(out)
                 raw_lines = out.splitlines()
+            if e.stderr:
+                stderr_text = e.stderr if isinstance(e.stderr, str) else e.stderr.decode("utf-8", "replace")
+                err_f.write(stderr_text)
 
     normalized_events = []
     turns = 0
@@ -164,4 +178,5 @@ def run(
         "mcp_calls": mcp_calls,
         "mcp_tool_errors": mcp_tool_errors,
         "normalized_events": normalized_events,
+        "stderr_tail": stderr_text[-2000:] if stderr_text else None,
     }

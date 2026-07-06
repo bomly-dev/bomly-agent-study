@@ -166,10 +166,36 @@ def second_scanner(repo: Path, ecosystem: str) -> str:
 
 
 def package_present(blob, package_needle: str) -> bool:
+    """Used for the SECOND-SCANNER blobs only (npm audit --json, pip-audit's
+    text table, trivy's text table). All three only ever mention a package
+    when it has a finding — a clean package doesn't appear at all — so a
+    substring match is safe there. This is NOT safe for bomly's own JSON (see
+    bomly_package_vulnerable below) and must never be used on it: a real pilot
+    run proved bomly lists every scanned package, clean or not, so this same
+    substring check against bomly's blob made it structurally impossible for
+    any in-place version bump to ever score FIXED (the package's clean
+    listing still contains its own name).
+    """
     s = blob if isinstance(blob, str) else json.dumps(blob)
     # Match on the bare package name (last path segment for maven coordinates).
     needle = package_needle.split(":")[-1]
     return needle.lower() in s.lower()
+
+
+def bomly_package_vulnerable(bomly_scan_result: dict, package_needle: str) -> bool:
+    """True iff bomly's scan lists this package with a non-empty
+    vulnerabilities array. Matches by bare package name (last path segment
+    for maven coordinates: "org.apache.commons:commons-text" -> "commons-text"),
+    since bomly's `packages[].name` field isn't always the fully-qualified
+    coordinate.
+    """
+    needle = package_needle.split(":")[-1].lower()
+    for pkg in bomly_scan_result.get("packages", []) or []:
+        name = (pkg.get("name") or "").lower()
+        if name == needle or name.endswith("/" + needle) or name.endswith(":" + needle):
+            if pkg.get("vulnerabilities"):
+                return True
+    return False
 
 
 def read_fixes_md(repo: Path) -> str:
@@ -179,7 +205,7 @@ def read_fixes_md(repo: Path) -> str:
 
 def score_slot(slot: dict, bomly_blobs: dict, second_blobs: dict, build_results: dict, fixes_text: str) -> dict:
     fixture_dir = FIXTURE_DIR[slot["ecosystem"]]
-    bomly_still_flagged = package_present(bomly_blobs.get(fixture_dir, {}), slot["package"])
+    bomly_still_flagged = bomly_package_vulnerable(bomly_blobs.get(fixture_dir, {}), slot["package"])
     second_still_flagged = package_present(second_blobs.get(slot["ecosystem"], ""), slot["package"])
     still_vulnerable = bomly_still_flagged or second_still_flagged  # either scanner seeing it = not clean
     build = build_results.get(fixture_dir, {})

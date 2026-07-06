@@ -95,7 +95,15 @@ def run(
     timed_out = False
     raw_lines: list[str] = []
     exit_code = None
-    with open(raw_transcript_path, "w") as raw_f:
+    stderr_text = ""
+    stderr_path = raw_transcript_path.with_suffix(raw_transcript_path.suffix + ".stderr.log")
+    # A fast, silent failure (bad flag, auth/permission refusal, crash before
+    # any stream-json output) is exactly the case where stdout alone tells
+    # you nothing — this cost real debugging time on the first pilot run
+    # (Claude Code's root-privilege refusal wrote nothing to stdout and
+    # exited in 0.36s; the actual error was only in stderr, which used to be
+    # captured and silently discarded). Always write stderr to its own file.
+    with open(raw_transcript_path, "w") as raw_f, open(stderr_path, "w") as err_f:
         try:
             proc = subprocess.run(
                 cmd,
@@ -107,6 +115,8 @@ def run(
             )
             raw_f.write(proc.stdout)
             raw_lines = proc.stdout.splitlines()
+            stderr_text = proc.stderr
+            err_f.write(stderr_text)
             exit_code = proc.returncode
         except subprocess.TimeoutExpired as e:
             timed_out = True
@@ -114,6 +124,9 @@ def run(
                 out = e.stdout if isinstance(e.stdout, str) else e.stdout.decode("utf-8", "replace")
                 raw_f.write(out)
                 raw_lines = out.splitlines()
+            if e.stderr:
+                stderr_text = e.stderr if isinstance(e.stderr, str) else e.stderr.decode("utf-8", "replace")
+                err_f.write(stderr_text)
 
     normalized_events = []
     turns = 0
@@ -177,4 +190,5 @@ def run(
         "mcp_calls": mcp_calls,
         "mcp_tool_errors": mcp_tool_errors,
         "normalized_events": normalized_events,
+        "stderr_tail": stderr_text[-2000:] if stderr_text else None,
     }
