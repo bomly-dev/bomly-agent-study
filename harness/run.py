@@ -2,8 +2,17 @@
 """Run one agent+condition end to end, in an isolated workspace.
 
 Isolation, per fixture (see ../cs-a-design.md and TRACKER CS-A2):
-  - Fresh `git clone` of the fixture repo into a throwaway workspace (never
-    reuses a prior run's checkout, never a shared worktree).
+  - Fresh workspace per run, never reused, never a shared worktree — but NOT
+    a plain `git clone` of this repo. A real pilot run proved that wrong:
+    Claude Code read fixtures/SLOTS.yaml (the scorer's ground-truth answer
+    key) on its own initiative, and declined to use it — but the fixture
+    repo genuinely does ship its own answer key to whatever clones it,
+    regardless of whether that particular model chose not to exploit it. See
+    AGENT_EXCLUDED_PATHS and fresh_clone() below: the agent's workspace is a
+    history-free snapshot (`git archive`, not `git clone`) with the
+    answer key, the scoring engine (harness/), both conditions' instructions
+    (prompts/), and every other run's output (runs/, runs-pilot/) removed
+    before the agent ever sees the directory.
   - Fresh, EMPTY per-run config directories for the agent CLI
     (CLAUDE_CONFIG_DIR / CODEX_HOME) so conversation history, project-trust
     decisions, and MCP registrations never carry across runs, and never touch
@@ -134,14 +143,68 @@ def run_capture(cmd: list[str], **kw) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True, **kw)
 
 
+# Never expose these to the agent's workspace — a real pilot run proved this
+# necessary: Claude Code read fixtures/SLOTS.yaml on its own (the scorer's
+# ground-truth answer key — advisory IDs, minimum safe versions, remediation
+# class per slot) and, to its credit, refused to just transcribe it and asked
+# for guidance instead of proceeding. A less careful model, or the same model
+# on a different day, might not. A plain `git clone` of this repo hands the
+# agent everything: the answer key, harness/ (the entire scoring engine —
+# enough to reverse-engineer or game it), prompts/ (BOTH conditions'
+# instructions, so a "bare" run could read condition-mcp/CLAUDE.md and learn
+# an MCP server exists — defeating the bare/mcp comparison), and every other
+# run's FIXES.md/diff under runs/ or runs-pilot/. A regular clone ALSO carries
+# full git history, so even deleting these paths from the working tree
+# wouldn't be enough — `git log -p` / `git show <old-sha>:fixtures/SLOTS.yaml`
+# could still retrieve them. See _agent_facing_snapshot() below for the fix.
+AGENT_EXCLUDED_PATHS = [
+    "fixtures/SLOTS.yaml",
+    "harness",
+    "prompts",
+    "scoring",
+    "runs",
+    "runs-pilot",
+    "analysis",
+    "CREDENTIALS.md",
+    "METHODOLOGY.md",
+    "LIMITATIONS.md",
+]
+
+
 def fresh_clone(workspace: Path, ref: str) -> None:
-    """Clone the fixture repo fresh into workspace/repo at the given ref."""
+    """Materialize the agent's workspace at workspace/repo: the fixture tree
+    at the frozen ref, with AGENT_EXCLUDED_PATHS removed, and NO git history —
+    just a single fresh commit over the already-redacted tree, so later
+    diff-capture (`git -C repo diff`) still works unchanged, comparing
+    against exactly what the agent was shown, nothing more.
+    """
     dest = workspace / "repo"
-    subprocess.run(["git", "clone", "--quiet", str(REPO_ROOT), str(dest)], check=True)
-    subprocess.run(["git", "-C", str(dest), "checkout", "--quiet", ref], check=True)
-    # A clone still carries .git history/remotes — irrelevant to the agent's
-    # task but harmless; the workspace itself is unique and freshly created
-    # per run and is deleted after artifact capture.
+    dest.mkdir(parents=True)
+    # `git archive` reads directly from REPO_ROOT's own history at `ref` and
+    # extracts a plain file tree — no .git, no history, nothing beyond what's
+    # in that one tree to inspect.
+    archive_proc = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "archive", "--format=tar", ref],
+        capture_output=True, check=True,
+    )
+    subprocess.run(["tar", "-x", "-C", str(dest)], input=archive_proc.stdout, check=True)
+
+    for rel in AGENT_EXCLUDED_PATHS:
+        target = dest / rel
+        if target.is_dir():
+            shutil.rmtree(target, ignore_errors=True)
+        elif target.exists():
+            target.unlink()
+
+    # Fresh, single-commit git history over the redacted tree — enough for
+    # `git diff`/`git status` to work normally, nothing more to discover.
+    subprocess.run(["git", "-C", str(dest), "init", "--quiet"], check=True)
+    subprocess.run(["git", "-C", str(dest), "add", "-A"], check=True)
+    subprocess.run(
+        ["git", "-C", str(dest), "-c", "user.email=study@bomly.dev", "-c", "user.name=bomly-agent-study",
+         "commit", "--quiet", "-m", "baseline"],
+        check=True,
+    )
 
 
 def write_condition_files(dest: Path, condition: str) -> None:
