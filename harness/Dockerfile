@@ -29,8 +29,18 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # --- JDK 17 (api-java fixture; matches maven.compiler.release in pom.xml) ---
-RUN curl -fsSL -o /tmp/openjdk17.tar.gz \
-      https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz \
+# TARGETARCH is set automatically by BuildKit (amd64|arm64) — Docker Desktop
+# on Apple Silicon builds arm64 by default, and an emulated amd64 JVM under
+# Rosetta failed here on first build ("failed to open elf ... Trace/breakpoint
+# trap"), so both binaries below are fetched per-arch rather than hardcoded.
+ARG TARGETARCH
+RUN case "$TARGETARCH" in \
+      amd64) JDK_ARCH=x64 ;; \
+      arm64) JDK_ARCH=aarch64 ;; \
+      *) echo "unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
+    esac \
+    && curl -fsSL -o /tmp/openjdk17.tar.gz \
+      "https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-${JDK_ARCH}_bin.tar.gz" \
     && mkdir -p /opt/openjdk-17 \
     && tar -xzf /tmp/openjdk17.tar.gz -C /opt/openjdk-17 --strip-components=1 \
     && rm /tmp/openjdk17.tar.gz
@@ -39,7 +49,7 @@ RUN curl -fsSL -o /tmp/openjdk17.tar.gz \
 #     metadata.bomly_version before freeze) ---
 ARG BOMLY_VERSION=0.16.0
 RUN curl -fsSL -o /tmp/bomly.tar.gz \
-      "https://github.com/bomly-dev/bomly-cli/releases/download/v${BOMLY_VERSION}/bomly_${BOMLY_VERSION}_linux_amd64.tar.gz" \
+      "https://github.com/bomly-dev/bomly-cli/releases/download/v${BOMLY_VERSION}/bomly_${BOMLY_VERSION}_linux_${TARGETARCH}.tar.gz" \
     && tar -xzf /tmp/bomly.tar.gz -C /usr/local/bin bomly \
     && rm /tmp/bomly.tar.gz \
     && bomly --version
