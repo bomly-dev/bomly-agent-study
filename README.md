@@ -33,21 +33,23 @@ what's actually been verified vs. what should work.
 
 ### 1. Get credentials
 
-You need either a Claude Code or a Codex CLI credential — see
-[CREDENTIALS.md](CREDENTIALS.md) for the full guide. Short version: run
-**one** of these once, then leave the resulting directory in place (the
-harness reads from it on every run; it's never modified):
+You need a Claude Code and/or a Codex CLI credential — see
+[CREDENTIALS.md](CREDENTIALS.md) for the full guide, including why the two
+agents are set up differently (a real pilot run caught a wrong assumption
+here — Claude's isn't a directory-based credential the way Codex's is).
 
 ```bash
-# Subscription-based (session-limited, no per-token billing) — recommended:
-mkdir -p ~/.bomly-study-creds/claude && \
-  CLAUDE_CONFIG_DIR=~/.bomly-study-creds/claude claude setup-token
-mkdir -p ~/.bomly-study-creds/codex && \
-  CODEX_HOME=~/.bomly-study-creds/codex codex login
+# Claude Code: prints a token — export it yourself, never paste it anywhere:
+claude setup-token
+export CLAUDE_CODE_OAUTH_TOKEN=<the token you were just given>
 
-# OR: API key (pay-per-token), no setup needed beyond exporting it:
-export ANTHROPIC_API_KEY=...   # for claude runs
-export OPENAI_API_KEY=...      # for codex runs
+# Codex: writes a real credential file, so it's set up into a dedicated dir:
+mkdir -p ~/.bomly-study-creds/codex
+CODEX_HOME=~/.bomly-study-creds/codex codex login
+
+# OR, for either agent: API key (pay-per-token), no setup beyond exporting it:
+export ANTHROPIC_API_KEY=...   # for claude runs, if CLAUDE_CODE_OAUTH_TOKEN isn't set
+export OPENAI_API_KEY=...      # for codex runs, if no /creds/codex mount is present
 ```
 
 ### 2. Run one agent+condition end to end

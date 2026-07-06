@@ -16,23 +16,25 @@
 # BOMLY_STUDY_CODEX_MODEL / BOMLY_STUDY_CODEX_EFFORT; an empty string falls
 # back to that CLI's own default instead of the study default.
 #
-# Auth — TWO supported modes, see CREDENTIALS.md for the full setup:
-#   1. Subscription-based (session-limited, no extra cost): run
-#      `claude setup-token` / `codex login` once into a dedicated directory
-#      (default ~/.bomly-study-creds/{claude,codex}; override with
-#      BOMLY_STUDY_CLAUDE_CREDS_DIR / BOMLY_STUDY_CODEX_CREDS_DIR). This
-#      script mounts that directory READ-ONLY into the container; run.py
-#      copies only the credential file it needs into that run's fresh,
-#      throwaway config dir before invoking the agent — the mounted template
-#      is never written to, and no conversation history ever touches it.
-#   2. API key: set ANTHROPIC_API_KEY / OPENAI_API_KEY in the calling shell.
-# If both are present for an agent, the credential-directory mode wins.
+# Auth — see CREDENTIALS.md. The two agents work differently, corrected after
+# a real pilot run proved the original (symmetric, directory-mount-based)
+# design wrong for Claude:
+#   - Claude Code: subscription auth is CLAUDE_CODE_OAUTH_TOKEN, an env var
+#     produced once via `claude setup-token` (NOT a directory-based
+#     credential — Claude Code's OAuth session normally lives in the macOS
+#     Keychain, which doesn't exist in a Linux container; setup-token exists
+#     to produce a portable token instead). Falls back to ANTHROPIC_API_KEY.
+#   - Codex: subscription auth genuinely IS file-based — `codex login`
+#     writes auth.json into CODEX_HOME. Run it once into a dedicated
+#     directory (default ~/.bomly-study-creds/codex; override with
+#     BOMLY_STUDY_CODEX_CREDS_DIR); this script mounts that READ-ONLY into
+#     the container, and run.py copies just auth.json into that run's fresh,
+#     throwaway CODEX_HOME. Falls back to OPENAI_API_KEY if no mount exists.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 IMAGE="bomly-agent-study:harness"
 
-CLAUDE_CREDS_DIR="${BOMLY_STUDY_CLAUDE_CREDS_DIR:-$HOME/.bomly-study-creds/claude}"
 CODEX_CREDS_DIR="${BOMLY_STUDY_CODEX_CREDS_DIR:-$HOME/.bomly-study-creds/codex}"
 
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
@@ -41,15 +43,13 @@ if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
 fi
 
 MOUNT_ARGS=()
-if [ -d "$CLAUDE_CREDS_DIR" ]; then
-  MOUNT_ARGS+=(-v "$CLAUDE_CREDS_DIR:/creds/claude:ro")
-fi
 if [ -d "$CODEX_CREDS_DIR" ]; then
   MOUNT_ARGS+=(-v "$CODEX_CREDS_DIR:/creds/codex:ro")
 fi
 
 docker run --rm \
   -e ANTHROPIC_API_KEY \
+  -e CLAUDE_CODE_OAUTH_TOKEN \
   -e OPENAI_API_KEY \
   -e BOMLY_STUDY_FIXTURE_REF \
   -e BOMLY_STUDY_CLAUDE_MODEL \

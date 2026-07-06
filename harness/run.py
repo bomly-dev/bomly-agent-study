@@ -15,19 +15,29 @@ Isolation, per fixture (see ../cs-a-design.md and TRACKER CS-A2):
     use the stdio transport, so the AGENT CLI ITSELF spawns `bomly mcp serve`
     as its own child subprocess for the duration of that one invocation. It
     cannot outlive the run or be shared across runs — the client owns it.
-  - Credentials, two supported modes (see ../CREDENTIALS.md):
-      1. Subscription-based: harness/run.sh mounts a dedicated, external
-         credential directory READ-ONLY into the container at /creds/claude
-         and/or /creds/codex (populated once, outside this repo, via
-         `claude setup-token` / `codex login`). This script copies only the
-         known credential file(s) from there into THIS run's fresh, empty
-         config dir before invoking the adapter — the read-only mount means
-         no run can ever write back into the template, and the template is
-         never used to run an actual agent session itself, so it never
-         accumulates conversation history to begin with.
-      2. API key: ANTHROPIC_API_KEY / OPENAI_API_KEY environment variables,
-         inherited as-is, never written to any file under the workspace.
-    If a /creds mount is present for an agent, it takes precedence.
+  - Credentials — the two agents work differently here, corrected after a
+    real pilot run proved the original design wrong for Claude (see
+    ../CREDENTIALS.md for the full story):
+      * Claude Code: subscription-based auth is `CLAUDE_CODE_OAUTH_TOKEN`, an
+        environment variable produced once via `claude setup-token` — NOT a
+        directory-based credential. (The original design tried copying
+        `.claude.json` out of a mounted CLAUDE_CONFIG_DIR template; that file
+        turned out to hold zero auth state — Claude Code's OAuth session
+        normally lives in the macOS Keychain, which doesn't exist in a Linux
+        container, and `setup-token` exists specifically to produce a
+        portable env-var token instead.) Falls back to ANTHROPIC_API_KEY if
+        the token isn't set. Either way: inherited as an environment
+        variable only, never written to any file under the workspace.
+      * Codex: subscription-based auth genuinely IS file-based — `codex
+        login` writes `auth.json` into CODEX_HOME. harness/run.sh mounts a
+        dedicated, external credential directory READ-ONLY into the
+        container at /creds/codex (populated once, outside this repo);
+        this script copies just that one file into THIS run's fresh, empty
+        CODEX_HOME before invoking the adapter. The read-only mount means no
+        run can ever write back into the template, and the template is never
+        used to run an actual agent session itself, so it never accumulates
+        conversation history. Falls back to OPENAI_API_KEY if no mount is
+        present.
 
 Usage:
   run.py <claude|codex> <bare|mcp> <run-number> [--scope webapp|service|api-java]
@@ -50,34 +60,27 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURE_TAG_ENV = "BOMLY_STUDY_FIXTURE_REF"  # set at freeze; defaults to HEAD pre-freeze
 DEFAULT_TIMEOUT_SECONDS = 45 * 60
 
-# Fixed mount points harness/run.sh uses for the read-only credential
-# template directories (see CREDENTIALS.md). Not configurable here — the
+# Fixed mount point harness/run.sh uses for Codex's read-only credential
+# template directory (see CREDENTIALS.md). Not configurable here — the
 # container-internal path is an implementation detail; what's configurable is
-# where run.sh mounts FROM on the host (BOMLY_STUDY_*_CREDS_DIR).
-CLAUDE_CREDS_MOUNT = Path("/creds/claude")
+# where run.sh mounts FROM on the host (BOMLY_STUDY_CODEX_CREDS_DIR). Claude
+# has no equivalent: its subscription credential is CLAUDE_CODE_OAUTH_TOKEN,
+# an environment variable, not a file — see the module docstring.
 CODEX_CREDS_MOUNT = Path("/creds/codex")
 
-# Codex's OAuth/API credential file is well-documented and stable — copy just
+# Codex's OAuth credential file is well-documented and stable — copy just
 # this one file, never the whole directory, so a stray config.toml in the
 # template (if one ever exists there) can't collide with the MCP-server
 # registration `codex mcp add` writes into THIS run's fresh CODEX_HOME below.
 CODEX_CRED_FILES = ["auth.json"]
 
-# Claude Code's exact credential filename for `claude setup-token` output
-# hasn't been confirmed against a real template directory yet (first real
-# pilot run should confirm and this list should be tightened accordingly).
-# Try known/likely candidates first; if none match, fall back to copying the
-# whole template tree so auth still works, but flag that fallback in
-# meta.json (credential_copy_mode) so it's visible and auditable rather than
-# silently uncertain.
-CLAUDE_CRED_FILES = [".credentials.json", ".claude.json"]
-
 
 def copy_credentials(mount_point: Path, known_files: list[str], dest: Path) -> str:
     """Copy only known credential file(s) from a read-only template mount
-    into this run's fresh config dir. Returns a mode string recorded in
-    meta.json: 'none' (no mount present — falling back to API key env vars),
-    'known-files' (copied only the expected credential file(s)), or
+    into this run's fresh config dir (Codex only — see module docstring for
+    why Claude doesn't use this path). Returns a mode string recorded in
+    meta.json: 'none' (no mount present — falling back to the API key env
+    var), 'known-files' (copied only the expected credential file(s)), or
     'full-tree-fallback' (none of the known filenames were found; copied
     everything as a functional fallback — should be tightened once verified).
     """
@@ -92,9 +95,7 @@ def copy_credentials(mount_point: Path, known_files: list[str], dest: Path) -> s
             else:
                 shutil.copy(src, dest / name)
         return "known-files"
-    # Fallback: copy everything. Safe because mount_point is read-only and
-    # (for Claude) is expected to only ever hold setup-token output, never a
-    # real session's history.
+    # Fallback: copy everything. Safe because mount_point is read-only.
     for item in mount_point.iterdir():
         dest_item = dest / item.name
         if item.is_dir():
@@ -102,6 +103,17 @@ def copy_credentials(mount_point: Path, known_files: list[str], dest: Path) -> s
         else:
             shutil.copy(item, dest_item)
     return "full-tree-fallback"
+
+
+def claude_credential_mode(env: dict) -> str:
+    """Claude's credential isn't a file to copy — just report which env var
+    resolved so meta.json stays informative and symmetric with Codex's
+    credential_copy_mode field."""
+    if env.get("CLAUDE_CODE_OAUTH_TOKEN"):
+        return "oauth-token-env-var"
+    if env.get("ANTHROPIC_API_KEY"):
+        return "api-key-env-var"
+    return "none"
 
 
 def now_iso() -> str:
@@ -243,8 +255,13 @@ def main() -> int:
 
         env = os.environ.copy()
         if args.agent == "claude":
+            # CLAUDE_CONFIG_DIR is still set to a fresh, empty per-run dir —
+            # still worth isolating whatever local cache/trust state Claude
+            # Code writes during a session — but nothing is copied into it.
+            # Auth is CLAUDE_CODE_OAUTH_TOKEN (or ANTHROPIC_API_KEY), plain
+            # environment variables inherited via os.environ.copy() above.
             env["CLAUDE_CONFIG_DIR"] = str(agent_config_dir)
-            meta["credential_copy_mode"] = copy_credentials(CLAUDE_CREDS_MOUNT, CLAUDE_CRED_FILES, agent_config_dir)
+            meta["credential_copy_mode"] = claude_credential_mode(env)
         elif args.agent == "codex":
             env["CODEX_HOME"] = str(agent_config_dir)
             meta["credential_copy_mode"] = copy_credentials(CODEX_CREDS_MOUNT, CODEX_CRED_FILES, agent_config_dir)
