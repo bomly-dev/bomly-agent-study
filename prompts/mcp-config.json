@@ -2,7 +2,7 @@
   "mcpServers": {
     "bomly": {
       "command": "bomly",
-      "args": ["mcp", "serve", "--path", "."]
+      "args": ["mcp", "serve"]
     }
   }
 }

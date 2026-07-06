@@ -384,9 +384,14 @@ def main() -> int:
 
         # No separately-managed MCP server process: prompts/mcp-config.json
         # uses the stdio transport, so the agent CLI itself spawns
-        # `bomly mcp serve --path .` as its own child subprocess, scoped to
-        # exactly this one invocation and inheriting cwd=repo. It cannot
-        # outlive the run or be shared across runs — the client owns it.
+        # `bomly mcp serve` (no path flag — bomly's MCP tools take `path` as
+        # a per-call argument, not a server-startup flag; passing --path
+        # here caused the subprocess to exit immediately with "unknown
+        # flag: --path", which is why every mcp-condition run so far had
+        # zero real mcp_calls — the server never got a chance to start) as
+        # its own child subprocess, scoped to exactly this one invocation
+        # and inheriting cwd=repo. It cannot outlive the run or be shared
+        # across runs — the client owns it.
         adapter_mod = __import__(f"adapters.{args.agent}", fromlist=["run"])
 
         prompt_path = REPO_ROOT / "prompts" / "PROMPT.md"
@@ -411,7 +416,7 @@ def main() -> int:
                 # at this run's fresh, empty config dir keeps the
                 # registration scoped to this run only.
                 subprocess.run(
-                    ["codex", "mcp", "add", "bomly", "--", "bomly", "mcp", "serve", "--path", "."],
+                    ["codex", "mcp", "add", "bomly", "--", "bomly", "mcp", "serve"],
                     env=env, cwd=repo, check=True, capture_output=True, text=True,
                 )
 
