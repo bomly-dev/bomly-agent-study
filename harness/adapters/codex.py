@@ -145,25 +145,42 @@ def run(
             continue
 
         etype = ev.get("type", "")
-        # Defensive bucketing — Codex's JSONL schema uses event names like
-        # "item.completed"/"turn.completed"/etc; match loosely on substrings
-        # rather than assuming an exact enum, and record everything so the
-        # raw transcript remains the source of truth regardless.
-        lower = etype.lower()
-        if "turn" in lower:
+        # Real schema, confirmed against actual pilot-run transcripts (this
+        # was originally guessed and wrong — see below): the OUTER type is
+        # thread.started / turn.started / turn.completed / item.started /
+        # item.completed. The interesting content (what kind of item this
+        # is — a shell command, an agent message, an MCP tool call) is
+        # NESTED at ev["item"]["type"], never at the top level. The first
+        # version of this parser matched substrings against the OUTER type
+        # only, so "item.completed"/"item.started" (containing neither
+        # "turn" nor "tool"/"function_call"/"command") fell through to
+        # "unknown" every time — only turn.started/turn.completed happened
+        # to contain "turn", so turns counted correctly by accident while
+        # tool_calls and mcp_calls silently stayed at 0 for every real run
+        # until this was caught by a suspiciously-zero result.
+        item = ev.get("item") or {}
+        item_type = str(item.get("type", ""))
+
+        if etype == "turn.completed":
             turns += 1
             normalized_events.append({"type": "turn", "raw_type": etype})
-        elif "tool" in lower or "function_call" in lower or "command" in lower:
-            tool_name = ev.get("name") or ev.get("tool") or ev.get("command", "")
-            is_mcp = "mcp" in lower or "bomly" in str(tool_name).lower()
+        elif etype == "item.completed" and item_type == "command_execution":
             tool_calls += 1
-            if is_mcp:
-                mcp_calls += 1
-            if ev.get("error") or ev.get("is_error"):
-                mcp_tool_errors.append({"tool": str(tool_name), "error": str(ev.get("error") or "")[:500]})
-            normalized_events.append({"type": "tool_call", "tool": str(tool_name), "is_mcp": is_mcp})
-        elif "message" in lower or "text" in lower:
-            normalized_events.append({"type": "text", "raw_type": etype, "text": str(ev.get("text", ""))[:2000]})
+            failed = item.get("status") == "failed" or (item.get("exit_code") not in (None, 0))
+            normalized_events.append(
+                {"type": "tool_call", "tool": item.get("command", ""), "is_mcp": False, "failed": failed}
+            )
+        elif etype == "item.completed" and item_type == "mcp_tool_call":
+            tool_calls += 1
+            mcp_calls += 1
+            tool_name = f"{item.get('server', '')}/{item.get('tool', '')}"
+            if item.get("error"):
+                mcp_tool_errors.append({"tool": tool_name, "error": str(item.get("error"))[:500]})
+            normalized_events.append({"type": "tool_call", "tool": tool_name, "is_mcp": True})
+        elif etype == "item.completed" and item_type == "agent_message":
+            normalized_events.append({"type": "text", "role": "assistant", "text": str(item.get("text", ""))[:2000]})
+        elif etype in ("item.started",):
+            pass  # superseded by the matching item.completed; avoid double-counting
         else:
             normalized_events.append({"type": etype or "unknown"})
 
