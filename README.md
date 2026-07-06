@@ -61,7 +61,34 @@ it. `AGENT` is `claude` or `codex`; `CONDITION` is `bare` or `mcp`; `SCOPE` is
 `webapp`, `service`, `api-java`, or `all` (all three, slower). Output lands in
 `runs/<agent>/<condition>/<run-number>/` — raw transcript, normalized
 transcript, `diff.patch`, `FIXES.md`, `meta.json`, `timing.json`, and
-`result.json` (the per-slot verdicts).
+`result.json` (the per-slot verdicts). Both `model` and the reasoning-effort
+level actually used are recorded in `meta.json`.
+
+#### Model and reasoning effort
+
+| | Model | Effort | Env var overrides |
+|---|---|---|---|
+| Claude Code | `claude-sonnet-5` | `high` | `BOMLY_STUDY_CLAUDE_MODEL`, `BOMLY_STUDY_CLAUDE_EFFORT` |
+| Codex | `gpt-5.5` | `medium` | `BOMLY_STUDY_CODEX_MODEL`, `BOMLY_STUDY_CODEX_EFFORT` |
+
+Both defaults were confirmed against the real CLIs, not guessed: Claude
+Code's `--effort` flag accepts `low`/`medium`/`high`/`xhigh`/`max`; `gpt-5.5`
+is a real, current Codex model slug (`codex debug models`) whose own default
+reasoning level is `medium`, with `low`/`medium`/`high`/`xhigh` supported —
+Codex sets it via the `model_reasoning_effort` config key. Set any override
+to an **empty string** to fall back to that CLI's own default instead of the
+study's default, e.g.:
+
+```bash
+BOMLY_STUDY_CLAUDE_MODEL=claude-opus-4-8 BOMLY_STUDY_CLAUDE_EFFORT=xhigh \
+  make reproduce-one AGENT=claude CONDITION=mcp SCOPE=webapp
+```
+
+The final run set (frozen before the `prereg-v1` tag, see
+[METHODOLOGY.md](METHODOLOGY.md) once published) pins one specific
+model+effort pair per agent for the whole study — these env vars are for
+picking that pair and for pilot/exploration, not for mixing models within a
+single published run set.
 
 To exercise the isolation/scoring pipeline without invoking a real agent or
 touching any credentials (useful for checking your setup, costs nothing):

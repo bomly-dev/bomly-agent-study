@@ -9,6 +9,13 @@
 # Usage:
 #   harness/run.sh <claude|codex> <bare|mcp> <run-number> [--scope webapp|service|api-java]
 #
+# Model/effort defaults (Ahmed, 2026-07-06): Claude Code -> claude-sonnet-5 at
+# --effort high; Codex -> gpt-5.5 at reasoning effort medium (both confirmed
+# against the real CLIs, not guessed — see harness/adapters/*.py). Override
+# per run with BOMLY_STUDY_CLAUDE_MODEL / BOMLY_STUDY_CLAUDE_EFFORT /
+# BOMLY_STUDY_CODEX_MODEL / BOMLY_STUDY_CODEX_EFFORT; an empty string falls
+# back to that CLI's own default instead of the study default.
+#
 # Auth — TWO supported modes, see CREDENTIALS.md for the full setup:
 #   1. Subscription-based (session-limited, no extra cost): run
 #      `claude setup-token` / `codex login` once into a dedicated directory
@@ -46,7 +53,9 @@ docker run --rm \
   -e OPENAI_API_KEY \
   -e BOMLY_STUDY_FIXTURE_REF \
   -e BOMLY_STUDY_CLAUDE_MODEL \
+  -e BOMLY_STUDY_CLAUDE_EFFORT \
   -e BOMLY_STUDY_CODEX_MODEL \
+  -e BOMLY_STUDY_CODEX_EFFORT \
   -e BOMLY_STUDY_MAX_BUDGET_USD \
   "${MOUNT_ARGS[@]}" \
   -v "$ROOT:/work/bomly-agent-study" \

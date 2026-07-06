@@ -64,7 +64,17 @@ def run(
     version_p = subprocess.run(["codex", "--version"], capture_output=True, text=True, env=env)
     agent_version = version_p.stdout.strip()
 
-    model = env.get("BOMLY_STUDY_CODEX_MODEL")  # pinned at freeze; None = CLI default
+    # Defaults per Ahmed's 2026-07-06 decision; override with
+    # BOMLY_STUDY_CODEX_MODEL / BOMLY_STUDY_CODEX_EFFORT (empty string
+    # disables the corresponding flag). Both values confirmed against the
+    # real model catalog (`codex debug models`): slug "gpt-5.5" exists, its
+    # own CLI default reasoning level is "medium", and supported levels are
+    # low/medium/high/xhigh. The config key `model_reasoning_effort` was
+    # confirmed by inspecting strings in the installed codex binary — not
+    # documented in `--help`, so this is worth re-checking against a newer
+    # Codex CLI release before assuming it still applies.
+    model = env.get("BOMLY_STUDY_CODEX_MODEL", "gpt-5.5")
+    effort = env.get("BOMLY_STUDY_CODEX_EFFORT", "medium")
 
     cmd = ["codex", "exec", prompt, "--json"]
     if use_dangerous_bypass:
@@ -72,7 +82,9 @@ def run(
     else:
         cmd += ["-s", "workspace-write", "-c", "sandbox_workspace_write.network_access=true"]
     if model:
-        cmd += ["-c", f'model="{model}"']
+        cmd += ["-m", model]
+    if effort:
+        cmd += ["-c", f'model_reasoning_effort="{effort}"']
     # mcp_config_path is unused here: unlike Claude's --mcp-config flag, Codex
     # reads MCP servers from $CODEX_HOME/config.toml. run.py registers the
     # bomly server via `codex mcp add` against this run's fresh CODEX_HOME
@@ -144,6 +156,7 @@ def run(
     return {
         "agent_version": agent_version,
         "model": model,
+        "effort": effort or None,
         "exit_code": exit_code,
         "timeout": timed_out,
         "turns": turns,

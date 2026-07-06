@@ -200,7 +200,8 @@ def main() -> int:
         "bomly_version": None,
         "bomly_sha256": None,
         "agent_version": None,
-        "model": os.environ.get("BOMLY_STUDY_MODEL", "unset — pin at freeze"),
+        "model": None,
+        "effort": None,
         "started_at": None,
         "ended_at": None,
         "timeout": False,
@@ -259,6 +260,7 @@ def main() -> int:
             result = {
                 "agent_version": "dry-run (no agent invoked)",
                 "model": "n/a",
+                "effort": "n/a",
                 "exit_code": 0,
                 "timeout": False,
                 "turns": 0,
@@ -284,6 +286,7 @@ def main() -> int:
             {
                 "agent_version": result.get("agent_version"),
                 "model": result.get("model", meta["model"]),
+                "effort": result.get("effort", meta["effort"]),
                 "started_at": started,
                 "ended_at": ended,
                 "timeout": result.get("timeout", False),

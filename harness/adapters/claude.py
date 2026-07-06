@@ -68,7 +68,13 @@ def run(
     version_p = subprocess.run(["claude", "--version"], capture_output=True, text=True, env=env)
     agent_version = version_p.stdout.strip()
 
-    model = env.get("BOMLY_STUDY_CLAUDE_MODEL")  # pinned at freeze; None = CLI default
+    # Defaults per Ahmed's 2026-07-06 decision; override with
+    # BOMLY_STUDY_CLAUDE_MODEL / BOMLY_STUDY_CLAUDE_EFFORT (empty string
+    # disables the corresponding flag and falls back to the CLI's own
+    # default). --effort is a real Claude Code flag (low/medium/high/xhigh/max
+    # — confirmed via `claude --help`), not a model-name suffix.
+    model = env.get("BOMLY_STUDY_CLAUDE_MODEL", "claude-sonnet-5")
+    effort = env.get("BOMLY_STUDY_CLAUDE_EFFORT", "high")
     max_budget = env.get("BOMLY_STUDY_MAX_BUDGET_USD", "5")
 
     cmd = [
@@ -81,6 +87,8 @@ def run(
     ]
     if model:
         cmd += ["--model", model]
+    if effort:
+        cmd += ["--effort", effort]
     if condition == "mcp" and mcp_config_path:
         cmd += ["--mcp-config", str(mcp_config_path)]
 
@@ -161,6 +169,7 @@ def run(
     return {
         "agent_version": agent_version,
         "model": model,
+        "effort": effort or None,
         "exit_code": exit_code,
         "timeout": timed_out,
         "turns": turns,
