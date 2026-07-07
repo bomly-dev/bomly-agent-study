@@ -377,6 +377,8 @@ def _looks_unrelated(diff_text: str) -> bool:
 def verify_from_run(run_dir: Path) -> dict:
     """Zero-API-key re-audit: fresh-clone the frozen ref, apply diff.patch, score."""
     meta = json.loads((run_dir / "meta.json").read_text())
+    timing_path = run_dir / "timing.json"
+    timing = json.loads(timing_path.read_text()) if timing_path.exists() else {}
     diff_path = run_dir / "diff.patch"
     workspace = Path(tempfile.mkdtemp(prefix="bomly-verify-only-"))
     try:
@@ -388,7 +390,27 @@ def verify_from_run(run_dir: Path) -> dict:
         fixes_src = run_dir / "FIXES.md"
         if fixes_src.exists():
             shutil.copy(fixes_src, repo / "FIXES.md")
-        return verify_workspace(repo, meta.get("scope", "all"), fixture_ref=meta["fixture_ref"])
+        result = verify_workspace(repo, meta.get("scope", "all"), fixture_ref=meta["fixture_ref"])
+        # Reconstruct run_meta from meta.json/timing.json — verify_workspace()
+        # itself has no notion of which run it's scoring, only run.py's
+        # inline path (right after a live run) sets this normally. Missing
+        # this here silently dropped agent/condition/run_number/mcp_calls
+        # from every run rescored via `make verify-only`, which then went
+        # missing from aggregate.py's CSV too (found when the aggregated
+        # results showed blank agent/condition columns for exactly the runs
+        # that had been rescored and promoted this way).
+        result["run_meta"] = {
+            "agent": meta.get("agent"),
+            "condition": meta.get("condition"),
+            "run_number": meta.get("run_number"),
+            "wall_seconds": timing.get("wall_seconds"),
+            "timeout": timing.get("timeout", meta.get("timeout")),
+            "turns": timing.get("turns"),
+            "tool_calls": timing.get("tool_calls"),
+            "mcp_calls": timing.get("mcp_calls"),
+            "mcp_tool_errors": meta.get("mcp_tool_errors", []),
+        }
+        return result
     finally:
         shutil.rmtree(workspace, ignore_errors=True)
 
