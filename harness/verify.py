@@ -162,9 +162,27 @@ def second_scanner(repo: Path, ecosystem: str) -> str:
         p = run_capture(["npm", "audit", "--json"], cwd=repo / "fixtures" / "webapp", timeout=120)
         return p.stdout
     if ecosystem == "pypi":
-        pip_audit = shutil.which("pip-audit")
+        # Deliberately NOT resolved via ambient PATH (shutil.which) anymore.
+        # pip-audit lives in an isolated venv (harness/Dockerfile's
+        # /opt/study-tools) specifically so it's invisible to bomly's own
+        # pip detector, which falls back to inspecting whatever's on the
+        # ambient interpreter's PATH when no project venv exists yet — a
+        # real pilot run proved that fallback picks up pip-audit's own
+        # dependency tree if pip-audit is ambient-installed. Same isolated
+        # path for local/bare-host use (harness/.venv, created by this
+        # repo's own tooling) and BOMLY_STUDY_PIP_AUDIT for anything else.
+        pip_audit = (
+            os.environ.get("BOMLY_STUDY_PIP_AUDIT")
+            or next((p for p in ("/opt/study-tools/bin/pip-audit",) if Path(p).exists()), None)
+            or shutil.which("pip-audit")
+        )
         if not pip_audit:
-            raise SystemExit("pip-audit not found on PATH (harness prerequisite, like npm/trivy)")
+            raise SystemExit(
+                "pip-audit not found. Expected /opt/study-tools/bin/pip-audit (inside the study "
+                "Docker image) or BOMLY_STUDY_PIP_AUDIT set to its path (local/bare-host use) — "
+                "not ambient PATH, since that's exactly what caused bomly's own pip detector to "
+                "misresolve in a real pilot run."
+            )
         p = run_capture(
             [pip_audit, "-r", "requirements.txt", "--vulnerability-service", "osv", "--progress-spinner", "off"],
             cwd=repo / "fixtures" / "service", timeout=180,

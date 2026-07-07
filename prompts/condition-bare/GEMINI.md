@@ -5,4 +5,4 @@ This repo has three small applications under `fixtures/`: `webapp` (Node/npm),
 manifest and test suite.
 
 Use whatever tools you prefer to investigate dependencies (e.g., `npm audit`
-and `pip-audit` are available on PATH for the applicable ecosystems).
+is on PATH; `pip-audit` is at `/opt/study-tools/bin/pip-audit`).

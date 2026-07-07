@@ -71,12 +71,30 @@ RUN npm install -g \
       "@openai/codex@${CODEX_VERSION}"
 
 # --- Second-opinion scanners (independent of bomly; used by verify.py) ---
-RUN pip3 install --break-system-packages --quiet pip-audit
-RUN curl -fsSL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-
-# --- Harness Python deps ---
+# pip-audit and the harness's own Python deps (PyYAML) go into a DEDICATED
+# venv at /opt/study-tools, deliberately NOT on the ambient PATH. A real
+# pilot run proved why this matters: bomly's pip detector needs an installed
+# environment to resolve requirements.txt's dependency graph (the file
+# itself has no edge/parent-child data), and when no project-specific venv
+# exists yet (i.e. the agent calls bomly_scan before running `pip install` —
+# a completely realistic thing to do first), it falls back to inspecting
+# whatever's on the ambient interpreter's PATH via `pip inspect --local`
+# (internal/detectors/python/venv.go in bomly-cli, confirmed by reading the
+# source). With pip-audit installed system-wide, that fallback returned
+# pip-audit's OWN dependency tree (cachecontrol, boolean-py, cyclonedx-
+# python-lib, ...) instead of the fixture's actual requirements.txt — a real
+# run's bomly_scan call on the Python fixture came back looking clean,
+# because it was silently scanning the wrong project. Reproduced directly:
+# with pip-audit merely present on PATH, `bomly scan --path
+# fixtures/service` returns pip-audit's dependency list, not the fixture's.
+# Keeping the ambient python3.12/pip3 as clean as a genuinely fresh
+# developer machine — nothing installed beyond the base interpreter — is
+# also just the more realistic simulation regardless of this specific bug.
+RUN python3.12 -m venv /opt/study-tools
 COPY harness/requirements.txt /tmp/harness-requirements.txt
-RUN pip3 install --break-system-packages --quiet -r /tmp/harness-requirements.txt
+RUN /opt/study-tools/bin/pip install --quiet --upgrade pip \
+    && /opt/study-tools/bin/pip install --quiet pip-audit -r /tmp/harness-requirements.txt
+RUN curl -fsSL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
 # --- Non-root user ---
 # Confirmed via a real pilot run, not assumed: Claude Code refuses
