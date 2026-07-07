@@ -10,7 +10,7 @@
 PYTHON ?= python3.12
 
 .PHONY: test test-webapp test-service test-java clean \
-        reproduce-one verify-only aggregate
+        reproduce-one verify-only aggregate study
 
 test: test-webapp test-service test-java ## Build + test all three fixtures from clean
 
@@ -53,3 +53,11 @@ verify-only: ## Re-score an already-published run, no API key needed:  make veri
 
 aggregate: ## Roll per-run result.json files into analysis/results.csv (or results-pilot.csv with PILOT=1)
 	$(PYTHON) harness/aggregate.py $(PILOT_FLAG)
+
+N ?= 5
+AGENTS ?= claude,codex
+CONDITIONS ?= bare,mcp
+STUDY_SCOPE ?= all
+
+study: ## Run the full agent x condition x N matrix, resuming past any already-valid runs. Safe to re-invoke after a session-limit interruption — only re-executes missing/invalid cells. DRY=1 to preview without running.
+	$(PYTHON) harness/run_study.py --agents $(AGENTS) --conditions $(CONDITIONS) --n $(N) --scope $(STUDY_SCOPE) $(PILOT_FLAG) $(if $(DRY),--dry-run,)

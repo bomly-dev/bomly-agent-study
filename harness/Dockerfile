@@ -56,7 +56,12 @@ RUN case "$TARGETARCH" in \
 
 # --- bomly CLI (pinned release; verify against fixtures/SLOTS.yaml's
 #     metadata.bomly_version before freeze) ---
-ARG BOMLY_VERSION=0.16.0
+# 0.16.1: picks up the pip-detector fix (bomly-cli#237/#238/#239) — the
+# ambient-interpreter fallback no longer resolves an unrelated project's
+# dependencies when the Python fixture has no venv yet. This is what caused
+# the mcp-condition pilot batch to under-report on fixtures/service; those 4
+# runs (runs-pilot/*/mcp/*) predate this fix and are not representative.
+ARG BOMLY_VERSION=0.16.1
 RUN curl -fsSL -o /tmp/bomly.tar.gz \
       "https://github.com/bomly-dev/bomly-cli/releases/download/v${BOMLY_VERSION}/bomly_${BOMLY_VERSION}_linux_${TARGETARCH}.tar.gz" \
     && tar -xzf /tmp/bomly.tar.gz -C /usr/local/bin bomly \
