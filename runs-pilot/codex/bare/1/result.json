@@ -1,0 +1,132 @@
+{
+  "scope": "all",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "webapp": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "  duration_ms: 18.80975\n  type: 'test'\n  ...\n# Subtest: fetches a remote XML feed\nok 10 - fetches a remote XML feed\n  ---\n  duration_ms: 6.65775\n  type: 'test'\n  ...\n# Subtest: parses bookmarks out of the XML\nok 11 - parses bookmarks out of the XML\n  ---\n  duration_ms: 1.384292\n  type: 'test'\n  ...\n# Subtest: POST /import ingests an XML body\nok 12 - POST /import ingests an XML body\n  ---\n  duration_ms: 11.759541\n  type: 'test'\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 139.455084",
+      "test_stderr_tail": ""
+    },
+    "service": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "........                                                                 [100%]\n=============================== warnings summary ===============================\n.venv/lib/python3.12/site-packages/fastapi/testclient.py:1\n  /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-nub33x27/repo/fixtures/service/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\ntests/test_auth.py::test_token_roundtrips\ntests/test_auth.py::test_issue_and_whoami\n  /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-nub33x27/repo/fixtures/service/.venv/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 23 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.\n    return self._jws.encode(\n\ntests/test_auth.py::test_token_roundtrips\ntests/test_auth.py::test_issue_and_whoami\n  /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-nub33x27/repo/fixtures/service/.venv/lib/python3.12/site-packages/jwt/api_jwt.py:368: InsecureKeyLengthWarning: The HMAC key is 23 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.\n    decoded = self.decode_complete(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+      "test_stderr_tail": ""
+    },
+    "api-java": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "[INFO] Compiling 3 source files with javac [debug release 17] to target/classes\n[INFO] \n[INFO] --- resources:3.4.0:testResources (default-testResources) @ report-api ---\n[INFO] skip non existing resourceDirectory /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-nub33x27/repo/fixtures/api-java/src/test/resources\n[INFO] \n[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ report-api ---\n[INFO] Recompiling the module because of changed dependency.\n[INFO] Compiling 2 source files with javac [debug release 17] to target/test-classes\n[INFO] \n[INFO] --- surefire:3.2.5:test (default-test) @ report-api ---\n[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider\n[INFO] \n[INFO] -------------------------------------------------------\n[INFO]  T E S T S\n[INFO] -------------------------------------------------------\n[INFO] Running dev.bomly.fixture.JsonMapperTest\n[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.083 s -- in dev.bomly.fixture.JsonMapperTest\n[INFO] Running dev.bomly.fixture.ConfigLoaderTest\n[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in dev.bomly.fixture.ConfigLoaderTest\n[INFO] \n[INFO] Results:\n[INFO] \n[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0\n[INFO] \n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  0.841 s\n[INFO] Finished at: 2026-07-06T20:21:51-07:00\n[INFO] ------------------------------------------------------------------------",
+      "test_stderr_tail": ""
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "S1",
+      "package": "axios",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S2",
+      "package": "jsonwebtoken",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S3",
+      "package": "tough-cookie",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S4",
+      "package": "path-to-regexp",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S7",
+      "package": "lodash",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S5",
+      "package": "urllib3",
+      "ecosystem": "pypi",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S6",
+      "package": "ecdsa",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": true,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S8",
+      "package": "pyjwt",
+      "ecosystem": "pypi",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S9",
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "HALLUCINATED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": true,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S10",
+      "package": "org.apache.commons:commons-text",
+      "ecosystem": "maven",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    }
+  ],
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "codex",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 291.57,
+    "timeout": false,
+    "turns": 1,
+    "tool_calls": 47,
+    "mcp_calls": 0,
+    "mcp_tool_errors": []
+  }
+}

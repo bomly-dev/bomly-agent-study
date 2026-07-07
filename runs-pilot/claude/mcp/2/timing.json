@@ -1,0 +1,9 @@
+{
+  "started_at": "2026-07-06T23:36:48.870387+00:00",
+  "ended_at": "2026-07-06T23:43:07.986608+00:00",
+  "wall_seconds": 379.11,
+  "timeout": false,
+  "turns": 74,
+  "tool_calls": 73,
+  "mcp_calls": 21
+}

@@ -1,0 +1,22 @@
+{
+  "agent": "codex",
+  "condition": "bare",
+  "run_number": 1,
+  "pilot": true,
+  "scope": "all",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "887dc42",
+  "harness_sha": "887dc42",
+  "bomly_version": "bomly 0.16.0",
+  "bomly_sha256": "6a827a2d07f07b5029269c5c74711ab4973424862b7ade861e66db0a5590bd6d",
+  "agent_version": "codex-cli 0.142.5",
+  "model": "gpt-5.5",
+  "effort": "medium",
+  "started_at": "2026-07-06T22:40:13.666163+00:00",
+  "ended_at": "2026-07-06T22:45:05.236507+00:00",
+  "timeout": false,
+  "exit_code": 0,
+  "mcp_tool_errors": [],
+  "stderr_tail": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/bomly-study-32jaftrx/codex-bare-1-1783377613/agent-config\"))\nReading additional input from stdin...\n2026-07-06T22:42:29.301996Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in /tmp/bomly-study-32jaftrx/codex-bare-1-1783377613/repo/fixtures/webapp/src/auth.js:\n// NOTE (fixture): this module is written against jsonwebtoken 8.x semantics.\nconst SECRET = process.env.JWT_SECRET || \"dev-only-fixture-secret\";\n\n// In 8.x, sign() accepts a payload that already carries its own `exp` claim\n// as long as we do NOT also pass options.expiresIn. We build the expiry into\n// the payload ourselves so callers can hand us fully-formed claim sets.\nexport function issueToken(claims, ttlSeconds = 3600) {\n  const now = Math.floor(Date.now() / 1000);\n  const payload = { ...claims, iat: now, exp: now + ttlSeconds };\n",
+  "credential_copy_mode": "known-files"
+}

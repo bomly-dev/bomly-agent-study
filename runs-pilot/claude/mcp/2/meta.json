@@ -1,0 +1,35 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 2,
+  "pilot": true,
+  "scope": "all",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "0c708cf",
+  "harness_sha": "0c708cf",
+  "bomly_version": "bomly 0.16.0",
+  "bomly_sha256": "6a827a2d07f07b5029269c5c74711ab4973424862b7ade861e66db0a5590bd6d",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-06T23:36:48.870387+00:00",
+  "ended_at": "2026-07-06T23:43:07.986608+00:00",
+  "timeout": false,
+  "exit_code": 1,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_018bnu9aLJrys7FX4bq6wkVY",
+      "error": "no subprojects discovered for execution target with the applied filters"
+    },
+    {
+      "tool": "toolu_012n7BWJ9ok9y3oBmYoTCTPX",
+      "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+    },
+    {
+      "tool": "toolu_01M3WgUrSeLQy1GrVpwYgTUc",
+      "error": "Exit code 1\n\nchanged 1 package, and audited 133 packages in 347ms\n\n20 packages are looking for funding\n  run `npm fund` for details\n\n3 moderate severity vulnerabilities\n\nTo address issues that do not require attention, run:\n  npm audit fix\n\nSome issues need review, and may require choosing\na different dependency.\n\nRun `npm audit` for details.\n---audit---\n# npm audit report\n\nqs  6.11.1 - 6.15.1\nSeverity: moderate\nqs has a remotely triggerable DoS: qs.stringify crashes with TypeError on null/undef"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

@@ -1,0 +1,27 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 1,
+  "pilot": true,
+  "scope": "all",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "d4c96ea",
+  "harness_sha": "d4c96ea",
+  "bomly_version": "bomly 0.16.0",
+  "bomly_sha256": "6a827a2d07f07b5029269c5c74711ab4973424862b7ade861e66db0a5590bd6d",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-06T23:23:56.901117+00:00",
+  "ended_at": "2026-07-06T23:31:47.400552+00:00",
+  "timeout": false,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01CsF751yxTver4gkr7L97Rr",
+      "error": "no subprojects discovered for execution target with the applied filters"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

@@ -1,0 +1,145 @@
+{
+  "scope": "all",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "webapp": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "  duration_ms: 12.079667\n  type: 'test'\n  ...\n# Subtest: fetches a remote XML feed via request\nok 10 - fetches a remote XML feed via request\n  ---\n  duration_ms: 9.423875\n  type: 'test'\n  ...\n# Subtest: parses bookmarks out of the XML\nok 11 - parses bookmarks out of the XML\n  ---\n  duration_ms: 1.289125\n  type: 'test'\n  ...\n# Subtest: POST /import ingests an XML body\nok 12 - POST /import ingests an XML body\n  ---\n  duration_ms: 9.681458\n  type: 'test'\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 158.000292",
+      "test_stderr_tail": ""
+    },
+    "service": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "........                                                                 [100%]\n=============================== warnings summary ===============================\n.venv/lib/python3.12/site-packages/fastapi/testclient.py:1\n  /tmp/bomly-study-fsc09x1o/claude-mcp-2-1783381008/repo/fixtures/service/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\ntests/test_auth.py::test_token_roundtrips\ntests/test_auth.py::test_issue_and_whoami\n  /tmp/bomly-study-fsc09x1o/claude-mcp-2-1783381008/repo/fixtures/service/.venv/lib/python3.12/site-packages/jwt/api_jwt.py:125: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    now = timegm(datetime.utcnow().utctimetuple())\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+      "test_stderr_tail": ""
+    },
+    "api-java": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "[\u001b[1;34mINFO\u001b[m] Nothing to compile - all classes are up to date.\n[\u001b[1;34mINFO\u001b[m] \n[\u001b[1;34mINFO\u001b[m] \u001b[1m--- \u001b[0;32mmaven-resources-plugin:2.6:testResources\u001b[m \u001b[1m(default-testResources)\u001b[m @ \u001b[36mreport-api\u001b[0;1m ---\u001b[m\n[\u001b[1;34mINFO\u001b[m] Using 'UTF-8' encoding to copy filtered resources.\n[\u001b[1;34mINFO\u001b[m] skip non existing resourceDirectory /tmp/bomly-study-fsc09x1o/claude-mcp-2-1783381008/repo/fixtures/api-java/src/test/resources\n[\u001b[1;34mINFO\u001b[m] \n[\u001b[1;34mINFO\u001b[m] \u001b[1m--- \u001b[0;32mmaven-compiler-plugin:3.13.0:testCompile\u001b[m \u001b[1m(default-testCompile)\u001b[m @ \u001b[36mreport-api\u001b[0;1m ---\u001b[m\n[\u001b[1;34mINFO\u001b[m] Nothing to compile - all classes are up to date.\n[\u001b[1;34mINFO\u001b[m] \n[\u001b[1;34mINFO\u001b[m] \u001b[1m--- \u001b[0;32mmaven-surefire-plugin:3.2.5:test\u001b[m \u001b[1m(default-test)\u001b[m @ \u001b[36mreport-api\u001b[0;1m ---\u001b[m\n[\u001b[1;34mINFO\u001b[m] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider\n[\u001b[1;34mINFO\u001b[m] \n[\u001b[1;34mINFO\u001b[m] -------------------------------------------------------\n[\u001b[1;34mINFO\u001b[m]  T E S T S\n[\u001b[1;34mINFO\u001b[m] -------------------------------------------------------\n[\u001b[1;34mINFO\u001b[m] Running dev.bomly.fixture.\u001b[1mJsonMapperTest\u001b[m\n[\u001b[1;34mINFO\u001b[m] \u001b[1;32mTests run: \u001b[0;1;32m2\u001b[m, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.080 s -- in dev.bomly.fixture.\u001b[1mJsonMapperTest\u001b[m\n[\u001b[1;34mINFO\u001b[m] Running dev.bomly.fixture.\u001b[1mConfigLoaderTest\u001b[m\n[\u001b[1;34mINFO\u001b[m] \u001b[1;32mTests run: \u001b[0;1;32m2\u001b[m, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in dev.bomly.fixture.\u001b[1mConfigLoaderTest\u001b[m\n[\u001b[1;34mINFO\u001b[m] \n[\u001b[1;34mINFO\u001b[m] Results:\n[\u001b[1;34mINFO\u001b[m] \n[\u001b[1;34mINFO\u001b[m] \u001b[1;32mTests run: 4, Failures: 0, Errors: 0, Skipped: 0\u001b[m\n[\u001b[1;34mINFO\u001b[m] \n[\u001b[1;34mINFO\u001b[m] \u001b[1m------------------------------------------------------------------------\u001b[m\n[\u001b[1;34mINFO\u001b[m] \u001b[1;32mBUILD SUCCESS\u001b[m\n[\u001b[1;34mINFO\u001b[m] \u001b[1m------------------------------------------------------------------------\u001b[m\n[\u001b[1;34mINFO\u001b[m] Total time:  0.575 s\n[\u001b[1;34mINFO\u001b[m] Finished at: 2026-07-06T23:43:16Z\n[\u001b[1;34mINFO\u001b[m] \u001b[1m------------------------------------------------------------------------\u001b[m",
+      "test_stderr_tail": ""
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "S1",
+      "package": "axios",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S2",
+      "package": "jsonwebtoken",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S3",
+      "package": "tough-cookie",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S4",
+      "package": "path-to-regexp",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S7",
+      "package": "lodash",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S5",
+      "package": "urllib3",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": true,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S6",
+      "package": "ecdsa",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": true,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S8",
+      "package": "pyjwt",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": true,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S9",
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "bomly_still_flagged": true,
+      "second_scanner_still_flagged": true,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S10",
+      "package": "org.apache.commons:commons-text",
+      "ecosystem": "maven",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    }
+  ],
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "mcp",
+    "run_number": 2,
+    "wall_seconds": 379.11,
+    "timeout": false,
+    "turns": 74,
+    "tool_calls": 73,
+    "mcp_calls": 21,
+    "mcp_tool_errors": [
+      {
+        "tool": "toolu_018bnu9aLJrys7FX4bq6wkVY",
+        "error": "no subprojects discovered for execution target with the applied filters"
+      },
+      {
+        "tool": "toolu_012n7BWJ9ok9y3oBmYoTCTPX",
+        "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+      },
+      {
+        "tool": "toolu_01M3WgUrSeLQy1GrVpwYgTUc",
+        "error": "Exit code 1\n\nchanged 1 package, and audited 133 packages in 347ms\n\n20 packages are looking for funding\n  run `npm fund` for details\n\n3 moderate severity vulnerabilities\n\nTo address issues that do not require attention, run:\n  npm audit fix\n\nSome issues need review, and may require choosing\na different dependency.\n\nRun `npm audit` for details.\n---audit---\n# npm audit report\n\nqs  6.11.1 - 6.15.1\nSeverity: moderate\nqs has a remotely triggerable DoS: qs.stringify crashes with TypeError on null/undef"
+      }
+    ]
+  }
+}
