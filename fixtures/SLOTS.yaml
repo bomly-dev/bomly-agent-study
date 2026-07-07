@@ -10,8 +10,8 @@
 # as final — it is the working ground truth during fixture construction.
 
 metadata:
-  bomly_version: "0.16.0"
-  date: "2026-07-05"
+  bomly_version: "0.16.2"
+  date: "2026-07-07"
   fixture_sha: "3e13955"          # refreshed at freeze
   # Second-opinion scanners (a slot is FIXED only if bomly AND its second
   # scanner agree the vulnerable version is gone):

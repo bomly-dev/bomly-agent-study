@@ -61,7 +61,11 @@ RUN case "$TARGETARCH" in \
 # dependencies when the Python fixture has no venv yet. This is what caused
 # the mcp-condition pilot batch to under-report on fixtures/service; those 4
 # runs (runs-pilot/*/mcp/*) predate this fix and are not representative.
-ARG BOMLY_VERSION=0.16.1
+# 0.16.2: picks up the Maven TGF fix (bomly-cli#243/#244) — mvn dependency:tree
+# now runs with -B (batch mode) and the TGF parser strips ANSI escapes
+# defensively, so it no longer silently falls back to a direct-deps-only scan
+# and drops S10 (the transitive Maven slot) from every pilot run so far.
+ARG BOMLY_VERSION=0.16.2
 RUN curl -fsSL -o /tmp/bomly.tar.gz \
       "https://github.com/bomly-dev/bomly-cli/releases/download/v${BOMLY_VERSION}/bomly_${BOMLY_VERSION}_linux_${TARGETARCH}.tar.gz" \
     && tar -xzf /tmp/bomly.tar.gz -C /usr/local/bin bomly \
