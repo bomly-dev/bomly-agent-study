@@ -190,8 +190,20 @@ def second_scanner(repo: Path, ecosystem: str) -> str:
         return p.stdout
     if ecosystem == "maven":
         env = os.environ.copy()
-        p = subprocess.run(["trivy", "fs", "--scanners", "vuln", "--quiet", "."], cwd=repo / "fixtures" / "api-java",
-                            capture_output=True, text=True, env=env, timeout=180)
+        # --skip-db-update: without it, trivy checks mirror.gcr.io for a
+        # fresher DB on every single invocation, which (a) makes second-
+        # scanner results non-deterministic across the run window — the
+        # opposite of the frozen-ground-truth design this study relies on
+        # — and (b) hung for 180s and failed outright the first time this
+        # was tried against a real network, even though a same-day cached
+        # DB was already on disk. The Dockerfile pre-warms this DB at
+        # build time (see the trivy install step) the same way ~/.m2 is
+        # pre-warmed for Maven, so this always has a DB to skip-update to.
+        p = subprocess.run(
+            ["trivy", "fs", "--scanners", "vuln", "--skip-db-update", "--quiet", "."],
+            cwd=repo / "fixtures" / "api-java",
+            capture_output=True, text=True, env=env, timeout=180,
+        )
         return p.stdout
     return ""
 
@@ -243,9 +255,30 @@ def score_slot(slot: dict, bomly_blobs: dict, second_blobs: dict, build_results:
     build_ok = build.get("build_ok", True) and build.get("test_ok", True)
 
     pkg_short = slot["package"].split(":")[-1]
-    claims_fixed = bool(re.search(rf"{re.escape(pkg_short)}.*fix", fixes_text, re.IGNORECASE))
+    # Bounded to 150 chars after the package name, not an unbounded `.*fix`
+    # sweep to the end of the file: a real codex/mcp run wrote one FIXES.md
+    # bullet covering BOTH a real fix (bumped jackson-databind to clear its
+    # tracked CVEs) AND a separate, unrelated newer CVE on the same package
+    # left undeclined ~300 chars later in the same line. An unbounded search
+    # let that later "no version-only remediation" clause flip a real,
+    # substantive fix to CORRECTLY_DECLINED. 150 chars comfortably covers the
+    # observed real declines (closest ~115 chars) without reaching into an
+    # unrelated clause later in the same bullet.
+    proximity = r".{0,150}?"
+    claims_fixed = bool(re.search(rf"{re.escape(pkg_short)}{proximity}fix", fixes_text, re.IGNORECASE))
+    # Phrase list grown from real pilot runs, not invented up front: a real
+    # codex/mcp run correctly declined S6 with "no version-only remediation
+    # exists" — none of the original phrases matched that (no literal "no
+    # fix"/"no fixed version"), so claims_fixed's "fix" substring match won
+    # instead (it hit "fix_state" in an unrelated bomly-status mention) and
+    # scored a correct decline as HALLUCINATED. Add phrasings as they show up
+    # in real transcripts rather than guessing exhaustively.
     claims_declined = bool(
-        re.search(rf"{re.escape(pkg_short)}.*(no fix|cannot|can't|unable to fix|no fixed version)", fixes_text, re.IGNORECASE)
+        re.search(
+            rf"{re.escape(pkg_short)}{proximity}(no fix|cannot|can't|unable to fix|no fixed version|no version-only remediation)",
+            fixes_text,
+            re.IGNORECASE,
+        )
     )
 
     if slot.get("no_fix"):

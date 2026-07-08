@@ -61,4 +61,4 @@ docker run --rm \
   -v "$ROOT:/work/bomly-agent-study" \
   -w /work/bomly-agent-study \
   "$IMAGE" \
-  python3 harness/run.py "$@"
+  /opt/study-tools/bin/python harness/run.py "$@"

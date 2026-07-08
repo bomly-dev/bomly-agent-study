@@ -1,0 +1,35 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 3,
+  "pilot": true,
+  "scope": "all",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "d25b9ae",
+  "harness_sha": "d25b9ae",
+  "bomly_version": "bomly 0.16.2",
+  "bomly_sha256": "6c5d60734aab12d244d41f3bb386da23d44470286c90980974f49fc0d9779f7f",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-07T18:54:25.813468+00:00",
+  "ended_at": "2026-07-07T19:04:49.682000+00:00",
+  "timeout": false,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_012S8R7T9LHtV3PgrtHedVdv",
+      "error": "no subprojects discovered for execution target with the applied filters"
+    },
+    {
+      "tool": "toolu_014GDHeojZmMZWvVV8AAPrce",
+      "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 15, in <module>\nIndexError: list index out of range\n=== webapp (15 unique packages) ===\naxios@1.6.0  sevs=['high', 'high', 'medium', 'medium', 'high', 'medium', 'high', 'medium', 'medium', 'high', 'medium', 'high', 'medium', 'high', 'high', 'high', 'medium', 'high', 'high', 'high', 'high', 'high', 'medium', 'medium', 'low', 'medium']  fixed_in={'1.16.0'}  fix_state={'fixed'}\nbody-parser@1.20.2  sevs=['high']  fixed_in={'1.20."
+    },
+    {
+      "tool": "toolu_014RK2MRn7yLXw28jRiVejgy",
+      "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 5, in <module>\n  File \"<string>\", line 5, in <lambda>\nValueError: invalid literal for int() with base 10: '0-rc1'\n---jsonwebtoken 9.x---\n['9.0.0', '9.0.1', '9.0.2', '9.0.3']\n---axios 1.x latest---\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n  File \"<string>\", line 4, in <lambda>\nValueError: invalid literal for int() with base 10: '0-beta'"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

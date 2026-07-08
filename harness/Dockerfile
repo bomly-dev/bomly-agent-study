@@ -123,4 +123,16 @@ ENV HOME=/home/ubuntu
 COPY --chown=ubuntu:ubuntu fixtures/api-java/pom.xml /tmp/warm-pom/pom.xml
 RUN cd /tmp/warm-pom && mvn -q dependency:go-offline && rm -rf /tmp/warm-pom
 
+# --- Pre-warm trivy's vulnerability DB (used as the Maven fixture's
+#     independent second scanner, harness/verify.py) into $HOME/.cache/trivy,
+#     same rationale as the Maven warm-up above. Without this, every scoring
+#     run's `trivy fs` call hits mirror.gcr.io fresh: non-deterministic
+#     results across the run window (a different DB snapshot per run) at
+#     best, a hung/failed scan at worst if that registry is slow or
+#     unreachable from wherever the container happens to run — confirmed
+#     directly: trivy hung 180s and failed even with a same-day cached DB
+#     already on disk, purely because it insisted on checking for a newer
+#     one first. verify.py passes --skip-db-update and relies on this.
+RUN trivy image --download-db-only --quiet
+
 WORKDIR /work
