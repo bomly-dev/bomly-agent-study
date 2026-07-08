@@ -5,5 +5,12 @@
   "timeout": false,
   "turns": 94,
   "tool_calls": 93,
-  "mcp_calls": 13
+  "mcp_calls": 13,
+  "tokens": {
+    "input": 155,
+    "output": 42497,
+    "cache_read": 8007473,
+    "cache_creation": 181518
+  },
+  "cost_usd": 4.1300329
 }

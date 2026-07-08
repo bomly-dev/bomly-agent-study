@@ -175,9 +175,26 @@ def run(
         else:
             normalized_events.append({"type": etype or "unknown"})
 
+    tokens = None
+    cost_usd = None
     if final_result:
         turns = final_result.get("num_turns", turns)
         model = final_result.get("model", model)
+        # Claude Code's terminal `result` event carries the whole session's
+        # token usage and a computed cost. Surface both so the study can
+        # answer "did MCP make the agent cheaper or more expensive per run"
+        # without re-parsing raw transcripts (see analysis; this is one of the
+        # more load-bearing columns). cache_read/cache_creation are separated
+        # because at these context sizes cache reads dominate raw input token
+        # counts and are priced differently.
+        u = final_result.get("usage") or {}
+        tokens = {
+            "input": u.get("input_tokens"),
+            "output": u.get("output_tokens"),
+            "cache_read": u.get("cache_read_input_tokens"),
+            "cache_creation": u.get("cache_creation_input_tokens"),
+        }
+        cost_usd = final_result.get("total_cost_usd")
 
     return {
         "agent_version": agent_version,
@@ -189,6 +206,8 @@ def run(
         "tool_calls": tool_calls,
         "mcp_calls": mcp_calls,
         "mcp_tool_errors": mcp_tool_errors,
+        "tokens": tokens,
+        "cost_usd": cost_usd,
         "normalized_events": normalized_events,
         "stderr_tail": stderr_text[-2000:] if stderr_text else None,
     }

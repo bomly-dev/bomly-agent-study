@@ -132,6 +132,13 @@
         "tool": "toolu_01CsF751yxTver4gkr7L97Rr",
         "error": "no subprojects discovered for execution target with the applied filters"
       }
-    ]
+    ],
+    "tokens": {
+      "input": 87,
+      "output": 32203,
+      "cache_read": 5397152,
+      "cache_creation": 173020
+    },
+    "cost_usd": 3.1413346
   }
 }

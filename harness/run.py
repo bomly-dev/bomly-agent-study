@@ -438,6 +438,8 @@ def main() -> int:
                 "tool_calls": 0,
                 "mcp_calls": 0,
                 "mcp_tool_errors": [],
+                "tokens": None,
+                "cost_usd": None,
                 "normalized_events": [],
                 "stderr_tail": None,
             }
@@ -482,6 +484,8 @@ def main() -> int:
             "turns": result.get("turns"),
             "tool_calls": result.get("tool_calls"),
             "mcp_calls": result.get("mcp_calls"),
+            "tokens": result.get("tokens"),
+            "cost_usd": result.get("cost_usd"),
         }
         (run_dir / "timing.json").write_text(json.dumps(timing, indent=2))
 
@@ -510,6 +514,8 @@ def main() -> int:
             "turns": timing["turns"],
             "tool_calls": timing["tool_calls"],
             "mcp_calls": timing["mcp_calls"],
+            "tokens": timing.get("tokens"),
+            "cost_usd": timing.get("cost_usd"),
             "mcp_tool_errors": meta["mcp_tool_errors"],
         }
         (run_dir / "result.json").write_text(json.dumps(score_result, indent=2))

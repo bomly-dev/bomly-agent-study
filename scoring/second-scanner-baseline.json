@@ -1,0 +1,161 @@
+{
+  "npm": {
+    "axios": [
+      "GHSA-35JP-WW65-95WH",
+      "GHSA-3G43-6GMG-66JW",
+      "GHSA-3P68-RC4W-QGX5",
+      "GHSA-3W6X-2G7M-8V23",
+      "GHSA-43FC-JF86-J433",
+      "GHSA-445Q-VR5W-6Q77",
+      "GHSA-4HJH-WCWX-XVWJ",
+      "GHSA-5C9X-8GCM-MPGX",
+      "GHSA-62HF-57XW-28J9",
+      "GHSA-6CHQ-WFR3-2HJ9",
+      "GHSA-898C-Q2CR-XWHG",
+      "GHSA-8HC4-VH64-CXMJ",
+      "GHSA-FVCV-3M26-PCQX",
+      "GHSA-HFXV-24RG-XRQF",
+      "GHSA-J5F8-GRM9-P9FC",
+      "GHSA-JR5F-V2JV-69X6",
+      "GHSA-M7PR-HJQH-92CM",
+      "GHSA-P92Q-9VQR-4J8V",
+      "GHSA-PF86-5X62-JRWF",
+      "GHSA-PMWG-CVHR-8VH7",
+      "GHSA-Q8QP-CVCW-X6JJ",
+      "GHSA-VF2M-468P-8V99",
+      "GHSA-W9J2-PVGH-6H63",
+      "GHSA-XHJH-PMCV-23JW",
+      "GHSA-XX6V-RP6X-Q39C"
+    ],
+    "body-parser": [
+      "GHSA-QWCR-R2FM-QRC7"
+    ],
+    "cookie": [
+      "GHSA-PXG6-PF52-XH8X"
+    ],
+    "express": [
+      "GHSA-QW6H-VGH9-J6WX"
+    ],
+    "form-data": [
+      "GHSA-FJXV-7RQG-78G4",
+      "GHSA-HMW2-7CC7-3QXX"
+    ],
+    "jsonwebtoken": [
+      "GHSA-8CF7-32GW-WR33",
+      "GHSA-HJRF-2M68-5959",
+      "GHSA-QWPH-4952-7XR6"
+    ],
+    "lodash": [
+      "GHSA-29MW-WPGM-HMR9",
+      "GHSA-35JH-R3H4-6JHM",
+      "GHSA-F23M-R3PF-42RH",
+      "GHSA-R5FR-RJXR-66JC",
+      "GHSA-XXJR-MMJV-4GPG"
+    ],
+    "path-to-regexp": [
+      "GHSA-37CH-88JC-XWX2",
+      "GHSA-9WV6-86V2-598J",
+      "GHSA-RHX6-C78J-4Q9W"
+    ],
+    "qs": [
+      "GHSA-6RW7-VPXM-498P",
+      "GHSA-W7FW-MJWX-W883"
+    ],
+    "request": [
+      "GHSA-P8P7-X288-28G6"
+    ],
+    "send": [
+      "GHSA-M6FV-JMCG-4JFG"
+    ],
+    "serve-static": [
+      "GHSA-CM22-4G7W-348P"
+    ],
+    "tough-cookie": [
+      "GHSA-72XF-G2V4-QVF3"
+    ],
+    "uuid": [
+      "GHSA-W5HQ-G745-H8PQ"
+    ]
+  },
+  "pypi": {
+    "ecdsa": [
+      "CVE-2024-23342",
+      "GHSA-WJ6H-64FC-37MP",
+      "PYSEC-2026-1325"
+    ],
+    "pyjwt": [
+      "CVE-2022-29217",
+      "CVE-2025-45768",
+      "CVE-2026-32597",
+      "CVE-2026-48522",
+      "CVE-2026-48524",
+      "CVE-2026-48526",
+      "GHSA-752W-5FWX-JX9F",
+      "GHSA-993G-76C3-P5M4",
+      "GHSA-FFQJ-6FQR-9H24",
+      "GHSA-FHV5-28VV-H8M8",
+      "GHSA-XGMM-8J9V-C9WX",
+      "PYSEC-2022-202",
+      "PYSEC-2025-183",
+      "PYSEC-2026-120",
+      "PYSEC-2026-175",
+      "PYSEC-2026-177",
+      "PYSEC-2026-179"
+    ],
+    "urllib3": [
+      "CVE-2023-43804",
+      "CVE-2023-45803",
+      "CVE-2024-37891",
+      "CVE-2025-50181",
+      "CVE-2025-66418",
+      "CVE-2025-66471",
+      "CVE-2026-21441",
+      "CVE-2026-44431",
+      "GHSA-2XPW-W6GG-JR37",
+      "GHSA-34JH-P97F-MPXF",
+      "GHSA-38JV-5279-WG99",
+      "GHSA-G4MX-Q9VG-27P4",
+      "GHSA-GM62-XV2J-4W53",
+      "GHSA-PQ67-6M6Q-MJ2V",
+      "GHSA-QCCP-GFCP-XXVC",
+      "GHSA-V845-JXX5-VC9F",
+      "PYSEC-2023-192",
+      "PYSEC-2023-212",
+      "PYSEC-2026-141",
+      "PYSEC-2026-1994",
+      "PYSEC-2026-1995",
+      "PYSEC-2026-1996",
+      "PYSEC-2026-1998",
+      "PYSEC-2026-1999"
+    ]
+  },
+  "maven": {
+    "com.fasterxml.jackson.core:jackson-core": [
+      "CVE-2025-52999",
+      "GHSA-72HV-8253-57QQ"
+    ],
+    "com.fasterxml.jackson.core:jackson-databind": [
+      "CVE-2020-36518",
+      "CVE-2021-46877",
+      "CVE-2022-42003",
+      "CVE-2022-42004",
+      "CVE-2026-50193",
+      "CVE-2026-54512",
+      "CVE-2026-54513",
+      "CVE-2026-54514",
+      "CVE-2026-54515"
+    ],
+    "org.apache.commons:commons-configuration2": [
+      "CVE-2022-33980",
+      "CVE-2024-29131",
+      "CVE-2024-29133",
+      "CVE-2026-45205"
+    ],
+    "org.apache.commons:commons-lang3": [
+      "CVE-2025-48924"
+    ],
+    "org.apache.commons:commons-text": [
+      "CVE-2022-42889"
+    ]
+  }
+}

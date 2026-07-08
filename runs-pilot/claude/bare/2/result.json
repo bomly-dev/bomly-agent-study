@@ -132,6 +132,13 @@
         "tool": "toolu_019JpT5xy8KAMRgKyGYiNd9b",
         "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 3, in <module>\n  File \"/usr/lib/python3.12/json/__init__.py\", line 293, in load\n    return loads(fp.read(),\n           ^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/__init__.py\", line 346, in loads\n    return _default_decoder.decode(s)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/decoder.py\", line 337, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ^^^^^^^^^^^^^^^^"
       }
-    ]
+    ],
+    "tokens": {
+      "input": 101,
+      "output": 27246,
+      "cache_read": 3681610,
+      "cache_creation": 111494
+    },
+    "cost_usd": 2.205714
   }
 }

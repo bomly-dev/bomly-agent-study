@@ -127,6 +127,14 @@
     "turns": 1,
     "tool_calls": 47,
     "mcp_calls": 0,
-    "mcp_tool_errors": []
+    "mcp_tool_errors": [],
+    "tokens": {
+      "input": 1633287,
+      "output": 11873,
+      "cache_read": 1514368,
+      "cache_creation": null,
+      "reasoning_output": 1660
+    },
+    "cost_usd": null
   }
 }

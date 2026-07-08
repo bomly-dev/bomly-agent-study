@@ -140,6 +140,13 @@
         "tool": "toolu_01M3WgUrSeLQy1GrVpwYgTUc",
         "error": "Exit code 1\n\nchanged 1 package, and audited 133 packages in 347ms\n\n20 packages are looking for funding\n  run `npm fund` for details\n\n3 moderate severity vulnerabilities\n\nTo address issues that do not require attention, run:\n  npm audit fix\n\nSome issues need review, and may require choosing\na different dependency.\n\nRun `npm audit` for details.\n---audit---\n# npm audit report\n\nqs  6.11.1 - 6.15.1\nSeverity: moderate\nqs has a remotely triggerable DoS: qs.stringify crashes with TypeError on null/undef"
       }
-    ]
+    ],
+    "tokens": {
+      "input": 99,
+      "output": 23774,
+      "cache_read": 6143072,
+      "cache_creation": 176661
+    },
+    "cost_usd": 3.2605576
   }
 }

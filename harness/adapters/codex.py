@@ -133,6 +133,7 @@ def run(
     tool_calls = 0
     mcp_calls = 0
     mcp_tool_errors = []
+    usage = None
 
     for line in raw_lines:
         line = line.strip()
@@ -163,6 +164,12 @@ def run(
 
         if etype == "turn.completed":
             turns += 1
+            # Codex reports cumulative token usage on each turn.completed; the
+            # last one is the whole-session total. Captured so the study can
+            # compare per-run token cost across conditions the same way it does
+            # for Claude (Codex's stream reports no dollar cost, so that stays
+            # None for this agent).
+            usage = ev.get("usage") or usage
             normalized_events.append({"type": "turn", "raw_type": etype})
         elif etype == "item.completed" and item_type == "command_execution":
             tool_calls += 1
@@ -184,6 +191,19 @@ def run(
         else:
             normalized_events.append({"type": etype or "unknown"})
 
+    tokens = None
+    if usage:
+        # Normalized to the same keys the Claude adapter emits. Codex's
+        # `cached_input_tokens` is the cache-read portion of `input_tokens`;
+        # it reports no separate cache-creation count, so that stays None.
+        tokens = {
+            "input": usage.get("input_tokens"),
+            "output": usage.get("output_tokens"),
+            "cache_read": usage.get("cached_input_tokens"),
+            "cache_creation": None,
+            "reasoning_output": usage.get("reasoning_output_tokens"),
+        }
+
     return {
         "agent_version": agent_version,
         "model": model,
@@ -194,6 +214,8 @@ def run(
         "tool_calls": tool_calls,
         "mcp_calls": mcp_calls,
         "mcp_tool_errors": mcp_tool_errors,
+        "tokens": tokens,
+        "cost_usd": None,
         "normalized_events": normalized_events,
         "stderr_tail": stderr_text[-2000:] if stderr_text else None,
     }

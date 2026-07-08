@@ -132,6 +132,13 @@
         "tool": "toolu_015qcwbny3LhZooKMnrpZt57",
         "error": "Exit code 2\nls: cannot access '/tmp/bomly-study-0tpfk4h0/claude-bare-1-1783377643/repo/FIXES.md': No such file or directory"
       }
-    ]
+    ],
+    "tokens": {
+      "input": 139,
+      "output": 36110,
+      "cache_read": 5736962,
+      "cache_creation": 106863
+    },
+    "cost_usd": 2.9050965999999994
   }
 }

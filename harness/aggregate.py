@@ -26,6 +26,7 @@ FIELDS = [
     "slot_id", "package", "ecosystem", "outcome",
     "bomly_still_flagged", "second_scanner_still_flagged", "build_ok",
     "wall_seconds", "timeout", "turns", "tool_calls", "mcp_calls",
+    "input_tokens", "output_tokens", "cache_read_tokens", "cost_usd",
     "mcp_tool_error_count", "regression_count", "unrelated_changes_flag",
 ]
 
@@ -53,6 +54,10 @@ def rows_for_result(result_path: Path) -> list[dict]:
                 "turns": run_meta.get("turns"),
                 "tool_calls": run_meta.get("tool_calls"),
                 "mcp_calls": run_meta.get("mcp_calls"),
+                "input_tokens": (run_meta.get("tokens") or {}).get("input"),
+                "output_tokens": (run_meta.get("tokens") or {}).get("output"),
+                "cache_read_tokens": (run_meta.get("tokens") or {}).get("cache_read"),
+                "cost_usd": run_meta.get("cost_usd"),
                 "mcp_tool_error_count": len(run_meta.get("mcp_tool_errors", [])),
                 "regression_count": len(data.get("regressions", [])),
                 "unrelated_changes_flag": data.get("unrelated_changes_flag"),

@@ -49,6 +49,21 @@ def load_slots() -> list[dict]:
 
 FIXTURE_DIR = {"npm": "webapp", "pypi": "service", "maven": "api-java"}
 
+# Frozen at fixture-freeze: the exact advisory IDs each second scanner emits
+# for each package on the PRISTINE (unfixed) fixture. A slot's second scanner
+# only counts as "still flagged" if it currently reports an ID that was in
+# this frozen set — anything new is a post-freeze advisory, out of scope by
+# pre-registration. Regenerate with scripts/gen-second-scanner-baseline.py.
+BASELINE_IDS_PATH = REPO_ROOT / "scoring" / "second-scanner-baseline.json"
+
+
+def load_baseline_ids() -> dict[str, dict[str, set[str]]]:
+    """{ecosystem: {package: {ADVISORY_ID, ...}}}, or {} if not generated yet."""
+    if not BASELINE_IDS_PATH.exists():
+        return {}
+    raw = json.loads(BASELINE_IDS_PATH.read_text())
+    return {eco: {pkg: set(ids) for pkg, ids in pkgs.items()} for eco, pkgs in raw.items()}
+
 
 def resolve_java_home() -> str:
     """Find a JDK 17+ home directory, portably.
@@ -157,7 +172,15 @@ def bomly_scan(repo: Path, fixture_dir: str) -> dict:
 
 
 def second_scanner(repo: Path, ecosystem: str) -> str:
-    """Returns raw text/JSON output of the ecosystem's independent scanner."""
+    """Returns raw JSON output of the ecosystem's independent scanner.
+
+    All three now emit JSON (not human tables): the scorer needs per-package
+    advisory IDs, not just "does this package name appear anywhere", so it can
+    tell "still vulnerable to the advisory this slot tracks" apart from "a
+    NEWER, unrelated advisory was published against the fixed version after
+    SLOTS.yaml was frozen". See extract_advisory_ids() and the frozen baseline
+    in scoring/second-scanner-baseline.json.
+    """
     if ecosystem == "npm":
         p = run_capture(["npm", "audit", "--json"], cwd=repo / "fixtures" / "webapp", timeout=120)
         return p.stdout
@@ -184,7 +207,8 @@ def second_scanner(repo: Path, ecosystem: str) -> str:
                 "misresolve in a real pilot run."
             )
         p = run_capture(
-            [pip_audit, "-r", "requirements.txt", "--vulnerability-service", "osv", "--progress-spinner", "off"],
+            [pip_audit, "-r", "requirements.txt", "--vulnerability-service", "osv",
+             "--format", "json", "--progress-spinner", "off"],
             cwd=repo / "fixtures" / "service", timeout=180,
         )
         return p.stdout
@@ -200,7 +224,7 @@ def second_scanner(repo: Path, ecosystem: str) -> str:
         # build time (see the trivy install step) the same way ~/.m2 is
         # pre-warmed for Maven, so this always has a DB to skip-update to.
         p = subprocess.run(
-            ["trivy", "fs", "--scanners", "vuln", "--skip-db-update", "--quiet", "."],
+            ["trivy", "fs", "--scanners", "vuln", "--skip-db-update", "--quiet", "--format", "json", "."],
             cwd=repo / "fixtures" / "api-java",
             capture_output=True, text=True, env=env, timeout=180,
         )
@@ -208,36 +232,98 @@ def second_scanner(repo: Path, ecosystem: str) -> str:
     return ""
 
 
-def package_present(blob, package_needle: str) -> bool:
-    """Used for the SECOND-SCANNER blobs only (npm audit --json, pip-audit's
-    text table, trivy's text table). All three only ever mention a package
-    when it has a finding — a clean package doesn't appear at all — so a
-    substring match is safe there. This is NOT safe for bomly's own JSON (see
-    bomly_package_vulnerable below) and must never be used on it: a real pilot
-    run proved bomly lists every scanned package, clean or not, so this same
-    substring check against bomly's blob made it structurally impossible for
-    any in-place version bump to ever score FIXED (the package's clean
-    listing still contains its own name).
+# Recognized advisory-ID shapes across all three second scanners. Used only to
+# pull identifiers out of scanner output; SLOTS.yaml's own advisories are CVEs,
+# but npm audit reports GHSAs (no CVE), pip-audit/OSV reports PYSEC ids plus a
+# CVE+GHSA alias list, and trivy reports CVEs — so the frozen baseline stores
+# whatever each scanner actually emits, and matching is a set intersection
+# against that, never a cross-ecosystem CVE<->GHSA translation.
+_ADVISORY_ID_RE = re.compile(r"(?:CVE-\d{4}-\d+|GHSA-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}|PYSEC-\d{4}-\d+)", re.IGNORECASE)
+
+
+def extract_advisory_ids(ecosystem: str, raw: str) -> dict[str, set[str]]:
+    """Parse a second scanner's JSON into {package_name: {ADVISORY_ID, ...}}.
+
+    Package keys are exactly what the scanner emits (bare name for npm/pypi,
+    "group:artifact" for trivy/maven), upper-cased advisory IDs. Returns {} on
+    empty/unparseable input — a clean scan legitimately produces no findings.
     """
-    s = blob if isinstance(blob, str) else json.dumps(blob)
-    # Match on the bare package name (last path segment for maven coordinates).
-    needle = package_needle.split(":")[-1]
-    return needle.lower() in s.lower()
+    out: dict[str, set[str]] = {}
+    if not raw or not raw.strip():
+        return out
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return out
+
+    if ecosystem == "npm":
+        # npm audit v2+: vulnerabilities keyed by package; each `via` entry is
+        # either a dict (a real advisory, GHSA in its url) or a string (the
+        # name of another package it's vulnerable *through*).
+        for name, node in (data.get("vulnerabilities") or {}).items():
+            ids: set[str] = set()
+            for via in node.get("via", []):
+                if isinstance(via, dict):
+                    ids.update(m.group(0).upper() for m in _ADVISORY_ID_RE.finditer(via.get("url", "")))
+            if ids:
+                out.setdefault(name, set()).update(ids)
+    elif ecosystem == "pypi":
+        # pip-audit --format json: {dependencies: [{name, vulns: [{id, aliases}]}]}
+        deps = data.get("dependencies", data if isinstance(data, list) else [])
+        for dep in deps:
+            name = (dep.get("name") or "").lower()
+            ids = set()
+            for v in dep.get("vulns", []) or []:
+                for tok in [v.get("id", "")] + (v.get("aliases") or []):
+                    ids.update(m.group(0).upper() for m in _ADVISORY_ID_RE.finditer(tok))
+            if ids:
+                out.setdefault(name, set()).update(ids)
+    elif ecosystem == "maven":
+        # trivy --format json: {Results: [{Vulnerabilities: [{VulnerabilityID, PkgName}]}]}
+        for res in data.get("Results", []) or []:
+            for v in res.get("Vulnerabilities", []) or []:
+                name = v.get("PkgName", "")
+                vid = (v.get("VulnerabilityID") or "").upper()
+                if name and vid:
+                    out.setdefault(name, set()).add(vid)
+    return out
 
 
-def bomly_package_vulnerable(bomly_scan_result: dict, package_needle: str) -> bool:
-    """True iff bomly's scan lists this package with a non-empty
-    vulnerabilities array. Matches by bare package name (last path segment
-    for maven coordinates: "org.apache.commons:commons-text" -> "commons-text"),
-    since bomly's `packages[].name` field isn't always the fully-qualified
-    coordinate.
+def _slot_second_scanner_ids(reported: dict[str, set[str]], slot: dict) -> set[str]:
+    """IDs the second scanner currently reports for this slot's package.
+    Tries the full coordinate and the bare last segment as keys (trivy uses
+    "group:artifact"; npm/pip-audit use the bare name)."""
+    pkg = slot["package"]
+    return reported.get(pkg) or reported.get(pkg.split(":")[-1].lower()) or reported.get(pkg.split(":")[-1]) or set()
+
+
+
+def bomly_package_vulnerable(bomly_scan_result: dict, package_needle: str, tracked_ids: set[str]) -> bool:
+    """True iff bomly still reports one of this slot's TRACKED advisories for
+    the package. Advisory-ID-scoped, not "does the package have any vuln at
+    all" — for the same reason the second-scanner check is (see score_slot):
+    a package fixed for its tracked CVE may still carry a different, untracked
+    advisory, and whether bomly's enrichment happens to include that untracked
+    advisory depends on OSV-cache freshness, which would make scoring
+    non-deterministic across the run window. A real case: a fix bumping
+    jackson-databind past its 3 tracked CVEs still leaves untracked jackson
+    advisories that a fresher bomly cache flags and a staler one doesn't —
+    scoping to the slot's own advisories removes that dependence.
+
+    Matches by bare package name (last path segment for maven coordinates),
+    since bomly's `packages[].name` isn't always the fully-qualified
+    coordinate; matches advisories against each vuln's `id` plus `aliases`
+    (bomly reports a GHSA id and the CVE alias per vuln).
     """
     needle = package_needle.split(":")[-1].lower()
+    tracked = {t.upper() for t in tracked_ids}
     for pkg in bomly_scan_result.get("packages", []) or []:
         name = (pkg.get("name") or "").lower()
         if name == needle or name.endswith("/" + needle) or name.endswith(":" + needle):
-            if pkg.get("vulnerabilities"):
-                return True
+            for v in pkg.get("vulnerabilities") or []:
+                ids = {str(v.get("id", "")).upper()} | {str(a).upper() for a in (v.get("aliases") or [])}
+                if ids & tracked:
+                    return True
     return False
 
 
@@ -246,10 +332,43 @@ def read_fixes_md(repo: Path) -> str:
     return p.read_text() if p.exists() else ""
 
 
-def score_slot(slot: dict, bomly_blobs: dict, second_blobs: dict, build_results: dict, fixes_text: str) -> dict:
+def score_slot(slot: dict, bomly_blobs: dict, second_ids: dict, baseline_ids: dict, build_results: dict, fixes_text: str) -> dict:
     fixture_dir = FIXTURE_DIR[slot["ecosystem"]]
-    bomly_still_flagged = bomly_package_vulnerable(bomly_blobs.get(fixture_dir, {}), slot["package"])
-    second_still_flagged = package_present(second_blobs.get(slot["ecosystem"], ""), slot["package"])
+    eco = slot["ecosystem"]
+    # Advisory-ID-scoped, not package-name-scoped, for BOTH scanners. The old
+    # check ("does this package name appear anywhere in the scanner output")
+    # misscored any real fix of a package that ALSO carries a different,
+    # untracked advisory — the exact case hit by codex/mcp/3 S9:
+    # jackson-databind bumped 2.13.0 -> 2.18.8 clears the slot's 3 tracked
+    # CVEs, but both bomly and trivy still flag jackson-databind for OTHER CVEs
+    # (e.g. CVE-2026-54515) that affect both versions and were never what this
+    # slot tests. Note those other CVEs are present at freeze too, so "was it
+    # in the baseline" does NOT separate them — only matching the slot's OWN
+    # tracked advisories does. Scoping bomly this way also removes a
+    # non-determinism: whether bomly's enrichment cache happens to include an
+    # untracked advisory varies with OSV-cache freshness across the run window.
+    tracked = {a.upper() for a in slot.get("advisories", [])}
+    bomly_still_flagged = bomly_package_vulnerable(bomly_blobs.get(fixture_dir, {}), slot["package"], tracked)
+    reported = _slot_second_scanner_ids(second_ids.get(eco, {}), slot)
+    if eco in ("pypi", "maven"):
+        # trivy's VulnerabilityID and pip-audit/OSV's id+aliases both expose
+        # the CVE, so we can match the slot's tracked CVEs directly and ignore
+        # every other advisory on the same package.
+        second_still_flagged = bool(reported & tracked)
+    else:
+        # npm audit reports only GHSA ids (no CVE, no alias list), so the
+        # slot's tracked CVEs can't be matched against it directly. Fall back
+        # to the frozen freeze-era GHSA set for the package
+        # (scoring/second-scanner-baseline.json): drift-safe (a GHSA published
+        # after freeze isn't in the baseline). Known limitation: this can't
+        # isolate a single tracked GHSA when a package has several, but the
+        # npm slots' correct fixes clear the package's audit entry entirely,
+        # so in practice reported goes empty on a real fix. If a missing
+        # baseline ever leaves this empty, over-flag (safe) rather than
+        # silently pass.
+        baseline = _slot_second_scanner_ids(baseline_ids.get(eco, {}), slot)
+        second_still_flagged = bool(reported & baseline) if baseline else bool(reported)
+
     still_vulnerable = bomly_still_flagged or second_still_flagged  # either scanner seeing it = not clean
     build = build_results.get(fixture_dir, {})
     build_ok = build.get("build_ok", True) and build.get("test_ok", True)
@@ -352,12 +471,14 @@ def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
     build_results = rebuild_and_test(repo, scope)
 
     bomly_blobs = {}
-    second_blobs = {}
+    second_ids = {}
     for eco, fdir in FIXTURE_DIR.items():
         if scope != "all" and fdir != scope:
             continue
         bomly_blobs[fdir] = bomly_scan(repo, fdir)
-        second_blobs[eco] = second_scanner(repo, eco)
+        second_ids[eco] = extract_advisory_ids(eco, second_scanner(repo, eco))
+
+    baseline_ids = load_baseline_ids()
 
     fixes_text = read_fixes_md(repo)
     diff_text = run_capture(["git", "diff", "--no-color"], cwd=repo).stdout
@@ -370,7 +491,7 @@ def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
 
     slot_results = []
     for slot in slots:
-        r = score_slot(slot, bomly_blobs, second_blobs, build_results, fixes_text)
+        r = score_slot(slot, bomly_blobs, second_ids, baseline_ids, build_results, fixes_text)
         # Refine ATTEMPTED_NOT_FIXED vs NOT_ATTEMPTED using the real diff.
         # Two things a real pilot run got wrong here, both fixed:
         #  1. This must never apply to no_fix slots — ATTEMPTED_NOT_FIXED
@@ -459,6 +580,8 @@ def verify_from_run(run_dir: Path) -> dict:
             "turns": timing.get("turns"),
             "tool_calls": timing.get("tool_calls"),
             "mcp_calls": timing.get("mcp_calls"),
+            "tokens": timing.get("tokens"),
+            "cost_usd": timing.get("cost_usd"),
             "mcp_tool_errors": meta.get("mcp_tool_errors", []),
         }
         return result
