@@ -1,0 +1,47 @@
+{
+  "agent": "claude",
+  "condition": "bare",
+  "run_number": 4,
+  "pilot": true,
+  "scope": "all",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "04aa523",
+  "harness_sha": "04aa523",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-08T23:21:31.340728+00:00",
+  "ended_at": "2026-07-08T23:27:20.405105+00:00",
+  "timeout": false,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01RGBwDnQZpQDUy7q7PQ2bXC",
+      "error": "Exit code 1\ntotal 68\ndrwxr-xr-x 1 root root 4096 Jul  8 23:16 .\ndrwxr-xr-x 1 root root 4096 Jul  8 23:16 ..\n-rw-r--r-- 1 root root 9033 Jul  8 23:16 Activate.ps1\n-rw-r--r-- 1 root root 2034 Jul  8 23:16 activate\n-rw-r--r-- 1 root root  926 Jul  8 23:16 activate.csh\n-rw-r--r-- 1 root root 2201 Jul  8 23:16 activate.fish\n-rwxr-xr-x 1 root root  179 Jul  8 23:16 doesitcache\n-rwxr-xr-x 1 root root  170 Jul  8 23:16 idna\n-rwxr-xr-x 1 root root  183 Jul  8 23:16 markdown-it\n-rwxr-xr-x 1 root root  196"
+    },
+    {
+      "tool": "toolu_01SvTLhP8xyfQCcYMHhTs86m",
+      "error": "<tool_use_error>InputValidationError: TaskCreate failed due to the following issues:\nThe required parameter `subject` is missing\nThe required parameter `description` is missing\nAn unexpected parameter `tasks` was provided\n\nTaskCreate creates ONE task per call and has no `tasks` or `todos` parameter. Call TaskCreate once per task, passing `subject` (a brief title) and `description` (what needs to be done) as top-level string parameters.\n\nThis tool's schema was not sent to the API \u2014 it was not in "
+    },
+    {
+      "tool": "toolu_01AP5i2QwR1jgW34dcF85sJ6",
+      "error": "Exit code 1\n# Top-level runtime dependencies. Compile to requirements.txt with:\n#   pip-compile requirements.in\n# (requirements.txt is the pinned, installed-from file \u2014 see the note there\n# about the urllib3 pin.)\nfastapi\nuvicorn\nrequests\njinja2\npyjwt==1.7.1\necdsa\n# Test-time dependencies (in addition to requirements.txt). Compile with:\n#   pip-compile requirements-dev.in -c requirements.txt -o requirements-dev.txt\n# The -c constraint keeps shared transitives aligned with the runtime pins.\npytes"
+    },
+    {
+      "tool": "toolu_015H1zgEVHjpHZoBVv8ChNCn",
+      "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+    },
+    {
+      "tool": "toolu_01W9aY39Tw9opNp14nWA8EFj",
+      "error": "Exit code 1\nFound 20 known vulnerabilities in 3 packages\nName    Version ID              Fix Versions\n------- ------- --------------- -------------\necdsa   0.19.2  PYSEC-2026-1325\npyjwt   1.7.1   PYSEC-2022-202  2.4.0\npyjwt   1.7.1   PYSEC-2026-120  2.12.0\npyjwt   1.7.1   PYSEC-2026-120  2.12.0\npyjwt   1.7.1   PYSEC-2025-183\npyjwt   1.7.1   PYSEC-2026-179  2.13.0\npyjwt   1.7.1   PYSEC-2026-175  2.13.0\npyjwt   1.7.1   PYSEC-2026-177  2.13.0\npyjwt   1.7.1   PYSEC-2026-177  2.13.0\npyjwt   1.7.1   P"
+    },
+    {
+      "tool": "toolu_01QFHBPgP5Y9hDxynWHfbWaF",
+      "error": "Exit code 1\n---AUDIT---\nFound 1 known vulnerability in 1 package\nName  Version ID              Fix Versions\n----- ------- --------------- ------------\necdsa 0.19.2  PYSEC-2026-1325"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

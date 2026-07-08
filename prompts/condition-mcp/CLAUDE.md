@@ -6,4 +6,4 @@ manifest and test suite.
 
 The bomly MCP server is available on this repo for investigating and
 remediating dependencies (tools: `bomly_scan`, `bomly_explain`, `bomly_diff`,
-`bomly_vuln_fix_context`, `bomly_plugins`).
+`bomly_plugins`).

@@ -1,0 +1,39 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 4,
+  "pilot": true,
+  "scope": "all",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "04aa523",
+  "harness_sha": "04aa523",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-08T23:21:35.375754+00:00",
+  "ended_at": "2026-07-08T23:29:49.898987+00:00",
+  "timeout": false,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01DJLrs9Xx8nZJ1BMNmrMmwn",
+      "error": "prepare scan: no subprojects discovered for execution target with the applied filters; discovery probe: found pom.xml at fixtures/api-java (maven); found requirements.txt at fixtures/service (pip); found package-lock.json at fixtures/webapp (npm)"
+    },
+    {
+      "tool": "toolu_01PKmW6zShT7d8Dy1kGECyUp",
+      "error": "Exit code 1\nnpm warn deprecated har-validator@5.1.5: this library is no longer supported\nnpm warn deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142\n\nadded 137 packages, and audited 138 packages in 549ms\n\n20 packages are looking for funding\n  run `npm fund` for details\n\n1 moderate severity vulnerability\n\nSome issues need review, and may require choosing\na different dependency.\n\nRun `npm audit` for details.\n=== AUDIT ===\n# npm audit report\n\n"
+    },
+    {
+      "tool": "toolu_01JGYzo8qB2YitVqM5Wvawoz",
+      "error": "Exit code 1\n\n> team-bookmarks@1.0.0 build\n> node --check src/server.js && node scripts/build.js\n\nnode:internal/modules/esm/resolve:314\n  return new ERR_PACKAGE_PATH_NOT_EXPORTED(\n         ^\n\nError [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './v4' is not defined by \"exports\" in /tmp/bomly-study-vod1mad0/claude-mcp-4-1783552895/repo/fixtures/webapp/node_modules/uuid/package.json\n    at exportsNotFound (node:internal/modules/esm/resolve:314:10)\n    at packageExportsResolve (node:internal/modu"
+    },
+    {
+      "tool": "toolu_012Qu4tdCd1kDiNBfinSdCbb",
+      "error": "Exit code 1\n# npm audit report\n\nrequest  *\nSeverity: moderate\nServer-Side Request Forgery in Request - https://github.com/advisories/GHSA-p8p7-x288-28g6\nDepends on vulnerable versions of uuid\nNo fix available\nnode_modules/request\n\nuuid  <11.1.1\nSeverity: moderate\nuuid: Missing buffer bounds check in v3/v5/v6 when buf is provided - https://github.com/advisories/GHSA-w5hq-g745-h8pq\nNo fix available\nnode_modules/request/node_modules/uuid\n\n2 moderate severity vulnerabilities\n\nSome issues need review"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

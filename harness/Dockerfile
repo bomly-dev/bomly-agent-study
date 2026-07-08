@@ -65,7 +65,16 @@ RUN case "$TARGETARCH" in \
 # now runs with -B (batch mode) and the TGF parser strips ANSI escapes
 # defensively, so it no longer silently falls back to a direct-deps-only scan
 # and drops S10 (the transitive Maven slot) from every pilot run so far.
-ARG BOMLY_VERSION=0.16.2
+# 0.17.0: picks up the MCP revamp (bomly-cli#245/#246) — bomly_scan's MCP
+# response was ~1.8-2.9MB, truncating 4 of 8 real scan calls to an error;
+# compact response is now measured at ~9.2KB. Also removes the
+# bomly_vuln_fix_context MCP tool (folded into bomly_scan's remediation
+# groups) and changes the CLI --format json schema itself ("findings[] are
+# now pure references... join packages[] by purl" per the PR) — verified
+# harness/verify.py's parsing still holds against the new schema before
+# trusting any scored run under this version; see prompts/condition-mcp/ for
+# the corresponding tool-list disclosure update.
+ARG BOMLY_VERSION=0.17.0
 RUN curl -fsSL -o /tmp/bomly.tar.gz \
       "https://github.com/bomly-dev/bomly-cli/releases/download/v${BOMLY_VERSION}/bomly_${BOMLY_VERSION}_linux_${TARGETARCH}.tar.gz" \
     && tar -xzf /tmp/bomly.tar.gz -C /usr/local/bin bomly \
