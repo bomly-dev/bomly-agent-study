@@ -1,5 +1,0 @@
-# Test-time dependencies (in addition to requirements.txt). Compile with:
-#   pip-compile requirements-dev.in -c requirements.txt -o requirements-dev.txt
-# The -c constraint keeps shared transitives aligned with the runtime pins.
-pytest
-httpx

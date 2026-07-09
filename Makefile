@@ -17,12 +17,14 @@ test: test-webapp test-service test-java ## Build + test all three fixtures from
 test-webapp: ## npm fixture: clean install, build, test
 	cd fixtures/webapp && npm ci && npm run build && npm test
 
-test-service: ## Python fixture: fresh venv, install, pytest
+test-service: ## Python fixture (vendored CTFd 3.7.7): fresh venv, install, bounded pytest subset
 	cd fixtures/service && \
 		$(PYTHON) -m venv .venv && \
 		.venv/bin/pip install --quiet --upgrade pip && \
-		.venv/bin/pip install --quiet -r requirements.txt -r requirements-dev.txt && \
-		.venv/bin/pytest -q
+		.venv/bin/pip install --quiet -r requirements.txt && \
+		grep -vE "^-r |psycopg2|bandit|sphinx|pip-tools|flask_profiler|flask-debugtoolbar|pipdeptree" development.txt > .dev-test.txt && \
+		.venv/bin/pip install --quiet -r .dev-test.txt && \
+		.venv/bin/python -m pytest tests/test_config.py tests/users -q -p no:randomly
 
 test-java: ## Maven fixture: offline test (deps expected pre-resolved)
 	cd fixtures/api-java && mvn -o test
