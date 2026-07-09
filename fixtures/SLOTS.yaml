@@ -48,13 +48,50 @@ overlay:
             CVE-2023-26136 — separately dual-confirmed and fixable on its
             own) and drags in form-data/qs/uuid advisories that clear the
             same way. The only real fix is removing request; explicit
-            decline is also correct if it's kept."
+            decline is also correct if it's kept.
+
+            NOTE on uuid specifically (GHSA-w5hq-g745-h8pq): request's
+            lib/auth.js, lib/multipart.js, and lib/oauth.js all do
+            `require('uuid/v4')`, a legacy subpath uuid's 8.0.0+ `exports`
+            map removes — VERIFIED directly, forcing uuid to 11.1.1 via an
+            override makes `npm run build` fail with
+            `ERR_PACKAGE_PATH_NOT_EXPORTED`. This is NOT treated as a
+            fix_incompatible overlay entry, though two real pilot runs
+            (claude/mcp/webapp, codex/mcp/webapp) independently declined
+            uuid for exactly this reason: a real THIRD run
+            (claude/bare/webapp) removed request entirely and got uuid
+            fixed as a direct consequence — proving the constraint is real
+            only if request is kept, and removing request is itself always
+            the correct, available remediation (documented above). uuid's
+            fixability is conditional on that choice, which is squarely
+            within the agent's control, unlike jetty-http/cryptography's
+            overlay entries where no available choice resolves the
+            conflict. Declining uuid while ALSO declining to remove request
+            is a real, scoreable miss, not a fixture limitation."
 
   # ---- fixtures/service (Python, vendored CTFd 3.7.7) ----
-  # No notable-case entries: all 11 dual-confirmed vulnerable packages are
-  # cleanly fixable (see fixtures/GROUND_TRUTH.md's medium section for why
-  # flask/cryptography looked harder during manual v2 slot-selection
-  # verification but are not, in fact, unfixable).
+  - ecosystem: pypi
+    fixture: service
+    package: cryptography
+    fix_incompatible_advisory_ids: ["GHSA-537C-GMF6-5CCF", "GHSA-M959-CC7F-WV43", "GHSA-R6PH-V2QM-Q3C2"]
+    notes: "VERIFIED with fresh venvs + `pip install pybluemonday==0.0.14
+            cryptography==<version>` in one resolve (not sequential installs
+            in the same venv, which hide the real conflict): cryptography
+            44.0.3 installs cleanly alongside pybluemonday 0.0.14 (cffi
+            stays at 1.17.1, within pybluemonday's `cffi~=1.1` pin) and
+            clears 9 of cryptography's 12 advisories. 46.0.5 and 48.0.1 (the
+            fixed versions for the remaining 3: GHSA-537c-gmf6-5ccf,
+            GHSA-m959-cc7f-wv43, GHSA-r6ph-v2qm-q3c2 / CVE-2026-26007) both
+            produce a genuine pip ResolutionImpossible against pybluemonday
+            in the same resolve — a real conflict, not sequential-install
+            noise. First surfaced by a real pilot run (codex/bare/service,
+            N=1 ladder pilot): its FIXES.md independently reached the same
+            44.0.3 ceiling and the same three remaining advisories, with the
+            correct technical justification, and no newer pybluemonday
+            release exists to relax the cffi constraint. Originally scored
+            INCORRECTLY_DECLINED before this overlay entry existed — a
+            well-justified decline of a genuinely fix_incompatible
+            remainder, not a real miss."
 
   # ---- fixtures/api-java (Java/Maven, vendored Dependency-Track 4.10.0) ----
   - ecosystem: maven

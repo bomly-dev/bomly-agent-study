@@ -32,18 +32,29 @@ agent happens to search for first.
 
 ## medium — fixtures/service (Python, vendored CTFd 3.7.7)
 
-**11 vulnerable packages, all 11 fixable.** No genuine no-fix case exists in CTFd's real
+**11 vulnerable packages, all 11 fixable in whole or in part** (see the `cryptography` note below
+for the one package with a real partial exception). No genuine no-fix case exists in CTFd's real
 vulnerable set (checked individually — this is why v2's hallucination-trap slot was re-homed to
 api-java instead of invented here).
 
-Two of these — `flask` (→3.1.3) and `cryptography` (→48.0.1) — looked unbounded during manual v2
-slot-selection verification (a naive single-package bump cascades into `flask-babel`'s removed
-`locked_cached_property`, then `flask-sqlalchemy`'s removed `_app_ctx_stack`; cryptography pulls a
-`cffi` version conflicting with other pins) and were deliberately left out of the old curated slot
-list for that reason. **They are not actually unfixable** — a real pilot run (`codex/mcp/service`,
-N=1 ladder pilot, 2026-07-09) resolved flask, werkzeug, cryptography, urllib3, idna, and every other
-package in this list in a single coordinated session, tests green throughout. Under full-surface
-scoring they're just harder members of the same set, not excluded — completeness means completeness.
+`flask` (→3.1.3) looked unbounded during manual v2 slot-selection verification (a naive
+single-package bump cascades into `flask-babel`'s removed `locked_cached_property`, then
+`flask-sqlalchemy`'s removed `_app_ctx_stack`) and was deliberately left out of the old curated
+slot list for that reason. **It is not actually unfixable** — real pilot runs (`codex/bare/service`
+and `codex/mcp/service`, N=1 ladder pilot, 2026-07-09) resolved flask, werkzeug, urllib3, idna, and
+every other package in this list except the case below, tests green throughout. Under full-surface
+scoring it's just a harder member of the same set, not excluded — completeness means completeness.
+
+`cryptography` (12 advisories) is the one real partial exception, verified directly (fresh venvs,
+`pip install pybluemonday==0.0.14 cryptography==<version>` in one resolve): 9 of its 12 advisories
+clear at 44.0.3, which installs cleanly alongside `pybluemonday==0.0.14`. The remaining 3
+(GHSA-537c-gmf6-5ccf, GHSA-m959-cc7f-wv43, GHSA-r6ph-v2qm-q3c2 / CVE-2026-26007) need 46.0.5+ or
+48.0.1, and EVERY version at or above that produces a genuine pip `ResolutionImpossible` against
+pybluemonday's `cffi~=1.1` pin — a fix exists upstream (bomly correctly reports it), but doesn't
+actually work in this app. A real pilot run (`codex/bare/service`) independently reached the same
+44.0.3 ceiling and the same three remaining advisories, with the correct technical justification.
+Flagged in `SLOTS.yaml`'s overlay (`fix_incompatible_advisory_ids`) so a complete, correctly-declined
+run scores as complete rather than as three missed fixes.
 
 ## hard — fixtures/api-java (Java/Maven, vendored Dependency-Track 4.10.0)
 

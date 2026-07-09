@@ -6,30 +6,201 @@
       "install_ok": true,
       "build_ok": true,
       "test_ok": false,
-      "test_stdout_tail": "    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic\n  /tmp/bomly-study-j99t5q3b/claude-bare-service-1-1783589565/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xfffef6fd3dd0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-j99t5q3b/claude-bare-service-1-1783589565/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xfffef62dcfe0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-j99t5q3b/claude-bare-service-1-1783589565/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xfffef69078f0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-j99t5q3b/claude-bare-service-1-1783589565/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xfffef626abd0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/users/test_auth.py::test_user_bad_login - AssertionError: assert...\nFAILED tests/users/test_auth.py::test_user_get_logout - AssertionError: asser...\nFAILED tests/users/test_auth.py::test_user_isnt_admin - AssertionError: asser...\nFAILED tests/users/test_auth.py::test_user_can_confirm_email - AssertionError...\nFAILED tests/users/test_auth.py::test_registration_code_required - AssertionE...\nFAILED tests/users/test_auth.py::test_registration_code_allows_numeric - Asse...\nFAILED tests/users/test_fields.py::test_user_needs_all_required_fields - Asse...\nFAILED tests/users/test_setup.py::test_ctfd_setup_redirect - AssertionError: ...\nFAILED tests/users/test_setup.py::test_ctfd_setup_verification - AssertionErr...\n9 failed, 73 passed, 889209 warnings in 76.78s (0:01:16)",
+      "test_stdout_tail": "    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic\n  /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-jx7t4yaa/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0x168969b50> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-jx7t4yaa/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0x174d753d0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-jx7t4yaa/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0x174d77a70> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-jx7t4yaa/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0x174d76630> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/users/test_auth.py::test_user_bad_login - AssertionError: assert...\nFAILED tests/users/test_auth.py::test_user_get_logout - AssertionError: asser...\nFAILED tests/users/test_auth.py::test_user_isnt_admin - AssertionError: asser...\nFAILED tests/users/test_auth.py::test_user_can_confirm_email - AssertionError...\nFAILED tests/users/test_auth.py::test_registration_code_required - AssertionE...\nFAILED tests/users/test_auth.py::test_registration_code_allows_numeric - Asse...\nFAILED tests/users/test_fields.py::test_user_needs_all_required_fields - Asse...\nFAILED tests/users/test_setup.py::test_ctfd_setup_redirect - AssertionError: ...\nFAILED tests/users/test_setup.py::test_ctfd_setup_verification - AssertionErr...\n9 failed, 73 passed, 893342 warnings in 70.35s (0:01:10)",
       "test_stderr_tail": ""
     }
   },
-  "slots": [
+  "packages": [
     {
-      "slot_id": "S5",
-      "package": "mako",
+      "package": "cryptography",
       "ecosystem": "pypi",
       "outcome": "NOT_ATTEMPTED",
-      "bomly_still_flagged": true,
-      "second_scanner_still_flagged": true,
+      "fixable_total": 9,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-3WW4-GG4F-JR7F",
+        "GHSA-5CPQ-8WJ7-HF2V",
+        "GHSA-6VQW-3V5J-54X4",
+        "GHSA-9V9H-CGJ8-H64P",
+        "GHSA-CF7P-GM2M-833M",
+        "GHSA-H4GH-QQ45-VH27",
+        "GHSA-JFHM-5GHH-2F97",
+        "GHSA-JM77-QPHF-C4W8",
+        "GHSA-V8GR-M533-GHJ9"
+      ],
+      "unfixable_total": 3,
+      "unfixable_remaining_ids": [
+        "GHSA-537C-GMF6-5CCF",
+        "GHSA-M959-CC7F-WV43",
+        "GHSA-R6PH-V2QM-Q3C2"
+      ],
+      "unfixable_resolved_bonus_ids": [],
       "build_ok": false
     },
     {
-      "slot_id": "S8",
+      "package": "flask",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-68RP-WP8R-4726",
+        "GHSA-M2QF-HXJV-5GPQ"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "idna",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-65PC-FJ4G-8RJX",
+        "GHSA-JJG7-2V4V-X38H"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "mako",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 3,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-2H4P-VJRC-8XPQ",
+        "GHSA-V92G-XGXW-VVMM",
+        "GHSA-V973-FXGF-6XHP"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "pillow",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 4,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-3F63-HFP8-52JQ",
+        "GHSA-44WM-F244-XHP3",
+        "GHSA-R73J-PQJ5-W3X7",
+        "GHSA-WJX4-4JCJ-G98J"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
       "package": "pydantic",
       "ecosystem": "pypi",
       "outcome": "NOT_ATTEMPTED",
-      "bomly_still_flagged": true,
-      "second_scanner_still_flagged": true,
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-MR82-8J83-VXMV"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "pymysql",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-V9HF-5J83-6XPP"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "python-dotenv",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-MF9W-MJ56-HR94"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "requests",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-9HJG-9R4M-MVJ7",
+        "GHSA-GC5V-M9X4-R6X2"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "urllib3",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 5,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-2XPW-W6GG-JR37",
+        "GHSA-38JV-5279-WG99",
+        "GHSA-GM62-XV2J-4W53",
+        "GHSA-PQ67-6M6Q-MJ2V",
+        "GHSA-QCCP-GFCP-XXVC"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "werkzeug",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 9,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-29VQ-49WR-VM6X",
+        "GHSA-2G68-C3QC-8985",
+        "GHSA-87HC-H4R5-73F7",
+        "GHSA-F9VJ-2WH5-FJ8J",
+        "GHSA-HGF8-39GV-G3F2",
+        "GHSA-HRFV-MQP8-Q5RW",
+        "GHSA-PX8H-6QXV-M22Q",
+        "GHSA-Q34M-JH98-GWM2",
+        "GHSA-XG9F-G7G7-2323"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
       "build_ok": false
     }
   ],
+  "completeness": 0.0,
+  "fixable_total": 39,
+  "fixable_resolved": 0,
   "regressions": [],
   "unrelated_changes_flag": false,
   "run_meta": {

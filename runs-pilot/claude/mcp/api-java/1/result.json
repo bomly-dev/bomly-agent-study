@@ -6,39 +6,529 @@
       "install_ok": true,
       "build_ok": true,
       "test_ok": true,
-      "test_stdout_tail": "[INFO] Tests run: 30, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.142 s - in org.dependencytrack.util.VulnerabilityUtilTest\n[INFO] Running org.dependencytrack.util.InternalComponentIdentificationUtilTest\n[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.097 s - in org.dependencytrack.util.InternalComponentIdentificationUtilTest\n[INFO] Running org.dependencytrack.util.VersionDistanceTest\n[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s - in org.dependencytrack.util.VersionDistanceTest\n[INFO] Running org.dependencytrack.util.RoundRobinAccessorTest\n[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.793 s - in org.dependencytrack.util.RoundRobinAccessorTest\n[INFO] Running org.dependencytrack.util.HttpUtilTest\n[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 s - in org.dependencytrack.util.HttpUtilTest\n[INFO] Running org.dependencytrack.util.PersistenceUtilTest\n[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.283 s - in org.dependencytrack.util.PersistenceUtilTest\n[INFO] Running org.dependencytrack.util.DateUtilTest\n[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.053 s - in org.dependencytrack.util.DateUtilTest\n[INFO] Running org.dependencytrack.util.CacheStampedeBlockerTest\n[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.079 s - in org.dependencytrack.util.CacheStampedeBlockerTest\n[INFO] \n[INFO] Results:\n[INFO] \n[INFO] Tests run: 336, Failures: 0, Errors: 0, Skipped: 0\n[INFO] \n[INFO] \n[INFO] --- jacoco-maven-plugin:0.8.11:report (post-unit-test) @ dependency-track ---\n[INFO] Loading execution data file /tmp/bomly-study-ujnkolmu/claude-mcp-api-java-1-1783589596/repo/fixtures/api-java/target/jacoco.exec\n[INFO] Analyzed bundle 'Dependency-Track' with 418 classes\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  56.287 s\n[INFO] Finished at: 2026-07-09T09:45:04Z\n[INFO] ------------------------------------------------------------------------",
+      "test_stdout_tail": "[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.044 s - in org.dependencytrack.model.LicenseTest\n[INFO] Running org.dependencytrack.model.TagTest\n[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s - in org.dependencytrack.model.TagTest\n[INFO] Running org.dependencytrack.model.CweTest\n[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s - in org.dependencytrack.model.CweTest\n[INFO] Running org.dependencytrack.model.DependencyMetricsTest\n[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.04 s - in org.dependencytrack.model.DependencyMetricsTest\n[INFO] Running org.dependencytrack.model.NotificationPublisherTest\n[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.041 s - in org.dependencytrack.model.NotificationPublisherTest\n[INFO] Running org.dependencytrack.model.validation.SpdxExpressionValidatorTest\n[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.385 s - in org.dependencytrack.model.validation.SpdxExpressionValidatorTest\n[INFO] Running org.dependencytrack.model.VulnerabilityTest\n[INFO] Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.054 s - in org.dependencytrack.model.VulnerabilityTest\n[INFO] Running org.dependencytrack.model.AnalysisCommentTest\n[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.029 s - in org.dependencytrack.model.AnalysisCommentTest\n[INFO] \n[INFO] Results:\n[INFO] \n[INFO] Tests run: 336, Failures: 0, Errors: 0, Skipped: 0\n[INFO] \n[INFO] \n[INFO] --- jacoco:0.8.11:report (post-unit-test) @ dependency-track ---\n[INFO] Loading execution data file /private/var/folders/18/w36lmfdd4sg8l6lg72bv15k00000gn/T/bomly-verify-only-admmvfbz/repo/fixtures/api-java/target/jacoco.exec\n[INFO] Analyzed bundle 'Dependency-Track' with 418 classes\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  53.620 s\n[INFO] Finished at: 2026-07-09T14:08:10-07:00\n[INFO] ------------------------------------------------------------------------",
       "test_stderr_tail": ""
     }
   },
-  "slots": [
+  "packages": [
     {
-      "slot_id": "S6",
-      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "package": "ch.qos.logback:logback-core",
       "ecosystem": "maven",
       "outcome": "NOT_ATTEMPTED",
-      "bomly_still_flagged": true,
-      "second_scanner_still_flagged": true,
+      "fixable_total": 6,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [
+        "GHSA-25QH-J22F-PWP8",
+        "GHSA-6V67-2WR5-GVF4",
+        "GHSA-PR98-23F8-JWXV",
+        "GHSA-QQPG-MVQG-649V"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
       "build_ok": true
     },
     {
-      "slot_id": "S9",
+      "package": "com.fasterxml.jackson.core:jackson-core",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-72HV-8253-57QQ"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-5JMJ-H7XM-6Q6V"
+      ],
+      "build_ok": true
+    },
+    {
+      "package": "com.github.jknack:handlebars",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "com.jayway.jsonpath:json-path",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-PFH2-HFMQ-PHG5"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "com.mysql:mysql-connector-j",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
       "package": "com.nimbusds:nimbus-jose-jwt",
       "ecosystem": "maven",
       "outcome": "NOT_ATTEMPTED",
-      "bomly_still_flagged": true,
-      "second_scanner_still_flagged": true,
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-GVPG-VGMX-XG6W",
+        "GHSA-XWMG-2G98-W7V9"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
       "build_ok": true
     },
     {
-      "slot_id": "S10",
-      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "package": "com.sun.mail:jakarta.mail",
       "ecosystem": "maven",
       "outcome": "NOT_ATTEMPTED",
-      "bomly_still_flagged": true,
-      "second_scanner_still_flagged": true,
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-9342-92GG-6V29"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "commons-beanutils:commons-beanutils",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-WXR5-93PH-8WR9"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "commons-fileupload:commons-fileupload",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-HFRX-6QGJ-FP6C",
+        "GHSA-VV7R-C36W-3PRJ"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "commons-io:commons-io",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-78WR-2P64-HPWJ"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-codec",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-3P8M-J85Q-PGMJ",
+        "GHSA-MJ4R-2HFC-F8P6"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-codec-http",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 11,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [
+        "GHSA-38F8-5428-X5CV",
+        "GHSA-57RV-R2G8-2CJ3",
+        "GHSA-5JPM-X58V-624V",
+        "GHSA-84H7-RJJ3-6JX4",
+        "GHSA-F6HV-JMP6-3VWV",
+        "GHSA-FGHV-69VJ-QJ49",
+        "GHSA-M4CV-J2PX-7723",
+        "GHSA-PWQR-WMGM-9RR8",
+        "GHSA-V8H7-RR48-VMMV",
+        "GHSA-XXQH-MFJM-7MV9"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-codec-http2",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 7,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [
+        "GHSA-F6HV-JMP6-3VWV",
+        "GHSA-PRJ3-CCX8-P6X4",
+        "GHSA-W9FJ-CFPG-GRVV",
+        "GHSA-XPW8-RCWV-8F8P"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-common",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-389X-839F-4RHX",
+        "GHSA-XQ3W-V528-46RV"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-handler",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 4,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [
+        "GHSA-6MJQ-H674-J845"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-handler-proxy",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-45Q3-82M4-75JR"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.pebbletemplates:pebble",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 0,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [
+        "GHSA-P75G-CXFJ-7WRX"
+      ],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.apache.commons:commons-compress",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.apache.commons:commons-lang3",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-J288-Q9X7-2F5V"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.assertj:assertj-core",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.bouncycastle:bcpkix-jdk18on",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 3,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-4CX2-FC23-5WG6",
+        "GHSA-WG6Q-6289-32HP",
+        "GHSA-WJXJ-5M7G-MG7Q"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.bouncycastle:bcprov-jdk18on",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 7,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [
+        "GHSA-4H8F-2WVX-GG5W",
+        "GHSA-67MF-3CR5-8W23",
+        "GHSA-8XFC-GM6G-VGPV",
+        "GHSA-HR8G-6V94-X4M9",
+        "GHSA-V435-XC8X-WVR9",
+        "GHSA-WJXJ-5M7G-MG7Q"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.codehaus.plexus:plexus-utils",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-6FMV-XXPF-W3CW"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.cyclonedx:cyclonedx-core-java",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.eclipse.jetty.http2:http2-common",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 3,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-MMXM-8W33-WC4H",
+        "GHSA-QPPJ-FM5R-HXR3",
+        "GHSA-RGGV-CV7R-MW98"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.eclipse.jetty.http2:http2-hpack",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-WGH7-54F2-X98R"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.eclipse.jetty.http2:http2-server",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-QPPJ-FM5R-HXR3"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.eclipse.jetty:jetty-http",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-HMR7-M48G-48F6"
+      ],
+      "unfixable_total": 3,
+      "unfixable_remaining_ids": [
+        "GHSA-355H-QMC2-WPWF",
+        "GHSA-QH8G-58PP-2WXH",
+        "GHSA-WJPW-4J6X-6RWH"
+      ],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.eclipse.jetty:jetty-server",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 4,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-G8M5-722R-8WHQ",
+        "GHSA-P26G-97M4-6Q7C",
+        "GHSA-Q4RV-GQ96-W7C5",
+        "GHSA-QW69-RQJ8-6QW8"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.eclipse.jetty:jetty-servlets",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-3GH6-V5V9-6V9J",
+        "GHSA-J26W-F9RQ-MR2Q"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.eclipse.jetty:jetty-xml",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-58QW-P7QM-5RVH"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.mozilla:rhino",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-3W8Q-XQ97-5J7X"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.postgresql:postgresql",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.xmlunit:xmlunit-core",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 1,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-CHFM-68VV-PVW5"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
       "build_ok": true
     }
   ],
+  "completeness": 0.2716049382716049,
+  "fixable_total": 81,
+  "fixable_resolved": 22,
   "regressions": [],
   "unrelated_changes_flag": false,
   "run_meta": {
