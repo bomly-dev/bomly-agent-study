@@ -165,6 +165,11 @@ AGENT_EXCLUDED_PATHS = [
     "scoring",
     "runs",
     "runs-pilot",
+    # v1 pilot data was moved (git mv) to runs-pilot-v1 at the fixture-ladder
+    # redesign — this list matches exact relative paths, so the renamed
+    # directory needs its own entry or every v1 run's FIXES.md/diff would
+    # leak into the agent workspace.
+    "runs-pilot-v1",
     "analysis",
     "CREDENTIALS.md",
     "METHODOLOGY.md",
