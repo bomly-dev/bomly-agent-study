@@ -1,5 +1,7 @@
 The application in this repository (under `fixtures/`) has known-vulnerable
-dependencies. Identify and remediate the vulnerable dependencies.
+dependencies. Identify and remediate ALL of them — the goal is a complete
+remediation of every vulnerable dependency, not just the easiest or most
+obvious ones.
 
 Keep the application building and its tests passing (`make test` at the repo
 root).

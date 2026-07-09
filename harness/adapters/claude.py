@@ -31,6 +31,8 @@ import os
 import subprocess
 from pathlib import Path
 
+from . import signals
+
 
 class NotInContainerError(RuntimeError):
     pass
@@ -196,12 +198,31 @@ def run(
         }
         cost_usd = final_result.get("total_cost_usd")
 
+    # Incomplete-session detection (v3, 2026-07-09, Ahmed): a session cut
+    # short by something OUTSIDE the agent's own task/reasoning — a dropped
+    # connection, a rate limit, or the operator's subscription usage cap —
+    # must be marked INCOMPLETE, not scored, and retried after the reset.
+    #
+    # Deliberately NOT based on `final_result.subtype` being non-"success":
+    # Claude Code's documented subtypes include error_max_turns, which is the
+    # agent exhausting ITS OWN turn budget — a real, legitimate outcome (this
+    # is exactly what a real N=1 ladder pilot run showed for claude on the
+    # harder fixtures: it went broad, chasing more of the real vulnerable
+    # surface than just the intended slots, and ran out of turns before
+    # landing a clean fix). Treating that as "incomplete, retry" would
+    # silently re-run a genuine finding until it happened to succeed,
+    # corrupting the exact completeness signal v3 scoring exists to capture.
+    # Phrase-matching against the transcript + stderr is deliberately the
+    # only signal used here — see harness/adapters/signals.py.
+    incomplete_reason = signals.detect_incomplete_reason("\n".join(raw_lines) + "\n" + stderr_text)
+
     return {
         "agent_version": agent_version,
         "model": model,
         "effort": effort or None,
         "exit_code": exit_code,
         "timeout": timed_out,
+        "incomplete_reason": incomplete_reason,
         "turns": turns,
         "tool_calls": tool_calls,
         "mcp_calls": mcp_calls,

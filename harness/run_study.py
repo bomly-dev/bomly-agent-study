@@ -20,13 +20,18 @@ three. The hard fixture (api-java) gets a longer per-session timeout.
 Safe to re-invoke any number of times. Each invocation:
   1. Enumerates the full (agent, condition, scope, run_number) matrix.
   2. For each cell, checks whether a VALID result already exists (see
-     _cell_status below — this is more than "does result.json exist": a run
-     truncated by a dropped API connection mid-task still writes a
-     syntactically valid result.json full of NOT_ATTEMPTED, which is not a
-     real data point and must not be silently accepted as "done").
+     _cell_status below). Three non-valid states, all retryable but reported
+     distinctly: 'missing' (never run), 'incomplete' (v3, 2026-07-09 — the
+     session actually ran and hit a real usage/rate limit or dropped
+     connection mid-task; harness/run.py detects this and skips scoring
+     entirely, so it's never mistaken for a real low-completeness result),
+     'invalid' (ran, produced no real output, and no incomplete signal
+     explains why).
   3. Skips valid cells, (re)runs everything else, one at a time.
   4. Prints a clear pending/done summary before and after, so a resumed run
-     is transparent about what it's about to do.
+     is transparent about what it's about to do — and distinguishes "still
+     waiting on a usage-limit reset" (expected, exit code 2) from "something
+     is actually broken" (exit code 1).
 """
 from __future__ import annotations
 
@@ -37,25 +42,14 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-
-# Text signatures of a run truncated by a transient network/API failure
-# rather than genuine agent behavior — found via a real pilot run where a
-# dropped connection mid-task left an agent with 27 real tool calls, zero
-# diff, and one of these exact phrases in its final result text. A run with
-# a nonzero diff or a written FIXES.md is NOT flagged even if one of these
-# phrases also appears somewhere (real runs can legitimately mention
-# connection issues while investigating network-facing code) — the
-# combination of {no real output} + {error phrase} is what actually
-# indicates a truncated, invalid run.
-TRUNCATION_SIGNATURES = (
-    "api error",
-    "connection closed",
-    "connection reset",
-    "overloaded_error",
-    "rate_limit_error",
-    "usage limit",
-    "quota exceeded",
-)
+sys.path.insert(0, str(REPO_ROOT / "harness"))
+from adapters import signals  # noqa: E402 — see harness/adapters/signals.py:
+# the phrase list this module used to keep locally (TRUNCATION_SIGNATURES) is
+# now shared with both agent adapters, which detect the same signal at
+# capture time (v3, 2026-07-09) rather than this orchestrator being the only
+# place it's checked. Kept here too as a second line of defense — a run
+# where the adapter-level check somehow missed it can still be caught from
+# the same transcript text after the fact.
 
 
 # Per-session timeout, seconds. The hard fixture (api-java: a real Maven app
@@ -70,7 +64,11 @@ def _cell_dir(runs_root: Path, agent: str, condition: str, scope: str, n: int) -
 
 
 def _cell_status(cell_dir: Path) -> tuple[str, str]:
-    """Returns (status, reason). status is 'valid', 'missing', or 'invalid'.
+    """Returns (status, reason). status is 'valid', 'missing', 'incomplete',
+    or 'invalid'. 'incomplete' and 'missing' are both retryable (treated as
+    pending by main() below); the distinction is purely for operator
+    visibility — an incomplete session actually ran and hit a real usage/
+    rate limit, a missing one just hasn't been attempted (or attempted) yet.
 
     Deliberately does NOT treat `timeout: true` or a nonzero `exit_code` in
     meta.json as invalid — both are legitimate, pre-registered outcomes for
@@ -79,37 +77,51 @@ def _cell_status(cell_dir: Path) -> tuple[str, str]:
     mid-session, which the design already records as `mcp_tool_errors` data
     rather than a failure — confirmed against a real pilot run,
     runs-pilot/claude/mcp/2, which has exit_code=1 and 3 mcp_tool_errors but
-    is a fully valid run with a real diff and 6 slots FIXED). The only
-    invalid case is a run that produced no real output at all — including
-    the one known failure mode, a dropped API connection truncating the
-    agent mid-task (result.json still gets written in that case, just full
-    of NOT_ATTEMPTED, which is not a trustworthy data point).
+    is a fully valid run with a real diff and 6 slots FIXED).
     """
-    result_path = cell_dir / "result.json"
     meta_path = cell_dir / "meta.json"
-    if not result_path.exists() or not meta_path.exists():
-        return "missing", "no result.json/meta.json yet"
+    if not meta_path.exists():
+        return "missing", "no meta.json yet — never run"
 
     try:
-        json.loads(meta_path.read_text())
+        meta = json.loads(meta_path.read_text())
     except (json.JSONDecodeError, OSError):
         return "invalid", "meta.json unreadable"
+
+    # v3 (2026-07-09, Ahmed): a session cut short by a usage/rate limit or
+    # dropped connection is INCOMPLETE, not scored, and always retryable —
+    # harness/run.py detects this at capture time (harness/adapters/signals.py)
+    # and skips scoring entirely for it, so it never gets a result.json at
+    # all. Checked before result_path.exists() below specifically so this
+    # reads as "ran, got interrupted" rather than being lumped into the
+    # generic "missing" bucket a genuinely never-attempted cell would show.
+    if meta.get("incomplete_reason"):
+        return "incomplete", f"session cut short ({meta['incomplete_reason']}) — retry after the usage limit resets"
+
+    result_path = cell_dir / "result.json"
+    if not result_path.exists():
+        return "missing", "meta.json present but no result.json — run didn't finish scoring"
 
     diff_path = cell_dir / "diff.patch"
     fixes_path = cell_dir / "FIXES.md"
     has_real_output = (diff_path.exists() and diff_path.stat().st_size > 0) or (
         fixes_path.exists() and fixes_path.stat().st_size > 0
     )
+    transcript_path = cell_dir / "transcript.raw.jsonl"
+    stderr_path = cell_dir / "transcript.raw.jsonl.stderr.log"
+    text = ""
+    if transcript_path.exists():
+        text += transcript_path.read_text(errors="replace").lower()
+    if stderr_path.exists():
+        text += stderr_path.read_text(errors="replace").lower()
+    # Checked unconditionally, not just when output is empty: an incomplete
+    # signal the adapter missed (older run, or a genuinely new phrasing) can
+    # still show up in a run that also has SOME real diff/FIXES.md content
+    # from before the interruption — that partial content doesn't make it a
+    # trustworthy data point for a "fix everything" completeness score.
+    if signals.detect_incomplete_reason(text):
+        return "incomplete", "network/usage-limit signature found in transcript (adapter-level check missed it)"
     if not has_real_output:
-        transcript_path = cell_dir / "transcript.raw.jsonl"
-        stderr_path = cell_dir / "transcript.raw.jsonl.stderr.log"
-        text = ""
-        if transcript_path.exists():
-            text += transcript_path.read_text(errors="replace").lower()
-        if stderr_path.exists():
-            text += stderr_path.read_text(errors="replace").lower()
-        if any(sig in text for sig in TRUNCATION_SIGNATURES):
-            return "invalid", "empty diff/FIXES.md + network-truncation signature in transcript"
         return "invalid", "empty diff.patch and empty FIXES.md — no real agent output"
 
     return "valid", "ok"
@@ -140,6 +152,7 @@ def main() -> int:
         statuses[(agent, condition, scope, n)] = _cell_status(_cell_dir(runs_root, agent, condition, scope, n))
 
     valid = [k for k, (status, _) in statuses.items() if status == "valid"]
+    incomplete = [k for k, (status, _) in statuses.items() if status == "incomplete"]
     pending = [k for k, (status, _) in statuses.items() if status != "valid"]
 
     print(
@@ -147,7 +160,13 @@ def main() -> int:
         f"{len(scopes)} fixture(s) x N={args.n} = {len(matrix)} sessions"
     )
     print(f"  already valid: {len(valid)}")
-    print(f"  pending (missing or invalid): {len(pending)}")
+    print(f"  pending (missing/invalid/incomplete): {len(pending)}")
+    if incomplete:
+        # Called out separately from missing/invalid: these sessions
+        # actually ran and hit a real usage/rate limit mid-task — expected
+        # at N=5's scale, not a harness problem, and re-running this same
+        # command after the limit resets is the entire fix.
+        print(f"    ({len(incomplete)} of those hit a usage/rate limit — expected, just re-run after it resets)")
     for agent, condition, scope, n in pending:
         status, reason = statuses[(agent, condition, scope, n)]
         print(f"    {agent:8} {condition:5} {scope:9} run {n} — {status} ({reason})")
@@ -180,15 +199,27 @@ def main() -> int:
                 f"  -> still {status} after running ({reason}; harness exit code {proc.returncode}) "
                 "— will retry on next invocation"
             )
-            failures.append((agent, condition, scope, n))
+            failures.append((agent, condition, scope, n, status))
         else:
             print("  -> valid")
+
+    still_incomplete = [f for f in failures if f[4] == "incomplete"]
+    still_broken = [f for f in failures if f[4] != "incomplete"]
 
     print(f"\nDone this pass: {len(pending) - len(failures)}/{len(pending)} succeeded.")
     if failures:
         print(f"{len(failures)} session(s) still need a retry — just re-run this same command:")
-        for agent, condition, scope, n in failures:
-            print(f"    {agent} {condition} {scope} run {n}")
+        for agent, condition, scope, n, status in failures:
+            print(f"    {agent} {condition} {scope} run {n} ({status})")
+    if still_incomplete and not still_broken:
+        # Every remaining session is retryable-and-expected (still inside a
+        # usage/rate-limit window), not a real harness problem — a distinct
+        # exit code so an automated caller (or a human skimming CI-style
+        # output) doesn't treat "waiting for a limit to reset" the same as
+        # "something is actually broken."
+        print(f"\nAll {len(still_incomplete)} remaining are usage/rate-limit INCOMPLETE — expected, not a failure. Re-run after it resets.")
+        return 2
+    if still_broken:
         return 1
     return 0
 

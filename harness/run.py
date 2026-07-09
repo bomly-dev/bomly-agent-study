@@ -455,6 +455,7 @@ def main() -> int:
         "started_at": None,
         "ended_at": None,
         "timeout": False,
+        "incomplete_reason": None,
         "exit_code": None,
         "mcp_tool_errors": [],
         "stderr_tail": None,
@@ -524,6 +525,7 @@ def main() -> int:
                 "effort": "n/a",
                 "exit_code": 0,
                 "timeout": False,
+                "incomplete_reason": None,
                 "turns": 0,
                 "tool_calls": 0,
                 "mcp_calls": 0,
@@ -554,6 +556,7 @@ def main() -> int:
                 "started_at": started,
                 "ended_at": ended,
                 "timeout": result.get("timeout", False),
+                "incomplete_reason": result.get("incomplete_reason"),
                 "exit_code": result.get("exit_code"),
                 "mcp_tool_errors": result.get("mcp_tool_errors", []),
                 "stderr_tail": result.get("stderr_tail"),
@@ -566,11 +569,13 @@ def main() -> int:
             for ev in norm_events:
                 f.write(json.dumps(ev) + "\n")
 
+        incomplete_reason = result.get("incomplete_reason")
         timing = {
             "started_at": started,
             "ended_at": ended,
             "wall_seconds": round(wall, 2),
             "timeout": result.get("timeout", False),
+            "incomplete_reason": incomplete_reason,
             "turns": result.get("turns"),
             "tool_calls": result.get("tool_calls"),
             "mcp_calls": result.get("mcp_calls"),
@@ -588,6 +593,21 @@ def main() -> int:
 
         (run_dir / "meta.json").write_text(json.dumps(meta, indent=2))
 
+        if incomplete_reason:
+            # v3 (2026-07-09, Ahmed): a session cut short by a usage/rate
+            # limit or dropped connection is marked INCOMPLETE, not scored —
+            # a partial remediation of a "fix everything" task isn't a real
+            # data point, and running the full rebuild+test+scan pipeline on
+            # it would just burn time (up to the api-java fixture's 75-min
+            # budget) for a result that gets thrown away anyway.
+            # harness/run_study.py's orchestrator reads meta.json's
+            # incomplete_reason directly (no result.json needed) and treats
+            # this cell as pending — re-running `make study` after the usage
+            # limit resets retries exactly this cell.
+            print(f"run INCOMPLETE ({incomplete_reason}): {run_dir} — not scored, will retry")
+            print(f"workspace: {workspace}" + (" (kept)" if args.keep_workspace else " (will be removed)"))
+            return 0
+
         # Score the workspace WHILE it still exists (post-agent state) — this
         # is the fast path. `make verify-only` (harness/verify.py --from-run)
         # reconstructs an equivalent workspace later from diff.patch alone, so
@@ -601,6 +621,7 @@ def main() -> int:
             "run_number": args.run_number,
             "wall_seconds": timing["wall_seconds"],
             "timeout": timing["timeout"],
+            "incomplete": False,
             "turns": timing["turns"],
             "tool_calls": timing["tool_calls"],
             "mcp_calls": timing["mcp_calls"],

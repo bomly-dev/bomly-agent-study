@@ -33,6 +33,8 @@ import os
 import subprocess
 from pathlib import Path
 
+from . import signals
+
 
 class NotInContainerError(RuntimeError):
     pass
@@ -204,12 +206,20 @@ def run(
             "reasoning_output": usage.get("reasoning_output_tokens"),
         }
 
+    # Incomplete-session detection (v3, 2026-07-09, Ahmed) — see
+    # harness/adapters/signals.py and claude.py's matching comment for the
+    # full rationale. Codex's JSONL schema has no documented "why did the
+    # turn end" subtype the way Claude's result event does, so this is
+    # phrase-matching only for both agents, not an asymmetric check.
+    incomplete_reason = signals.detect_incomplete_reason("\n".join(raw_lines) + "\n" + stderr_text)
+
     return {
         "agent_version": agent_version,
         "model": model,
         "effort": effort or None,
         "exit_code": exit_code,
         "timeout": timed_out,
+        "incomplete_reason": incomplete_reason,
         "turns": turns,
         "tool_calls": tool_calls,
         "mcp_calls": mcp_calls,

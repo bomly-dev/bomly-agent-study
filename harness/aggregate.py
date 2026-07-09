@@ -91,19 +91,23 @@ def main() -> int:
         print(f"no {runs_dir.name}/ directory yet — nothing to aggregate", file=sys.stderr)
         return 0
 
-    # v2 layout: runs/<agent>/<condition>/<scope>/<n>/result.json — one
-    # fixture per session, scope in the path.
+    # v2 layout: runs/<agent>/<condition>/<scope>/<n>/{meta,result}.json —
+    # one fixture per session, scope in the path. An INCOMPLETE session
+    # (harness/run.py, v3 2026-07-09) never gets a result.json at all — it's
+    # skipped before the expensive scoring pipeline runs, since a partial
+    # remediation of a "fix everything" task isn't a real data point. Counted
+    # from meta.json (always written) purely for visibility, never pooled.
     all_rows = []
     result_paths = sorted(runs_dir.glob("*/*/*/*/result.json"))
-    incomplete_count = 0
-    scored_count = 0
     for result_path in result_paths:
-        data = json.loads(result_path.read_text())
-        if (data.get("run_meta") or {}).get("incomplete"):
-            incomplete_count += 1
-            continue
         all_rows.extend(rows_for_result(result_path))
-        scored_count += 1
+    scored_count = len(result_paths)
+
+    incomplete_count = 0
+    for meta_path in runs_dir.glob("*/*/*/*/meta.json"):
+        meta = json.loads(meta_path.read_text())
+        if meta.get("incomplete_reason"):
+            incomplete_count += 1
 
     if not all_rows and not incomplete_count:
         print(f"no result.json files found under {runs_dir.name}/", file=sys.stderr)
