@@ -213,6 +213,48 @@ def _strip_excluded_sections(root: Path) -> None:
 
 MAKEFILE_HARNESS_MARKER = "# --- Harness targets ---"
 
+# Fixture directory -> its Makefile test target. Used to scope the agent's
+# workspace to a single fixture per session (v2 protocol: every run is one
+# agent x one condition x ONE fixture).
+FIXTURE_DIRS = ("webapp", "service", "api-java")
+FIXTURE_TEST_TARGET = {"webapp": "test-webapp", "service": "test-service", "api-java": "test-java"}
+
+
+def _scope_agent_makefile(makefile_path: Path, scope: str) -> None:
+    """Rewrite the agent-visible Makefile for a single-fixture workspace.
+
+    With the other fixtures stripped from the tree, the root `make test`
+    (which chains all three fixtures' targets) would fail on missing
+    directories — and the other fixtures' target bodies would leak that this
+    repo normally carries more applications than the agent can see. Keep
+    `make test` working and honest: point it at the one in-workspace
+    fixture's target and drop the other fixtures' target blocks and clean
+    lines entirely.
+    """
+    if scope == "all" or not makefile_path.exists():
+        return
+    text = makefile_path.read_text()
+    keep_target = FIXTURE_TEST_TARGET[scope]
+    # test: depends only on the kept fixture's target — and rewrite the whole
+    # line including its `##` help comment ("all three fixtures" would reveal
+    # the stripped fixtures' existence).
+    text = re.sub(
+        r"^test: [^\n]*",
+        f"test: {keep_target} ## Build + test the fixture from clean",
+        text,
+        flags=re.MULTILINE,
+    )
+    for other, target in FIXTURE_TEST_TARGET.items():
+        if other == scope:
+            continue
+        # remove the whole target block (header + tab-indented recipe lines)
+        text = re.sub(rf"^{re.escape(target)}:[^\n]*\n(?:\t[^\n]*\n)*\n?", "", text, flags=re.MULTILINE)
+        # remove clean-recipe lines that reference the stripped fixture
+        text = re.sub(rf"^\t[^\n]*fixtures/{re.escape(other)}[^\n]*\n", "", text, flags=re.MULTILINE)
+        # drop the removed target from .PHONY
+        text = text.replace(f" {target}", "")
+    makefile_path.write_text(text)
+
 
 def _trim_agent_makefile(makefile_path: Path) -> None:
     """The root Makefile is needed for `make test` and isn't in
@@ -241,12 +283,18 @@ def _trim_agent_makefile(makefile_path: Path) -> None:
     makefile_path.write_text(trimmed)
 
 
-def fresh_clone(workspace: Path, ref: str) -> None:
+def fresh_clone(workspace: Path, ref: str, scope: str = "all") -> None:
     """Materialize the agent's workspace at workspace/repo: the fixture tree
     at the frozen ref, with AGENT_EXCLUDED_PATHS removed, and NO git history —
     just a single fresh commit over the already-redacted tree, so later
     diff-capture (`git -C repo diff`) still works unchanged, comparing
     against exactly what the agent was shown, nothing more.
+
+    With a single-fixture scope (v2 protocol), the OTHER fixtures are removed
+    too: they're irrelevant to the session, would pollute per-fixture token
+    and timing measurements if the agent wandered into them, and a workspace
+    that only contains what the task is about is also just the more realistic
+    shape of a real repo.
     """
     dest = workspace / "repo"
     dest.mkdir(parents=True)
@@ -266,7 +314,13 @@ def fresh_clone(workspace: Path, ref: str) -> None:
         elif target.exists():
             target.unlink()
 
+    if scope != "all":
+        for other in FIXTURE_DIRS:
+            if other != scope:
+                shutil.rmtree(dest / "fixtures" / other, ignore_errors=True)
+
     _trim_agent_makefile(dest / "Makefile")
+    _scope_agent_makefile(dest / "Makefile", scope)
     _strip_excluded_sections(dest)
 
     # Fresh, single-commit git history over the redacted tree — enough for
@@ -343,12 +397,14 @@ def main() -> int:
     harness_sha = run_capture(["git", "-C", str(REPO_ROOT), "rev-parse", "--short", "HEAD"]).stdout.strip()
 
     runs_root = "runs-pilot" if args.pilot else "runs"
-    run_dir = REPO_ROOT / runs_root / args.agent / args.condition / str(args.run_number)
+    # v2 layout: scope is part of the run's identity (one fixture per agent
+    # session), so it's part of the path — runs/<agent>/<condition>/<scope>/<n>.
+    run_dir = REPO_ROOT / runs_root / args.agent / args.condition / args.scope / str(args.run_number)
     run_dir.mkdir(parents=True, exist_ok=True)
 
     work_root_auto_created = args.work_root is None
     work_root = Path(args.work_root) if args.work_root else Path(tempfile.mkdtemp(prefix="bomly-study-"))
-    workspace = work_root / f"{args.agent}-{args.condition}-{args.run_number}-{int(time.time())}"
+    workspace = work_root / f"{args.agent}-{args.condition}-{args.scope}-{args.run_number}-{int(time.time())}"
     workspace.mkdir(parents=True)
     agent_config_dir = workspace / "agent-config"  # fresh CLAUDE_CONFIG_DIR / CODEX_HOME
     agent_config_dir.mkdir()
@@ -383,7 +439,7 @@ def main() -> int:
         meta["bomly_version"] = v.stdout.strip().splitlines()[0] if v.stdout else None
 
     try:
-        fresh_clone(workspace, fixture_ref)
+        fresh_clone(workspace, fixture_ref, scope=args.scope)
         repo = workspace / "repo"
         write_condition_files(repo, args.condition)
 

@@ -1,9 +1,8 @@
-This repository contains small applications (webapp/, service/, api-java/ under
-fixtures/) with known-vulnerable dependencies. Identify and remediate the
-vulnerable dependencies.
+The application in this repository (under `fixtures/`) has known-vulnerable
+dependencies. Identify and remediate the vulnerable dependencies.
 
-Keep every application building and its tests passing (`make test` at the repo
-root, or the per-app target for the app you're working on).
+Keep the application building and its tests passing (`make test` at the repo
+root).
 
 If a vulnerability cannot be fixed by changing a version (no fixed version
 exists), say so explicitly rather than guessing or claiming a fix that doesn't

@@ -26,8 +26,8 @@ test-service: ## Python fixture (vendored CTFd 3.7.7): fresh venv, install, boun
 		.venv/bin/pip install --quiet -r .dev-test.txt && \
 		.venv/bin/python -m pytest tests/test_config.py tests/users -q -p no:randomly
 
-test-java: ## Maven fixture: offline test (deps expected pre-resolved)
-	cd fixtures/api-java && mvn -o test
+test-java: ## Maven fixture (vendored Dependency-Track 4.10.0): bounded surefire subset
+	cd fixtures/api-java && mvn -B test -Dtest="org.dependencytrack.model.**,org.dependencytrack.util.**,org.dependencytrack.parser.**" -DfailIfNoTests=false
 
 clean: ## Remove build artifacts and virtualenvs
 	rm -rf fixtures/webapp/node_modules fixtures/webapp/dist
@@ -47,10 +47,10 @@ PILOT ?=
 
 PILOT_FLAG := $(if $(PILOT),--pilot,)
 
-reproduce-one: ## Run one agent+condition end to end in Docker, then score it. Needs a credential (see CREDENTIALS.md). Add PILOT=1 for a pilot run.
+reproduce-one: ## Run one agent+condition+fixture session end to end in Docker, then score it. Needs a credential (see CREDENTIALS.md). Add PILOT=1 for a pilot run.
 	./harness/run.sh $(AGENT) $(CONDITION) $(RUN_NUMBER) --scope $(SCOPE) $(PILOT_FLAG)
 
-verify-only: ## Re-score an already-published run, no API key needed:  make verify-only RUN=runs/claude/mcp/1
+verify-only: ## Re-score an already-published run, no API key needed:  make verify-only RUN=runs/claude/mcp/webapp/1
 	./harness/verify.sh $(RUN)
 
 aggregate: ## Roll per-run result.json files into analysis/results.csv (or results-pilot.csv with PILOT=1)
@@ -59,7 +59,7 @@ aggregate: ## Roll per-run result.json files into analysis/results.csv (or resul
 N ?= 5
 AGENTS ?= claude,codex
 CONDITIONS ?= bare,mcp
-STUDY_SCOPE ?= all
+SCOPES ?= webapp,service,api-java
 
-study: ## Run the full agent x condition x N matrix, resuming past any already-valid runs. Safe to re-invoke after a session-limit interruption — only re-executes missing/invalid cells. DRY=1 to preview without running.
-	$(PYTHON) harness/run_study.py --agents $(AGENTS) --conditions $(CONDITIONS) --n $(N) --scope $(STUDY_SCOPE) $(PILOT_FLAG) $(if $(DRY),--dry-run,)
+study: ## Run the full agent x condition x fixture x N matrix (one fixture per session), resuming past any already-valid runs. Safe to re-invoke after a session-limit interruption — only re-executes missing/invalid sessions. DRY=1 to preview without running.
+	$(PYTHON) harness/run_study.py --agents $(AGENTS) --conditions $(CONDITIONS) --scopes $(SCOPES) --n $(N) $(PILOT_FLAG) $(if $(DRY),--dry-run,)

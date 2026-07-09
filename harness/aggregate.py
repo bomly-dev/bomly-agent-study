@@ -78,8 +78,11 @@ def main() -> int:
         print(f"no {runs_dir.name}/ directory yet — nothing to aggregate", file=sys.stderr)
         return 0
 
+    # v2 layout: runs/<agent>/<condition>/<scope>/<n>/result.json — one
+    # fixture per session, scope in the path.
     all_rows = []
-    for result_path in sorted(runs_dir.glob("*/*/*/result.json")):
+    result_paths = sorted(runs_dir.glob("*/*/*/*/result.json"))
+    for result_path in result_paths:
         all_rows.extend(rows_for_result(result_path))
 
     if not all_rows:
@@ -92,7 +95,7 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(all_rows)
 
-    n_runs = len(list(runs_dir.glob("*/*/*/result.json")))
+    n_runs = len(result_paths)
     print(f"wrote {len(all_rows)} rows from {n_runs} runs to {out_path}")
     return 0
 

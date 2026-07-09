@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """Orchestrate the full N-per-cell study matrix — resumable by design.
 
-Motivation: at N=5 (2 agents x 2 conditions x 5 = 20 runs), hitting a
-subscription/session usage limit partway through is a real, expected
-possibility, not an edge case. Re-invoking this script after ANY
+Motivation: at N=5 (2 agents x 2 conditions x 3 fixtures x 5 = 60 sessions),
+hitting a subscription/session usage limit partway through is a real,
+expected possibility, not an edge case. Re-invoking this script after ANY
 interruption (session limit, crash, killed process, laptop sleep) must pick
 up exactly where it left off — never redo already-valid runs, never require
 figuring out by hand which cells are missing.
 
 Usage:
-  harness/run_study.py --agents claude,codex --conditions bare,mcp --n 5 --scope all
+  harness/run_study.py --agents claude,codex --conditions bare,mcp --scopes webapp,service,api-java --n 5
   harness/run_study.py --dry-run   # just print the plan, run nothing
 
+v2 protocol: every cell is ONE fixture in its own agent session
+(agent x condition x scope x n), so the ladder's easy/medium/hard rungs are
+measured independently and an interruption costs one fixture-session, not
+three. The hard fixture (api-java) gets a longer per-session timeout.
+
 Safe to re-invoke any number of times. Each invocation:
-  1. Enumerates the full (agent, condition, run_number) matrix.
+  1. Enumerates the full (agent, condition, scope, run_number) matrix.
   2. For each cell, checks whether a VALID result already exists (see
      _cell_status below — this is more than "does result.json exist": a run
      truncated by a dropped API connection mid-task still writes a
@@ -53,8 +58,15 @@ TRUNCATION_SIGNATURES = (
 )
 
 
-def _cell_dir(runs_root: Path, agent: str, condition: str, n: int) -> Path:
-    return runs_root / agent / condition / str(n)
+# Per-session timeout, seconds. The hard fixture (api-java: a real Maven app
+# with a 200-400 artifact tree) legitimately needs longer than the default 45
+# minutes; the easy/medium rungs don't.
+SCOPE_TIMEOUT_SECONDS = {"api-java": 75 * 60}
+DEFAULT_TIMEOUT_SECONDS = 45 * 60
+
+
+def _cell_dir(runs_root: Path, agent: str, condition: str, scope: str, n: int) -> Path:
+    return runs_root / agent / condition / scope / str(n)
 
 
 def _cell_status(cell_dir: Path) -> tuple[str, str]:
@@ -103,38 +115,42 @@ def _cell_status(cell_dir: Path) -> tuple[str, str]:
     return "valid", "ok"
 
 
-def build_matrix(agents: list[str], conditions: list[str], n: int) -> list[tuple[str, str, int]]:
-    return [(a, c, i) for a in agents for c in conditions for i in range(1, n + 1)]
+def build_matrix(agents: list[str], conditions: list[str], scopes: list[str], n: int) -> list[tuple[str, str, str, int]]:
+    return [(a, c, s, i) for a in agents for c in conditions for s in scopes for i in range(1, n + 1)]
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--agents", default="claude,codex")
     ap.add_argument("--conditions", default="bare,mcp")
+    ap.add_argument("--scopes", default="webapp,service,api-java")
     ap.add_argument("--n", type=int, default=5)
-    ap.add_argument("--scope", default="all")
     ap.add_argument("--pilot", action="store_true", help="Write to runs-pilot/ instead of runs/")
     ap.add_argument("--dry-run", action="store_true", help="Print the plan only; run nothing")
     args = ap.parse_args()
 
     agents = [a.strip() for a in args.agents.split(",") if a.strip()]
     conditions = [c.strip() for c in args.conditions.split(",") if c.strip()]
-    matrix = build_matrix(agents, conditions, args.n)
+    scopes = [s.strip() for s in args.scopes.split(",") if s.strip()]
+    matrix = build_matrix(agents, conditions, scopes, args.n)
     runs_root = REPO_ROOT / ("runs-pilot" if args.pilot else "runs")
 
     statuses = {}
-    for agent, condition, n in matrix:
-        statuses[(agent, condition, n)] = _cell_status(_cell_dir(runs_root, agent, condition, n))
+    for agent, condition, scope, n in matrix:
+        statuses[(agent, condition, scope, n)] = _cell_status(_cell_dir(runs_root, agent, condition, scope, n))
 
     valid = [k for k, (status, _) in statuses.items() if status == "valid"]
     pending = [k for k, (status, _) in statuses.items() if status != "valid"]
 
-    print(f"Matrix: {len(agents)} agent(s) x {len(conditions)} condition(s) x N={args.n} = {len(matrix)} cells")
+    print(
+        f"Matrix: {len(agents)} agent(s) x {len(conditions)} condition(s) x "
+        f"{len(scopes)} fixture(s) x N={args.n} = {len(matrix)} sessions"
+    )
     print(f"  already valid: {len(valid)}")
     print(f"  pending (missing or invalid): {len(pending)}")
-    for agent, condition, n in pending:
-        status, reason = statuses[(agent, condition, n)]
-        print(f"    {agent:8} {condition:5} run {n} — {status} ({reason})")
+    for agent, condition, scope, n in pending:
+        status, reason = statuses[(agent, condition, scope, n)]
+        print(f"    {agent:8} {condition:5} {scope:9} run {n} — {status} ({reason})")
 
     if args.dry_run:
         print("\n--dry-run: stopping here, nothing executed.")
@@ -144,29 +160,35 @@ def main() -> int:
         print("\nNothing to do — every cell already has a valid result.")
         return 0
 
-    print(f"\nRunning {len(pending)} cell(s)...\n")
+    print(f"\nRunning {len(pending)} session(s)...\n")
     failures = []
-    for i, (agent, condition, n) in enumerate(pending, 1):
-        print(f"[{i}/{len(pending)}] {agent} {condition} run {n} ...")
-        cmd = [str(REPO_ROOT / "harness" / "run.sh"), agent, condition, str(n), "--scope", args.scope]
+    for i, (agent, condition, scope, n) in enumerate(pending, 1):
+        timeout = SCOPE_TIMEOUT_SECONDS.get(scope, DEFAULT_TIMEOUT_SECONDS)
+        print(f"[{i}/{len(pending)}] {agent} {condition} {scope} run {n} (timeout {timeout // 60}m) ...")
+        cmd = [
+            str(REPO_ROOT / "harness" / "run.sh"),
+            agent, condition, str(n),
+            "--scope", scope,
+            "--timeout", str(timeout),
+        ]
         if args.pilot:
             cmd.append("--pilot")
         proc = subprocess.run(cmd)
-        status, reason = _cell_status(_cell_dir(runs_root, agent, condition, n))
+        status, reason = _cell_status(_cell_dir(runs_root, agent, condition, scope, n))
         if status != "valid":
             print(
                 f"  -> still {status} after running ({reason}; harness exit code {proc.returncode}) "
                 "— will retry on next invocation"
             )
-            failures.append((agent, condition, n))
+            failures.append((agent, condition, scope, n))
         else:
             print("  -> valid")
 
     print(f"\nDone this pass: {len(pending) - len(failures)}/{len(pending)} succeeded.")
     if failures:
-        print(f"{len(failures)} cell(s) still need a retry — just re-run this same command:")
-        for agent, condition, n in failures:
-            print(f"    {agent} {condition} run {n}")
+        print(f"{len(failures)} session(s) still need a retry — just re-run this same command:")
+        for agent, condition, scope, n in failures:
+            print(f"    {agent} {condition} {scope} run {n}")
         return 1
     return 0
 
