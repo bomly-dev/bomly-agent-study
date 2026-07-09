@@ -113,13 +113,34 @@ def rebuild_and_test(repo: Path, scope: str) -> dict:
             build = run_capture(["npm", "run", "build"], cwd=path, timeout=120) if install.returncode == 0 else install
             test = run_capture(["npm", "test"], cwd=path, timeout=180) if build.returncode == 0 else build
         elif d == "service":
+            # Vendored CTFd 3.7.7. Commands mirror the root Makefile's
+            # test-service target — deliberately duplicated here rather than
+            # invoking `make`, so scoring never executes an agent-modified
+            # Makefile (the workspace copy is part of the agent's writable
+            # tree; diff.patch can carry Makefile edits).
             venv = path / ".venv"
             shutil.rmtree(venv, ignore_errors=True)
             python_bin = os.environ.get("BOMLY_STUDY_PYTHON", "python3.12")
             run_capture([python_bin, "-m", "venv", str(venv)], cwd=path)
             pip = venv / "bin" / "pip"
-            install = run_capture([str(pip), "install", "--quiet", "-r", "requirements.txt", "-r", "requirements-dev.txt"], cwd=path, timeout=300)
-            test = run_capture([str(venv / "bin" / "pytest"), "-q"], cwd=path, timeout=180) if install.returncode == 0 else install
+            install = run_capture([str(pip), "install", "--quiet", "-r", "requirements.txt"], cwd=path, timeout=600)
+            if install.returncode == 0:
+                dev_lines = [
+                    l for l in (path / "development.txt").read_text().splitlines()
+                    if l.strip() and not re.match(
+                        r"^-r |.*(psycopg2|bandit|sphinx|pip-tools|flask_profiler|flask-debugtoolbar|pipdeptree)", l
+                    )
+                ]
+                (path / ".dev-test.txt").write_text("\n".join(dev_lines) + "\n")
+                install = run_capture([str(pip), "install", "--quiet", "-r", ".dev-test.txt"], cwd=path, timeout=600)
+            test = (
+                run_capture(
+                    [str(venv / "bin" / "python"), "-m", "pytest", "tests/test_config.py", "tests/users",
+                     "-q", "-p", "no:randomly"],
+                    cwd=path, timeout=600,
+                )
+                if install.returncode == 0 else install
+            )
             build = install
         elif d == "api-java":
             java_home = resolve_java_home()
@@ -139,7 +160,22 @@ def rebuild_and_test(repo: Path, scope: str) -> dict:
             # perfectly good fix. npm ci / pip install elsewhere in this same
             # function already use the network for exactly this reason —
             # Maven should be consistent with them, not stricter.
-            test = subprocess.run(["mvn", "test"], cwd=path, capture_output=True, text=True, env=env, timeout=300)
+            #
+            # Vendored Dependency-Track 4.10.0: the full suite is 186 test
+            # classes (way beyond a scoring pass' budget), so run the same
+            # bounded subset as the root Makefile's test-java target —
+            # duplicated here rather than invoking `make`, so scoring never
+            # executes an agent-modified Makefile. -P enhance: DataNucleus
+            # JDO bytecode enhancement is a profile upstream, not part of
+            # the default lifecycle (DEVELOPING.md, "DataNucleus Bytecode
+            # Enhancement") — every @PersistenceCapable-backed test fails
+            # with NucleusUserException without it.
+            test = subprocess.run(
+                ["mvn", "-B", "-P", "enhance", "test",
+                 "-Dtest=org.dependencytrack.model.**,org.dependencytrack.util.**,org.dependencytrack.parser.**",
+                 "-DfailIfNoTests=false"],
+                cwd=path, capture_output=True, text=True, env=env, timeout=1800,
+            )
             build = test
             install = test
         else:
@@ -538,9 +574,15 @@ def _looks_unrelated(diff_text: str) -> bool:
     # explicitly allows ("keep tests passing"). Maven's src/test/java/... was
     # already covered by "src/"; webapp's top-level test/ and service's tests/
     # were the gap.
+    # v2 real-world fixtures widen the legitimate-edit surface: CTFd's
+    # application code lives under fixtures/service/CTFd/ (not src/ or
+    # app/), with migrations/ and manage.py at its root, and its dev deps in
+    # development.txt; Dependency-Track keeps everything under src/ and
+    # pom.xml, already covered.
     allowed_patterns = (
         "package.json", "package-lock.json", "requirements.in", "requirements.txt",
-        "requirements-dev", "pom.xml", "FIXES.md", "src/", "app/", "test/", "tests/",
+        "requirements-dev", "development.txt", "pom.xml", "FIXES.md",
+        "src/", "app/", "test/", "tests/", "CTFd/", "migrations/", "manage.py",
     )
     changed_files = [l[6:] for l in diff_text.splitlines() if l.startswith("+++ b/")]
     return any(not any(p in f for p in allowed_patterns) for f in changed_files)

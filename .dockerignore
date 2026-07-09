@@ -1,0 +1,17 @@
+# Keep the Docker build context (and the image, where these get COPYed in
+# full for the Maven pre-warm step) free of local build/test artifacts and
+# run data — none of it belongs in the image, and target/ in particular
+# would bake in class files from whatever `mvn test` last ran on the host.
+.git
+harness/.venv
+harness/__pycache__
+harness/adapters/__pycache__
+scripts/__pycache__
+fixtures/api-java/target
+fixtures/webapp/node_modules
+fixtures/webapp/dist
+fixtures/service/.venv
+fixtures/service/.venv-check
+runs
+runs-pilot
+runs-pilot-v1

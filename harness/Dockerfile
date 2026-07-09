@@ -126,11 +126,26 @@ USER ubuntu
 ENV HOME=/home/ubuntu
 
 # --- Pre-warm Maven's local repo so the api-java scan/build is fully offline
-#     inside the container (see fixtures/api-java/README.md). Done as the
-#     `ubuntu` user (not root) so it warms $HOME/.m2 under the same account
-#     that will actually run `mvn` at study time.
-COPY --chown=ubuntu:ubuntu fixtures/api-java/pom.xml /tmp/warm-pom/pom.xml
-RUN cd /tmp/warm-pom && mvn -q dependency:go-offline && rm -rf /tmp/warm-pom
+#     inside the container. Done as the `ubuntu` user (not root) so it warms
+#     $HOME/.m2 under the same account that will actually run `mvn` at study
+#     time.
+#
+# Vendored Dependency-Track 4.10.0 needs more than `dependency:go-offline`
+# against a bare pom.xml (that was enough for the old toy fixture): its
+# DataNucleus JDO layer requires bytecode enhancement, which upstream binds
+# to a Maven PROFILE (`-P enhance`, see fixtures/api-java/DEVELOPING.md,
+# "DataNucleus Bytecode Enhancement") rather than the default lifecycle —
+# `go-offline` doesn't resolve an inactive profile's plugins, and enhancement
+# itself needs real compiled classes, not just the POM. So this copies the
+# full source tree (.dockerignore drops target/) and runs the SAME bounded
+# command harness/verify.py and the fixture's own Makefile target use, which
+# both resolves every dependency/plugin needed AND primes the enhancer's
+# output — confirming at build time, not just at scoring time, that the
+# offline run actually works.
+COPY --chown=ubuntu:ubuntu fixtures/api-java /tmp/warm-pom
+RUN cd /tmp/warm-pom \
+    && mvn -B -P enhance test -Dtest="org.dependencytrack.model.**,org.dependencytrack.util.**,org.dependencytrack.parser.**" -DfailIfNoTests=false \
+    && rm -rf /tmp/warm-pom
 
 # --- Pre-warm trivy's vulnerability DB (used as the Maven fixture's
 #     independent second scanner, harness/verify.py) into $HOME/.cache/trivy,

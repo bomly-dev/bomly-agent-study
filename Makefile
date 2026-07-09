@@ -27,7 +27,11 @@ test-service: ## Python fixture (vendored CTFd 3.7.7): fresh venv, install, boun
 		.venv/bin/python -m pytest tests/test_config.py tests/users -q -p no:randomly
 
 test-java: ## Maven fixture (vendored Dependency-Track 4.10.0): bounded surefire subset
-	cd fixtures/api-java && mvn -B test -Dtest="org.dependencytrack.model.**,org.dependencytrack.util.**,org.dependencytrack.parser.**" -DfailIfNoTests=false
+	# -P enhance: DataNucleus JDO bytecode enhancement is a profile upstream,
+	# not part of the default lifecycle (see DEVELOPING.md, "DataNucleus
+	# Bytecode Enhancement") — without it every @PersistenceCapable-backed
+	# test fails with NucleusUserException before ever reaching test logic.
+	cd fixtures/api-java && mvn -B -P enhance test -Dtest="org.dependencytrack.model.**,org.dependencytrack.util.**,org.dependencytrack.parser.**" -DfailIfNoTests=false
 
 clean: ## Remove build artifacts and virtualenvs
 	rm -rf fixtures/webapp/node_modules fixtures/webapp/dist
