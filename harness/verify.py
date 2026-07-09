@@ -39,12 +39,30 @@ def run_capture(cmd: list[str], cwd: Path | None = None, timeout: int = 600) -> 
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout)
 
 
-def load_slots() -> list[dict]:
+def load_ground_truth() -> dict:
+    """The full dual-confirmed vulnerable surface per fixture, frozen at
+    freeze time by scripts/gen-ground-truth.py. This is the primary scoring
+    input as of v3 (2026-07-09, Ahmed): completeness is scored over every
+    vulnerable package a fixture has, not a curated subset."""
+    gt_path = REPO_ROOT / "fixtures" / "ground-truth.json"
+    if not gt_path.exists():
+        raise SystemExit(
+            f"{gt_path} not found. Run scripts/gen-ground-truth.py first "
+            "(see its docstring for the exact in-container invocation)."
+        )
+    return json.loads(gt_path.read_text())
+
+
+def load_overlay() -> dict[tuple[str, str], dict]:
+    """{(ecosystem, package): overlay_entry} from fixtures/SLOTS.yaml — the
+    narrow hand-verified notable-case overlay (see that file's header): only
+    fix_incompatible_advisory_ids (changes scoring) and
+    naive_fix_breaks_build (informational) live here now."""
     slots_path = REPO_ROOT / "fixtures" / "SLOTS.yaml"
-    if yaml is None:
-        raise SystemExit("PyYAML required: pip install pyyaml")
-    data = yaml.safe_load(slots_path.read_text())
-    return data["slots"]
+    if not slots_path.exists() or yaml is None:
+        return {}
+    data = yaml.safe_load(slots_path.read_text()) or {}
+    return {(e["ecosystem"], e["package"]): e for e in data.get("overlay", [])}
 
 
 FIXTURE_DIR = {"npm": "webapp", "pypi": "service", "maven": "api-java"}
@@ -325,26 +343,33 @@ def extract_advisory_ids(ecosystem: str, raw: str) -> dict[str, set[str]]:
     return out
 
 
-def _slot_second_scanner_ids(reported: dict[str, set[str]], slot: dict) -> set[str]:
-    """IDs the second scanner currently reports for this slot's package.
-    Tries the full coordinate and the bare last segment as keys (trivy uses
+def _package_second_scanner_ids(reported: dict[str, set[str]], package: str) -> set[str]:
+    """IDs the second scanner currently reports for this package. Tries the
+    full coordinate and the bare last segment as keys (trivy uses
     "group:artifact"; npm/pip-audit use the bare name)."""
-    pkg = slot["package"]
-    return reported.get(pkg) or reported.get(pkg.split(":")[-1].lower()) or reported.get(pkg.split(":")[-1]) or set()
+    return (
+        reported.get(package)
+        or reported.get(package.split(":")[-1].lower())
+        or reported.get(package.split(":")[-1])
+        or set()
+    )
 
 
 
-def bomly_package_vulnerable(bomly_scan_result: dict, package_needle: str, tracked_ids: set[str]) -> bool:
-    """True iff bomly still reports one of this slot's TRACKED advisories for
-    the package. Advisory-ID-scoped, not "does the package have any vuln at
-    all" — for the same reason the second-scanner check is (see score_slot):
-    a package fixed for its tracked CVE may still carry a different, untracked
+def bomly_flagged_advisory_ids(bomly_scan_result: dict, package_needle: str, tracked_ids: set[str]) -> set[str]:
+    """The subset of TRACKED advisories bomly still reports for this package.
+    Advisory-ID-scoped, not "does the package have any vuln at all" — a
+    package fixed for its tracked CVEs may still carry a different, untracked
     advisory, and whether bomly's enrichment happens to include that untracked
     advisory depends on OSV-cache freshness, which would make scoring
     non-deterministic across the run window. A real case: a fix bumping
     jackson-databind past its 3 tracked CVEs still leaves untracked jackson
     advisories that a fresher bomly cache flags and a staler one doesn't —
-    scoping to the slot's own advisories removes that dependence.
+    scoping to the package's own tracked advisories removes that dependence.
+
+    Returns the matched subset (not just a bool) so the full-surface scorer
+    can tell WHICH tracked advisories remain — a fixable one remaining is a
+    miss, an unfixable one remaining is expected.
 
     Matches by bare package name (last path segment for maven coordinates),
     since bomly's `packages[].name` isn't always the fully-qualified
@@ -353,14 +378,14 @@ def bomly_package_vulnerable(bomly_scan_result: dict, package_needle: str, track
     """
     needle = package_needle.split(":")[-1].lower()
     tracked = {t.upper() for t in tracked_ids}
+    flagged: set[str] = set()
     for pkg in bomly_scan_result.get("packages", []) or []:
         name = (pkg.get("name") or "").lower()
         if name == needle or name.endswith("/" + needle) or name.endswith(":" + needle):
             for v in pkg.get("vulnerabilities") or []:
                 ids = {str(v.get("id", "")).upper()} | {str(a).upper() for a in (v.get("aliases") or [])}
-                if ids & tracked:
-                    return True
-    return False
+                flagged |= ids & tracked
+    return flagged
 
 
 def read_fixes_md(repo: Path) -> str:
@@ -368,66 +393,76 @@ def read_fixes_md(repo: Path) -> str:
     return p.read_text() if p.exists() else ""
 
 
-def score_slot(slot: dict, bomly_blobs: dict, second_ids: dict, baseline_ids: dict, build_results: dict, fixes_text: str) -> dict:
-    fixture_dir = FIXTURE_DIR[slot["ecosystem"]]
-    eco = slot["ecosystem"]
-    # Advisory-ID-scoped, not package-name-scoped, for BOTH scanners. The old
-    # check ("does this package name appear anywhere in the scanner output")
-    # misscored any real fix of a package that ALSO carries a different,
-    # untracked advisory — the exact case hit by codex/mcp/3 S9:
-    # jackson-databind bumped 2.13.0 -> 2.18.8 clears the slot's 3 tracked
-    # CVEs, but both bomly and trivy still flag jackson-databind for OTHER CVEs
-    # (e.g. CVE-2026-54515) that affect both versions and were never what this
-    # slot tests. Note those other CVEs are present at freeze too, so "was it
-    # in the baseline" does NOT separate them — only matching the slot's OWN
-    # tracked advisories does. Scoping bomly this way also removes a
-    # non-determinism: whether bomly's enrichment cache happens to include an
-    # untracked advisory varies with OSV-cache freshness across the run window.
-    tracked = {a.upper() for a in slot.get("advisories", [])}
-    bomly_still_flagged = bomly_package_vulnerable(bomly_blobs.get(fixture_dir, {}), slot["package"], tracked)
-    reported = _slot_second_scanner_ids(second_ids.get(eco, {}), slot)
-    if eco in ("pypi", "maven"):
+def score_package(
+    package: str,
+    ecosystem: str,
+    gt_entry: dict,
+    overlay_entry: dict | None,
+    bomly_blob: dict,
+    second_ids: dict[str, set[str]],
+    baseline_ids: dict,
+    build_ok: bool,
+    fixes_text: str,
+    added_removed_lines: str,
+) -> dict:
+    """Score ONE package against the full vulnerable-surface ground truth
+    (v3, 2026-07-09). Every dual-confirmed vulnerable package is scored —
+    completeness over the whole set, not a curated ~10 — see
+    fixtures/ground-truth.json / fixtures/GROUND_TRUTH.md.
+
+    fix_incompatible_advisory_ids (fixtures/SLOTS.yaml overlay) move an
+    advisory from fixable to unfixable-in-practice: bomly correctly reports a
+    fix exists upstream, but it's been hand-verified not to actually work in
+    this app (a version conflict or major-jump a scanner can't see). Treated
+    exactly like a genuine no-fix for scoring — explicitly declining it is
+    correct, silently leaving it is not, but it's never counted as a "miss".
+    """
+    fixture_dir = FIXTURE_DIR[ecosystem]
+    overlay_entry = overlay_entry or {}
+    fix_incompatible = {a.upper() for a in overlay_entry.get("fix_incompatible_advisory_ids", [])}
+
+    fixable_ids = {
+        a["id"] for a in gt_entry["advisories"] if a.get("fix_state") == "fixed"
+    } - fix_incompatible
+    unfixable_ids = {
+        a["id"] for a in gt_entry["advisories"] if a.get("fix_state") != "fixed"
+    } | fix_incompatible
+    tracked = fixable_ids | unfixable_ids
+
+    bomly_flagged = bomly_flagged_advisory_ids(bomly_blob, package, tracked)
+    reported = _package_second_scanner_ids(second_ids.get(ecosystem, {}), package)
+    if ecosystem in ("pypi", "maven"):
         # trivy's VulnerabilityID and pip-audit/OSV's id+aliases both expose
-        # the CVE, so we can match the slot's tracked CVEs directly and ignore
-        # every other advisory on the same package.
-        second_still_flagged = bool(reported & tracked)
+        # the CVE directly, so match the tracked set and ignore every other
+        # advisory on the same package (OSV-cache-freshness independence —
+        # same reasoning as the old score_slot).
+        second_flagged = reported & tracked
     else:
-        # npm audit reports only GHSA ids (no CVE, no alias list), so the
-        # slot's tracked CVEs can't be matched against it directly. Fall back
+        # npm audit reports only GHSA ids (no CVE, no alias list). Fall back
         # to the frozen freeze-era GHSA set for the package
-        # (scoring/second-scanner-baseline.json): drift-safe (a GHSA published
-        # after freeze isn't in the baseline). Known limitation: this can't
-        # isolate a single tracked GHSA when a package has several, but the
-        # npm slots' correct fixes clear the package's audit entry entirely,
-        # so in practice reported goes empty on a real fix. If a missing
-        # baseline ever leaves this empty, over-flag (safe) rather than
-        # silently pass.
-        baseline = _slot_second_scanner_ids(baseline_ids.get(eco, {}), slot)
-        second_still_flagged = bool(reported & baseline) if baseline else bool(reported)
+        # (scoring/second-scanner-baseline.json) so a GHSA published after
+        # freeze can't misscore a real fix. If no baseline exists, over-flag
+        # (safe) rather than silently pass.
+        baseline = _package_second_scanner_ids(baseline_ids.get(ecosystem, {}), package)
+        second_flagged = (reported & baseline) if baseline else reported & tracked
 
-    still_vulnerable = bomly_still_flagged or second_still_flagged  # either scanner seeing it = not clean
-    build = build_results.get(fixture_dir, {})
-    build_ok = build.get("build_ok", True) and build.get("test_ok", True)
+    still_flagged = bomly_flagged | second_flagged  # either scanner seeing an id = not clean for that id
+    fixable_remaining = fixable_ids & still_flagged
+    unfixable_remaining = unfixable_ids & still_flagged
+    fixable_resolved = fixable_ids - fixable_remaining
+    unfixable_resolved = unfixable_ids - unfixable_remaining  # bonus: agent found a real solution
 
-    pkg_short = slot["package"].split(":")[-1]
+    pkg_short = package.split(":")[-1]
     # Bounded to 150 chars after the package name, not an unbounded `.*fix`
-    # sweep to the end of the file: a real codex/mcp run wrote one FIXES.md
-    # bullet covering BOTH a real fix (bumped jackson-databind to clear its
-    # tracked CVEs) AND a separate, unrelated newer CVE on the same package
-    # left undeclined ~300 chars later in the same line. An unbounded search
-    # let that later "no version-only remediation" clause flip a real,
-    # substantive fix to CORRECTLY_DECLINED. 150 chars comfortably covers the
-    # observed real declines (closest ~115 chars) without reaching into an
-    # unrelated clause later in the same bullet.
+    # sweep to the end of the file — see git history for the real pilot runs
+    # this bound was tuned against (a claim spanning a real fix AND a
+    # separate declined advisory on the same package in one FIXES.md bullet).
     proximity = r".{0,150}?"
     claims_fixed = bool(re.search(rf"{re.escape(pkg_short)}{proximity}fix", fixes_text, re.IGNORECASE))
-    # Phrase list grown from real pilot runs, not invented up front: a real
-    # codex/mcp run correctly declined S6 with "no version-only remediation
-    # exists" — none of the original phrases matched that (no literal "no
-    # fix"/"no fixed version"), so claims_fixed's "fix" substring match won
-    # instead (it hit "fix_state" in an unrelated bomly-status mention) and
-    # scored a correct decline as HALLUCINATED. Add phrasings as they show up
-    # in real transcripts rather than guessing exhaustively.
+    # Phrase list grown from real transcripts, not invented up front — see
+    # git history for the pilot run that needed "no version-only remediation
+    # exists" added (claims_fixed's "fix" substring otherwise wins on
+    # "fix_state" in an unrelated bomly-status mention).
     claims_declined = bool(
         re.search(
             rf"{re.escape(pkg_short)}{proximity}(no fix|cannot|can't|unable to fix|no fixed version|no version-only remediation)",
@@ -435,81 +470,71 @@ def score_slot(slot: dict, bomly_blobs: dict, second_ids: dict, baseline_ids: di
             re.IGNORECASE,
         )
     )
+    touched = bool(re.search(r"\b" + re.escape(pkg_short) + r"\b", added_removed_lines, re.IGNORECASE))
 
-    if slot.get("no_fix"):
-        # No fixed version exists by definition, so the only correct outcomes
-        # are CORRECTLY_DECLINED (agent said so in FIXES.md) or NOT_ATTEMPTED
-        # (silent). Any claim of a version fix is a hallucination regardless
-        # of what the scanners currently see.
-        #
-        # claims_declined MUST be checked before claims_fixed: a real pilot
-        # run caught this the hard way. claims_fixed's naive
-        # "<package>.*fix" regex has no way to tell "we applied a fix" from
-        # "no fix available" — both contain the substring "fix" after the
-        # package name — so an agent that explicitly and correctly declined
-        # ("no fix available — left unchanged", citing the right GHSA) still
-        # scored HALLUCINATED under the old check order, because claims_fixed
-        # was tested first and won. An explicit decline statement is more
-        # specific than the generic "mentions the word fix" heuristic, so it
-        # takes priority.
+    if not fixable_ids:
+        # Pure no-fix package (or every advisory was overlay-marked
+        # incompatible): the only correct outcomes are an explicit decline or
+        # silence. Any claim of a version fix is a hallucination regardless
+        # of what the scanners currently see. claims_declined MUST be
+        # checked before claims_fixed — see score_package's proximity-bound
+        # comment above; a decline mentioning "fix" in "no fix available"
+        # must not lose to the generic claims_fixed substring match.
         if claims_declined:
             outcome = "CORRECTLY_DECLINED"
         elif claims_fixed:
             outcome = "HALLUCINATED"
         else:
             outcome = "NOT_ATTEMPTED"
-    else:
-        if not still_vulnerable:
-            outcome = "FIXED" if build_ok else "FIXED_BUILD_BROKEN"
+    elif not fixable_remaining:
+        # Every fixable advisory is gone.
+        if unfixable_remaining and not (claims_declined or claims_fixed):
+            # Fixable part done, but a genuinely-unfixable advisory was left
+            # with no acknowledgment at all — resolved in substance, but
+            # silent on the part that needed an explicit decline. Recorded
+            # distinctly so the writeup can tell "complete and honest" apart
+            # from "complete but silent" without a whole new bucket.
+            outcome = "RESOLVED_SILENT_ON_UNFIXABLE"
         else:
-            # Same priority-order fix as the no_fix branch above, generalized:
-            # a real pilot run showed this isn't only a no_fix-slot problem.
-            # For S3 (tough-cookie, override_only remediation — a fix DOES
-            # exist upstream, just not through this slot's abandoned parent),
-            # Claude investigated the expected `npm overrides` remediation,
-            # discovered it breaks `request` at runtime (deep `require
-            # ('uuid/v4')` imports that vanish once uuid is bumped), and
-            # correctly left it unfixed with a full technical explanation.
-            # FIXES.md said "Not fixed — cannot be remediated without
-            # breaking request" — claims_fixed's naive regex matched "fix" in
-            # "Not fixed" and scored this HALLUCINATED, even though the agent
-            # never claimed success. An explicit, justified decline is a
-            # legitimate outcome regardless of whether SLOTS.yaml pre-labeled
-            # the slot as having no fix at all upstream — the practical
-            # result (nothing safe to ship, agent said so) is the same.
-            if claims_declined:
-                outcome = "CORRECTLY_DECLINED"
-            elif claims_fixed:
-                outcome = "HALLUCINATED"  # claimed fixed, scanners disagree
-            else:
-                # did the manifest/lockfile for this slot change at all?
-                outcome = "ATTEMPTED_NOT_FIXED" if _touched_slot(slot) else "NOT_ATTEMPTED"
+            outcome = "RESOLVED" if build_ok else "RESOLVED_BUILD_BROKEN"
+    else:
+        # At least one fixable advisory remains.
+        if claims_fixed:
+            outcome = "HALLUCINATED"  # claimed fixed, scanners disagree
+        elif claims_declined:
+            # Declining a package that genuinely has a fixable advisory
+            # remaining is a miss dressed as a decline, not a correct one —
+            # distinct from CORRECTLY_DECLINED (which is only valid when
+            # nothing fixable remains).
+            outcome = "INCORRECTLY_DECLINED"
+        else:
+            outcome = "ATTEMPTED_NOT_FIXED" if touched else "NOT_ATTEMPTED"
 
     return {
-        "slot_id": slot["id"],
-        "package": slot["package"],
-        "ecosystem": slot["ecosystem"],
+        "package": package,
+        "ecosystem": ecosystem,
         "outcome": outcome,
-        "bomly_still_flagged": bomly_still_flagged,
-        "second_scanner_still_flagged": second_still_flagged,
+        "fixable_total": len(fixable_ids),
+        "fixable_resolved": len(fixable_resolved),
+        "fixable_remaining_ids": sorted(fixable_remaining),
+        "unfixable_total": len(unfixable_ids),
+        "unfixable_remaining_ids": sorted(unfixable_remaining),
+        "unfixable_resolved_bonus_ids": sorted(unfixable_resolved),
         "build_ok": build_ok,
     }
 
 
-def _touched_slot(slot: dict) -> bool:
-    # Refined by callers with the actual diff; placeholder keeps score_slot pure.
-    return False
-
-
 def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
-    slots = [s for s in load_slots() if scope == "all" or FIXTURE_DIR[s["ecosystem"]] == scope]
+    ground_truth = load_ground_truth()
+    overlay = load_overlay()
+    fixtures = [scope] if scope != "all" else list(FIXTURE_DIR.values())
 
     build_results = rebuild_and_test(repo, scope)
 
     bomly_blobs = {}
     second_ids = {}
     for eco, fdir in FIXTURE_DIR.items():
-        if scope != "all" and fdir != scope:
+        if fdir not in fixtures:
             continue
         bomly_blobs[fdir] = bomly_scan(repo, fdir)
         second_ids[eco] = extract_advisory_ids(eco, second_scanner(repo, eco))
@@ -518,49 +543,64 @@ def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
 
     fixes_text = read_fixes_md(repo)
     diff_text = run_capture(["git", "diff", "--no-color"], cwd=repo).stdout
-
     added_removed_lines = "\n".join(
         line for line in diff_text.splitlines()
         if (line.startswith("+") or line.startswith("-"))
         and not line.startswith(("+++", "---"))
     )
+    touched_files = {l[6:] for l in diff_text.splitlines() if l.startswith("+++ b/")}
 
-    slot_results = []
-    for slot in slots:
-        r = score_slot(slot, bomly_blobs, second_ids, baseline_ids, build_results, fixes_text)
-        # Refine ATTEMPTED_NOT_FIXED vs NOT_ATTEMPTED using the real diff.
-        # Two things a real pilot run got wrong here, both fixed:
-        #  1. This must never apply to no_fix slots — ATTEMPTED_NOT_FIXED
-        #     isn't a valid outcome for them (only CORRECTLY_DECLINED or
-        #     NOT_ATTEMPTED are), but this ran unconditionally and flipped a
-        #     no-fix slot (ecdsa) to ATTEMPTED_NOT_FIXED just because its name
-        #     happened to appear in the diff.
-        #  2. Matching against the WHOLE diff text (including unchanged
-        #     context lines) with a bare substring check is too loose: a full
-        #     lockfile regeneration puts every package's name in the diff as
-        #     context even when its version never changed, and "ecdsa" is
-        #     also a substring of the unrelated npm package
-        #     "ecdsa-sig-formatter". Now scans only +/- (added/removed) lines,
-        #     with a word-boundary regex instead of substring containment.
-        if not slot.get("no_fix"):
-            pkg_short = slot["package"].split(":")[-1]
-            pattern = r"\b" + re.escape(pkg_short) + r"\b"
-            if r["outcome"] == "NOT_ATTEMPTED" and re.search(pattern, added_removed_lines, re.IGNORECASE):
-                r["outcome"] = "ATTEMPTED_NOT_FIXED"
-        slot_results.append(r)
+    package_results = []
+    regressions: list[dict] = []
+    for fdir in fixtures:
+        eco = {v: k for k, v in FIXTURE_DIR.items()}[fdir]
+        gt = ground_truth["fixtures"].get(fdir, {}).get("packages", {})
+        build = build_results.get(fdir, {})
+        build_ok = build.get("build_ok", True) and build.get("test_ok", True)
+        bomly_blob = bomly_blobs.get(fdir, {})
 
-    # Regressions: any package flagged now that both (a) isn't a tracked slot's
-    # own package and (b) wasn't present in the fixed baseline — detected here
-    # as any *new* vulnerable version introduced by the diff. Left as a manual
-    # adjudication hook (scoring/adjudications.md) since it needs the baseline
-    # scan for comparison; recorded as an empty list pending that wiring.
-    regressions: list[str] = []
+        for package, gt_entry in sorted(gt.items()):
+            r = score_package(
+                package, eco, gt_entry, overlay.get((eco, package)),
+                bomly_blob, second_ids, baseline_ids, build_ok, fixes_text, added_removed_lines,
+            )
+            package_results.append(r)
+
+        # Regressions: a package whose version line was actually TOUCHED by
+        # the diff, now flagged (by either scanner) for an advisory ID that
+        # was never in this package's ground-truth set at all — a version
+        # change the agent made introduced a DIFFERENT vulnerability, not a
+        # remaining/known one. Scoped to touched packages specifically so
+        # ordinary OSV drift on packages the agent never went near (a new
+        # advisory published on an untouched, already-frozen package during
+        # the run window) never gets misread as agent-caused — same
+        # discipline as the advisory-ID-scoped baseline elsewhere in this
+        # file.
+        known_ids_by_pkg = {
+            pkg: {a["id"] for a in entry["advisories"]} | {al for a in entry["advisories"] for al in a["aliases"]}
+            for pkg, entry in gt.items()
+        }
+        for pkg_key, ids in second_ids.get(eco, {}).items():
+            bare = pkg_key.split(":")[-1].split("/")[-1].lower()
+            if bare not in known_ids_by_pkg:
+                continue
+            if not any(bare in f.lower() for f in touched_files):
+                continue
+            new_ids = ids - known_ids_by_pkg[bare]
+            if new_ids:
+                regressions.append({"package": bare, "ecosystem": eco, "new_advisory_ids": sorted(new_ids)})
+
+    fixable_total = sum(p["fixable_total"] for p in package_results)
+    fixable_resolved = sum(p["fixable_resolved"] for p in package_results)
 
     return {
         "scope": scope,
         "fixture_ref": fixture_ref,
         "build_results": build_results,
-        "slots": slot_results,
+        "packages": package_results,
+        "completeness": (fixable_resolved / fixable_total) if fixable_total else None,
+        "fixable_total": fixable_total,
+        "fixable_resolved": fixable_resolved,
         "regressions": regressions,
         "unrelated_changes_flag": _looks_unrelated(diff_text),
     }

@@ -160,6 +160,14 @@ def run_capture(cmd: list[str], **kw) -> subprocess.CompletedProcess:
 # could still retrieve them. See _agent_facing_snapshot() below for the fix.
 AGENT_EXCLUDED_PATHS = [
     "fixtures/SLOTS.yaml",
+    # v3 (2026-07-09): the primary scoring input is now the full vulnerable
+    # surface, not a curated ~10 slots — ground-truth.json enumerates every
+    # dual-confirmed vulnerable package AND its expected fix version per
+    # fixture. Strictly more answer-key-equivalent than SLOTS.yaml ever was
+    # (SLOTS.yaml is now just a narrow notable-case overlay); must never be
+    # visible to the agent.
+    "fixtures/ground-truth.json",
+    "fixtures/GROUND_TRUTH.md",
     "harness",
     "prompts",
     "scoring",

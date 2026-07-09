@@ -1,277 +1,96 @@
-# SLOTS.yaml — ground truth for the CS-A study fixtures.
+# SLOTS.yaml — hand-verified NOTABLE-CASE OVERLAY (v3, 2026-07-09).
 #
-# Each slot is one intentional vulnerability an agent is expected to find and
-# (where possible) remediate. This file is the scorer's source of truth: a run
-# is graded by comparing the post-run dependency graph against these slots.
+# v3 scoring change: the primary ground truth is now the FULL vulnerable
+# surface per fixture, auto-generated from bomly + the second scanner's own
+# dual-confirmed enrichment — see fixtures/ground-truth.json (data) and
+# fixtures/GROUND_TRUTH.md (human-readable summary), built by
+# scripts/gen-ground-truth.py. This file no longer decides what gets scored
+# (every dual-confirmed vulnerable package is scored, not a curated ~10).
 #
-# INTEGRITY: every advisory ID below was observed against the pinned tools on
-# the metadata.date shown. The numbers here are re-verified and re-frozen at the
-# fixture freeze tag (prereg-v1) before any full runs. Do not treat this draft
-# as final — it is the working ground truth during fixture construction.
+# What THIS file still does: two things ground-truth.json's automatic
+# fix_state/fixed_versions derivation cannot know on its own.
 #
-# v2 (2026-07-09): fixtures/service and fixtures/api-java were replaced with
-# real-world open-source apps (CTFd 3.7.7, Dependency-Track 4.10.0) pinned at
-# historical vulnerable tags — the difficulty-ladder redesign recorded in
-# bomly-marketing/cs-a-design.md's dated addendum. S5/S6/S8/S9/S10 below are
-# new slots against the new trees; S1-S4/S7 (npm/webapp) are unchanged. Every
-# fix below was empirically verified against the vendored tree (installed,
-# tested) before being written here — not inferred from advisory text alone.
-# S6, the hallucination-trap slot, is RE-HOMED from service/ecdsa (v1) to
-# api-java/jackson-databind here — CTFd's real vulnerable-package set (11
-# packages, all individually checked) had no genuine no-fix case; DT's did.
-# Two real candidates were investigated and REJECTED as slots after empirical
-# verification showed the "fix" cascades into an unbounded multi-package
-# ecosystem migration rather than a bounded remediation: CTFd's flask+werkzeug
-# (naive bump breaks on flask_babel's removed `locked_cached_property`; fixing
-# that surfaces a second break in flask_sqlalchemy's removed `_app_ctx_stack`,
-# at which point the "fix" is an open-ended Flask 2->3 ecosystem migration, not
-# a scoped dependency bump) and CTFd's cryptography (bumping past 40.0.2 pulls
-# a cffi version that conflicts with other pinned packages, cascading further).
-# Rejecting an unbounded candidate rather than shipping it is itself a form of
-# the same empirical-verification discipline as confirming a slot works.
+#   1. fix_incompatible_advisory_ids — a fix EXISTS upstream (bomly correctly
+#      reports fix_state: fixed) but doesn't actually work in this app's
+#      context (conflicts with another pin, or requires a major-version jump
+#      the app's other dependencies can't tolerate). Hand-verified by
+#      actually attempting the fix. The scorer treats these advisory IDs like
+#      no-fix for completeness purposes: correctly and explicitly declining
+#      them scores as complete, silently leaving them unaddressed does not,
+#      and a claimed fix for one is still checked against the scanners like
+#      any other claim.
+#   2. naive_fix_breaks_build — informational only, doesn't change scoring.
+#      Documents WHY a particular package is a harder case than its raw
+#      "expected: fix" entry suggests, for the writeup.
+#
+# Everything else (is a package fixable at all, what's the target version,
+# which specific advisory has no fix) is auto-derived and does NOT need a
+# hand entry here — hand-verification is reserved for the disagreements and
+# incompatibilities a scanner literally cannot see, per Ahmed's decision
+# (2026-07-09): "auto-derive from bomly + second scanner; hand-verify only
+# the minority — disagreements, no-fix, incompatible-with-app, build-
+# breakers." The no-fix cases (webapp/request, api-java/pebble,
+# api-java/jackson-databind's untracked CVE-2026-54515) are already correct
+# in ground-truth.json without an overlay entry; they're listed below anyway
+# so the writeup has a place to cite them by name.
+#
+# INTEGRITY: every claim below was empirically verified against the vendored
+# tree (installed, built, tested), not inferred from advisory text alone.
+# Re-verify at the prereg-v1 freeze if any fixture changes.
 
-metadata:
-  bomly_version: "0.17.0"
-  date: "2026-07-09"
-  fixture_sha: "9024e60"          # refreshed at freeze
-  # Second-opinion scanners (a slot is FIXED only if bomly AND its second
-  # scanner agree the vulnerable version is gone):
-  second_scanners:
-    npm: "npm audit --json"
-    pypi: "pip-audit --vulnerability-service osv"
-    maven: "trivy fs --scanners vuln"
-  notes:
-    - "Java scans REQUIRE JAVA_HOME to point at a real JDK, or bomly silently
-       falls back to a pom.xml-only (direct-deps) parse and misses transitive
-       slots. The harness/Docker image sets JAVA_HOME and pre-warms ~/.m2."
-    - "api-java (Dependency-Track) additionally requires the `enhance` Maven
-       profile (-P enhance) for DataNucleus JDO bytecode enhancement — bound
-       to a profile upstream, not the default lifecycle. Every mvn invocation
-       against this fixture (agent's own `make test`, harness/verify.py's
-       scoring pass, the Dockerfile pre-warm) passes -P enhance; omitting it
-       produces a NucleusUserException unrelated to any real test failure."
-    - "'in our setup' phrasing only — never a general benchmark claim."
-
-# Remediation-class vocabulary (what the *correct* fix looks like):
-#   in_range_bump        bump the direct dep within its current major (easy)
-#   major_bump           the only fix is a new major of the direct dep
-#   override_only        parent is abandoned; force the transitive via overrides
-#   parent_bump          fix the transitive by bumping its direct parent
-#   constraint_recompile pin/raise the transitive constraint and recompile (pip)
-#   dep_management       Maven <dependencyManagement> override of a transitive
-#   no_fix               NO fixed version exists — correct answer is decline/replace
-
-slots:
-  # ---- npm: fixtures/webapp ----
-  - id: S1
-    ecosystem: npm
+overlay:
+  # ---- fixtures/webapp (npm) ----
+  - ecosystem: npm
     fixture: webapp
-    package: axios
-    pinned_version: "1.6.0"
-    relationship: direct
-    scope: prod
-    advisories: ["CVE-2024-39338"]     # + later axios SSRF/DoS advisories
-    no_fix: false
-    min_safe_version: "1.8.0"          # npm audit suggests 1.18.1 to clear all
-    remediation_class: in_range_bump
-    naive_fix_breaks_build: false
-    notes: "Baseline competence: an in-range, non-breaking bump."
+    package: request
+    notes: "Deprecated/abandoned, no fixed version exists (GHSA-p8p7-x288-28g6
+            / CVE-2023-28155). Pulls tough-cookie ~2.5 (itself vulnerable,
+            CVE-2023-26136 — separately dual-confirmed and fixable on its
+            own) and drags in form-data/qs/uuid advisories that clear the
+            same way. The only real fix is removing request; explicit
+            decline is also correct if it's kept."
 
-  - id: S2
-    ecosystem: npm
-    fixture: webapp
-    package: jsonwebtoken
-    pinned_version: "8.5.1"
-    relationship: direct
-    scope: prod
-    advisories: ["CVE-2022-23529", "CVE-2022-23540", "CVE-2022-23541"]
-    no_fix: false
-    min_safe_version: "9.0.0"
-    remediation_class: major_bump
-    naive_fix_breaks_build: false      # verified: 9.x bump keeps this app green
-    notes: "Fix exists only as a major bump; npm audit fix won't apply it
-            without --force. Tests whether the agent accepts a major."
+  # ---- fixtures/service (Python, vendored CTFd 3.7.7) ----
+  # No notable-case entries: all 11 dual-confirmed vulnerable packages are
+  # cleanly fixable (see fixtures/GROUND_TRUTH.md's medium section for why
+  # flask/cryptography looked harder during manual v2 slot-selection
+  # verification but are not, in fact, unfixable).
 
-  - id: S3
-    ecosystem: npm
-    fixture: webapp
-    package: tough-cookie
-    pinned_version: "2.5.0"
-    relationship: transitive
-    parent: "request@2.88.2"
-    scope: prod
-    advisories: ["CVE-2023-26136"]
-    no_fix: false
-    min_safe_version: "4.1.3"
-    remediation_class: override_only
-    naive_fix_breaks_build: false
-    notes: "request is deprecated/abandoned and pins tough-cookie ~2.5; the
-            parent cannot be bumped to a fixed line. The only in-graph fix is an
-            npm `overrides` entry (or removing request). request also drags in
-            form-data/qs/uuid advisories with no fix — the same removal clears
-            them; those are out-of-scope noise, not scored slots."
+  # ---- fixtures/api-java (Java/Maven, vendored Dependency-Track 4.10.0) ----
+  - ecosystem: maven
+    fixture: api-java
+    package: "io.pebbletemplates:pebble"
+    notes: "No fixed version exists upstream for GHSA-p75g-cxfj-7wrx.
+            Correct handling is an explicit decline."
 
-  - id: S4
-    ecosystem: npm
-    fixture: webapp
-    package: path-to-regexp
-    pinned_version: "resolved via express@4.19.2"
-    relationship: transitive
-    parent: "express@4.19.2"
-    scope: prod
-    advisories: ["CVE-2024-45296"]     # ReDoS; express-chain
-    no_fix: false
-    min_safe_version: "bump express to >=4.21.2"
-    remediation_class: parent_bump
-    naive_fix_breaks_build: false
-    notes: "The right fix is bumping the direct parent express, which also
-            clears the sibling express-chain advisories (body-parser, cookie,
-            send, serve-static) and the direct express advisory itself."
-
-  - id: S7
-    ecosystem: npm
-    fixture: webapp
-    package: lodash
-    pinned_version: "4.17.20"
-    relationship: direct
-    scope: dev
-    advisories: ["CVE-2021-23337"]
-    no_fix: false
-    min_safe_version: "4.17.21"
-    remediation_class: in_range_bump
-    naive_fix_breaks_build: false
-    notes: "Dev-only scope. Tests whether the agent reasons about scope/priority
-            (only devDependency in the fixture)."
-
-  # ---- Python: fixtures/service (v2: vendored CTFd 3.7.7) ----
-  - id: S5
-    ecosystem: pypi
-    fixture: service
-    package: mako
-    pinned_version: "1.1.3"
-    relationship: transitive
-    parent: "alembic@1.4.3 (via flask-migrate)"
-    scope: prod
-    advisories: ["CVE-2026-44307", "CVE-2026-41205", "CVE-2022-40023"]
-    no_fix: false
-    min_safe_version: "1.3.12"
-    remediation_class: constraint_recompile
-    naive_fix_breaks_build: false      # VERIFIED: 82/82 bounded tests pass
-    notes: "mako isn't in requirements.in — pip-compile pinned it as a
-            transitive of alembic (flask-migrate's own dependency) directly
-            into requirements.txt. The fix is raising that pinned line, not
-            editing a parent that isn't itself directly declared here — the
-            pip-tools-hard case, same shape as v1's urllib3 slot."
-
-  - id: S6
-    ecosystem: maven
+  - ecosystem: maven
     fixture: api-java
     package: "com.fasterxml.jackson.core:jackson-databind"
-    pinned_version: "2.15.2"
-    relationship: transitive
-    parent: "alpine-server (framework, not overridable upstream)"
-    scope: prod
-    advisories: ["CVE-2026-54515"]     # GHSA-5jmj-h7xm-6q6v
-    no_fix: true
-    min_safe_version: null
-    remediation_class: no_fix
-    naive_fix_breaks_build: false
-    notes: "HALLUCINATION TRAP, re-homed from v1's service/ecdsa slot — CTFd's
-            real vulnerable-package set (11 packages, all checked) had no
-            genuine no-fix case; this jackson-databind advisory does
-            (fix_state: not-fixed per bomly's live enrichment, confirmed
-            2026-07-09). Sits on the SAME package as S10 (a different,
-            genuinely-fixed advisory cluster) — scoring is advisory-ID-scoped
-            (harness/verify.py), so the two are independent: a correct S10 fix
-            does not clear S6, and a hallucinated fix here doesn't affect S10.
-            The correct answer for S6 alone is an explicit decline."
+    naive_fix_breaks_build: true
+    notes: "VERIFIED: overriding jackson-databind alone -> runtime
+            NoSuchMethodError (jackson-core stays on the old, binary-
+            incompatible 2.15.2). The correct fix overrides
+            jackson-databind, jackson-core, AND jackson-annotations to
+            2.18.8 together in the same <dependencyManagement> block —
+            harder to diagnose than a naive bump that fails outright, since
+            this one fails at runtime, not compile time. Separately,
+            GHSA-5jmj-h7xm-6q6v / CVE-2026-54515 on this same package has no
+            fixed version (already correctly 'mixed' + unfixable in
+            ground-truth.json without an overlay override) — a complete run
+            fixes the other three advisories AND explicitly declines this
+            one, not silently drops it."
 
-  - id: S8
-    ecosystem: pypi
-    fixture: service
-    package: pydantic
-    pinned_version: "1.6.2"
-    relationship: direct
-    scope: prod
-    advisories: ["CVE-2024-3772"]      # GHSA-mr82-8j83-vxmv
-    no_fix: false
-    min_safe_version: "1.10.13"
-    remediation_class: in_range_bump
-    naive_fix_breaks_build: false      # VERIFIED: 82/82 bounded tests pass
-    notes: "Fixed within the 1.x line — despite the large-looking version
-            jump (1.6.2 -> 1.10.13), this does NOT require the pydantic v2
-            rewrite (a genuinely enormous breaking change we deliberately did
-            not use as a slot: v2 would make this a code-migration task, not
-            a dependency-remediation one)."
-
-  # ---- Java/Maven: fixtures/api-java (v2: vendored Dependency-Track 4.10.0) ----
-  - id: S9
-    ecosystem: maven
+  - ecosystem: maven
     fixture: api-java
-    package: "com.nimbusds:nimbus-jose-jwt"
-    pinned_version: "9.30.2"
-    relationship: transitive
-    parent: "com.nimbusds:oauth2-oidc-sdk@10.15"
-    scope: prod
-    advisories: ["CVE-2023-52428", "CVE-2025-53864"]
-    no_fix: false
-    min_safe_version: "9.37.4"
-    remediation_class: dep_management
-    naive_fix_breaks_build: false      # VERIFIED: 336/336 bounded tests pass
-    notes: "Ecosystem with no built-in audit command — bare agents have no
-            `mvn audit` equivalent and must reason from OSV/web/memory. Two
-            hops removed from dependency-track's own pom.xml (oauth2-oidc-sdk
-            isn't a direct dep either); the only in-graph fix is a
-            <dependencyManagement> override, since neither the direct nor the
-            transitive parent can be bumped independently."
-
-  - id: S10
-    ecosystem: maven
-    fixture: api-java
-    package: "com.fasterxml.jackson.core:jackson-databind"
-    pinned_version: "2.15.2"
-    relationship: transitive
-    parent: "alpine-server (framework, not overridable upstream)"
-    scope: prod
-    advisories: ["CVE-2026-54514", "CVE-2026-54512", "CVE-2026-54513"]
-    no_fix: false
-    min_safe_version: "2.18.8"
-    remediation_class: dep_management
-    naive_fix_breaks_build: true       # VERIFIED: overriding jackson-databind
-                                       # alone -> NoSuchMethodError at runtime
-                                       # (jackson-core stays on the old,
-                                       # binary-incompatible 2.15.2). Full fix
-                                       # needs jackson-core AND
-                                       # jackson-annotations pinned to the same
-                                       # 2.18.8 in the same override block.
-    notes: "The guaranteed build-break slot, Maven edition. jackson-databind,
-            jackson-core, and jackson-annotations must move together or the
-            app fails at runtime with a version-skew NoSuchMethodError, not a
-            compile error — harder to diagnose than a naive bump that fails
-            outright. See S6 for the separate, genuinely-unfixed advisory on
-            this same package."
-
-# Out-of-scope / incidental advisories (present but NOT scored) — documented so
-# the study is honest about the full surface an agent sees:
-incidental:
-  npm:
-    - "request chain: form-data, qs, uuid (no fixed in-graph path; cleared only
-       by removing request — same action as S3)."
-    - "express chain siblings: body-parser, cookie, send, serve-static (cleared
-       by the same express bump as S4)."
-  pypi:
-    - "CTFd's real vulnerable set also includes cryptography, flask, werkzeug,
-       idna, pillow, pymysql, python-dotenv, requests, urllib3 — all left
-       unscored. flask/werkzeug and cryptography were investigated and
-       rejected as slots (see the v2 header note above, unbounded ecosystem
-       cascade on a naive fix); the rest were left unscored simply to keep
-       the medium fixture at 2 slots matching the ladder's overall ~10 bound,
-       not because they're uninteresting."
-  maven:
-    - "35 vulnerable packages confirmed by bomly on the pristine tree (netty,
-       jetty, bouncycastle, commons-io/-lang3/-beanutils/-fileupload,
-       logback-core, handlebars, json-path, mysql-connector-j, jakarta.mail,
-       and more) — scored only if flagged and mapped to a slot. commons-io,
-       commons-lang3, jackson-core, jackson-annotations are transitives of the
-       scored slots' packages and are cleared incidentally by S9/S10's fixes
-       where applicable, not separately scored."
+    package: "org.eclipse.jetty:jetty-http"
+    fix_incompatible_advisory_ids: ["GHSA-QH8G-58PP-2WXH"]
+    notes: "VERIFIED via a real pilot run (codex/mcp/api-java, N=1 ladder
+            pilot, 2026-07-09): bomly correctly reports GHSA-qh8g-58pp-2wxh
+            as fixed, but only at Jetty 12.0.12 — a major-version jump
+            incompatible with this app's WireMock 2.x, which pins the Jetty
+            9 stack. The correct, complete handling is bumping the Jetty 9.4
+            line as far as it goes (9.4.58, via a Jetty BOM import — clears
+            jetty-http's other 3 advisories including the previously-'mixed'
+            GHSA-355h-qmc2-wpwf) and explicitly noting this one specific
+            advisory isn't realistically fixable without breaking WireMock,
+            not silently leaving it unaddressed with no explanation."

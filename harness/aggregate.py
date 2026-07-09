@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
-"""Roll every runs/<agent>/<condition>/<n>/result.json into analysis/results.csv.
+"""Roll every runs/<agent>/<condition>/<scope>/<n>/result.json into analysis/results.csv.
 
-One row per (run, slot) — i.e. a run against all 10 slots produces 10 rows —
-plus the run-level fields (wall time, tool calls, timeout, regressions)
-repeated on each of that run's rows so the CSV stays flat and pivotable in any
-spreadsheet tool without a join.
+v3 (2026-07-09): one row per (run, package) over the FULL vulnerable surface
+— e.g. a run against the hard fixture produces ~35 rows, not a curated ~10 —
+plus the run-level fields (completeness, wall time, tool calls, tokens,
+regressions) repeated on each of that run's rows so the CSV stays flat and
+pivotable in any spreadsheet tool without a join.
 
 Reads ONLY runs/ by default — never runs-pilot/. Per the pre-registered
 design, pilot runs are published but never pooled into the final dataset;
 pass --pilot to aggregate runs-pilot/ instead, into a separate
 analysis/results-pilot.csv, for inspecting pilot behavior on its own.
+
+Incomplete runs (usage/rate-limit hit mid-session — see harness/run_study.py)
+are never pooled into the real numbers: skipped from the per-package rows,
+counted and reported separately so they're visible without polluting
+completeness stats.
 """
 from __future__ import annotations
 
@@ -23,8 +29,11 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 FIELDS = [
     "agent", "condition", "run_number", "scope",
-    "slot_id", "package", "ecosystem", "outcome",
-    "bomly_still_flagged", "second_scanner_still_flagged", "build_ok",
+    "package", "ecosystem", "outcome",
+    "package_fixable_total", "package_fixable_resolved",
+    "package_unfixable_total", "package_unfixable_remaining",
+    "build_ok",
+    "run_completeness", "run_fixable_total", "run_fixable_resolved",
     "wall_seconds", "timeout", "turns", "tool_calls", "mcp_calls",
     "input_tokens", "output_tokens", "cache_read_tokens", "cost_usd",
     "mcp_tool_error_count", "regression_count", "unrelated_changes_flag",
@@ -35,20 +44,24 @@ def rows_for_result(result_path: Path) -> list[dict]:
     data = json.loads(result_path.read_text())
     run_meta = data.get("run_meta", {})
     rows = []
-    for slot in data.get("slots", []):
+    for pkg in data.get("packages", []):
         rows.append(
             {
                 "agent": run_meta.get("agent"),
                 "condition": run_meta.get("condition"),
                 "run_number": run_meta.get("run_number"),
                 "scope": data.get("scope"),
-                "slot_id": slot.get("slot_id"),
-                "package": slot.get("package"),
-                "ecosystem": slot.get("ecosystem"),
-                "outcome": slot.get("outcome"),
-                "bomly_still_flagged": slot.get("bomly_still_flagged"),
-                "second_scanner_still_flagged": slot.get("second_scanner_still_flagged"),
-                "build_ok": slot.get("build_ok"),
+                "package": pkg.get("package"),
+                "ecosystem": pkg.get("ecosystem"),
+                "outcome": pkg.get("outcome"),
+                "package_fixable_total": pkg.get("fixable_total"),
+                "package_fixable_resolved": pkg.get("fixable_resolved"),
+                "package_unfixable_total": pkg.get("unfixable_total"),
+                "package_unfixable_remaining": len(pkg.get("unfixable_remaining_ids", [])),
+                "build_ok": pkg.get("build_ok"),
+                "run_completeness": data.get("completeness"),
+                "run_fixable_total": data.get("fixable_total"),
+                "run_fixable_resolved": data.get("fixable_resolved"),
                 "wall_seconds": run_meta.get("wall_seconds"),
                 "timeout": run_meta.get("timeout"),
                 "turns": run_meta.get("turns"),
@@ -82,10 +95,17 @@ def main() -> int:
     # fixture per session, scope in the path.
     all_rows = []
     result_paths = sorted(runs_dir.glob("*/*/*/*/result.json"))
+    incomplete_count = 0
+    scored_count = 0
     for result_path in result_paths:
+        data = json.loads(result_path.read_text())
+        if (data.get("run_meta") or {}).get("incomplete"):
+            incomplete_count += 1
+            continue
         all_rows.extend(rows_for_result(result_path))
+        scored_count += 1
 
-    if not all_rows:
+    if not all_rows and not incomplete_count:
         print(f"no result.json files found under {runs_dir.name}/", file=sys.stderr)
         return 0
 
@@ -95,8 +115,9 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(all_rows)
 
-    n_runs = len(result_paths)
-    print(f"wrote {len(all_rows)} rows from {n_runs} runs to {out_path}")
+    print(f"wrote {len(all_rows)} rows from {scored_count} scored runs to {out_path}")
+    if incomplete_count:
+        print(f"skipped {incomplete_count} INCOMPLETE run(s) — not pooled, retry after the usage limit resets", file=sys.stderr)
     return 0
 
 
