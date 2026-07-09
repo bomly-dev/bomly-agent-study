@@ -342,14 +342,35 @@ def fresh_clone(workspace: Path, ref: str, scope: str = "all") -> None:
     shutil.rmtree(dest / ".git" / "logs", ignore_errors=True)
 
 
-def write_condition_files(dest: Path, condition: str) -> None:
+# Per-scope substitution for the bare condition's {{TOOL_HINT}} placeholder.
+# Found via a real dry-run inspection: with the per-fixture-session redesign
+# stripping the workspace to one fixture, the OLD static disclosure ("npm
+# audit is on PATH; pip-audit is at ...") was still being copied verbatim
+# into every condition file regardless of scope — an api-java-only session
+# told the agent about two tools that don't exist anywhere in its workspace,
+# and said nothing about api-java actually having no native audit tool at
+# all (the whole reason that fixture is in the study). "all" is kept for
+# --scope all smoke-testing/dry-runs, not used by real per-fixture sessions.
+BARE_TOOL_HINT = {
+    "webapp": "e.g., `npm audit` is on PATH",
+    "service": "e.g., `pip-audit` is at `/opt/study-tools/bin/pip-audit`",
+    "api-java": "this ecosystem has no built-in dependency-audit command",
+    "all": "e.g., `npm audit` is on PATH; `pip-audit` is at `/opt/study-tools/bin/pip-audit`",
+}
+
+
+def write_condition_files(dest: Path, condition: str, scope: str) -> None:
     cond_dir = REPO_ROOT / "prompts" / f"condition-{condition}"
     if not cond_dir.exists():
         raise SystemExit(f"missing prompts dir: {cond_dir}")
     for name in ("CLAUDE.md", "AGENTS.md", "GEMINI.md"):
         src = cond_dir / name
-        if src.exists():
-            shutil.copy(src, dest / name)
+        if not src.exists():
+            continue
+        text = src.read_text()
+        if "{{TOOL_HINT}}" in text:
+            text = text.replace("{{TOOL_HINT}}", BARE_TOOL_HINT[scope])
+        (dest / name).write_text(text)
 
 
 def scope_paths(scope: str, repo: Path) -> list[Path]:
@@ -441,7 +462,7 @@ def main() -> int:
     try:
         fresh_clone(workspace, fixture_ref, scope=args.scope)
         repo = workspace / "repo"
-        write_condition_files(repo, args.condition)
+        write_condition_files(repo, args.condition, args.scope)
 
         # No separately-managed MCP server process: prompts/mcp-config.json
         # uses the stdio transport, so the agent CLI itself spawns
