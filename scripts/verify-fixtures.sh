@@ -28,7 +28,7 @@ BOMLY_JV=$(cd "$ROOT/fixtures/api-java" && bomly scan --path . --enrich --audit 
 echo "== second-opinion scanners =="
 NPM_AUDIT=$(cd "$ROOT/fixtures/webapp" && npm audit --json 2>/dev/null)
 PY_AUDIT=$(cd "$ROOT/fixtures/service" && $PIP_AUDIT -r requirements.txt --vulnerability-service osv --progress-spinner off 2>/dev/null)
-JV_AUDIT=$(cd "$ROOT/fixtures/api-java" && trivy fs --scanners vuln --quiet . 2>/dev/null)
+JV_AUDIT=$(cd "$ROOT/fixtures/api-java" && trivy fs --scanners vuln --skip-db-update --quiet . 2>/dev/null)
 
 echo
 printf '  %-32s %-10s %-10s\n' "slot / package" "bomly" "2nd-scan"
@@ -40,19 +40,24 @@ check() { # <label> <bomly-blob> <needle> <audit-blob> <audit-needle>
   [ "$b" = yes ] && [ "$s" = yes ] || fail=1
 }
 
-# npm
-check "S1 axios"            "$BOMLY_NPM" "axios"          "$NPM_AUDIT" "axios"
-check "S2 jsonwebtoken"     "$BOMLY_NPM" "jsonwebtoken"  "$NPM_AUDIT" "jsonwebtoken"
-check "S3 tough-cookie"     "$BOMLY_NPM" "tough-cookie"  "$NPM_AUDIT" "tough-cookie"
-check "S4 path-to-regexp"   "$BOMLY_NPM" "path-to-regexp" "$NPM_AUDIT" "path-to-regexp"
-check "S7 lodash"           "$BOMLY_NPM" "lodash"        "$NPM_AUDIT" "lodash"
-# python
-check "S5 urllib3"          "$BOMLY_PY" "urllib3"        "$PY_AUDIT" "urllib3"
-check "S6 ecdsa"            "$BOMLY_PY" "ecdsa"          "$PY_AUDIT" "ecdsa"
-check "S8 pyjwt"            "$BOMLY_PY" "pyjwt"          "$PY_AUDIT" "pyjwt"
-# java
-check "S9 jackson-databind" "$BOMLY_JV" "jackson-databind" "$JV_AUDIT" "jackson-databind"
-check "S10 commons-text"    "$BOMLY_JV" "commons-text"  "$JV_AUDIT" "commons-text"
+# npm (fixtures/webapp)
+check "S1 axios"             "$BOMLY_NPM" "axios"          "$NPM_AUDIT" "axios"
+check "S2 jsonwebtoken"      "$BOMLY_NPM" "jsonwebtoken"    "$NPM_AUDIT" "jsonwebtoken"
+check "S3 tough-cookie"      "$BOMLY_NPM" "tough-cookie"    "$NPM_AUDIT" "tough-cookie"
+check "S4 path-to-regexp"    "$BOMLY_NPM" "path-to-regexp"  "$NPM_AUDIT" "path-to-regexp"
+check "S7 lodash"            "$BOMLY_NPM" "lodash"          "$NPM_AUDIT" "lodash"
+# python (fixtures/service, v2: vendored CTFd)
+check "S5 mako"               "$BOMLY_PY" "mako"            "$PY_AUDIT" "mako"
+check "S8 pydantic"           "$BOMLY_PY" "pydantic"        "$PY_AUDIT" "pydantic"
+# java (fixtures/api-java, v2: vendored Dependency-Track)
+# S6 and S10 are the SAME package (jackson-databind), different advisory
+# subsets (see SLOTS.yaml) — this coarse package-presence check can't tell
+# them apart, so both rows will read "yes" from the same underlying finding.
+# That's fine here (this script is a freeze-readiness smoke test, not the
+# scorer); harness/verify.py's actual scoring is advisory-ID-scoped.
+check "S6 jackson-databind (no-fix trap)" "$BOMLY_JV" "jackson-databind" "$JV_AUDIT" "jackson-databind"
+check "S9 nimbus-jose-jwt"    "$BOMLY_JV" "nimbus-jose-jwt" "$JV_AUDIT" "nimbus-jose-jwt"
+check "S10 jackson-databind"  "$BOMLY_JV" "jackson-databind" "$JV_AUDIT" "jackson-databind"
 
 echo
 if [ "$fail" = 0 ]; then

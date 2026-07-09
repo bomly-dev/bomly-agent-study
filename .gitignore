@@ -8,6 +8,11 @@ venv/
 __pycache__/
 *.pyc
 .pytest_cache/
+# Filtered dev-requirements written at scoring/test time by
+# harness/verify.py's rebuild_and_test() (CTFd's development.txt minus
+# packages not needed for the bounded SQLite test subset) — a generated
+# artifact, not a fixture asset.
+fixtures/service/.dev-test.txt
 
 # Java / Maven
 target/

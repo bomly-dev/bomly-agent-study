@@ -78,84 +78,191 @@
     ]
   },
   "pypi": {
-    "ecdsa": [
-      "CVE-2024-23342",
-      "GHSA-WJ6H-64FC-37MP",
-      "PYSEC-2026-1325"
+    "cryptography": [
+      "CVE-2023-38325",
+      "CVE-2023-49083",
+      "CVE-2023-50782",
+      "CVE-2024-0727",
+      "CVE-2024-26130",
+      "CVE-2026-26007",
+      "CVE-2026-34073",
+      "GHSA-3WW4-GG4F-JR7F",
+      "GHSA-537C-GMF6-5CCF",
+      "GHSA-5CPQ-8WJ7-HF2V",
+      "GHSA-6VQW-3V5J-54X4",
+      "GHSA-9V9H-CGJ8-H64P",
+      "GHSA-CF7P-GM2M-833M",
+      "GHSA-H4GH-QQ45-VH27",
+      "GHSA-JFHM-5GHH-2F97",
+      "GHSA-JM77-QPHF-C4W8",
+      "GHSA-M959-CC7F-WV43",
+      "GHSA-R6PH-V2QM-Q3C2",
+      "GHSA-V8GR-M533-GHJ9",
+      "PYSEC-2023-112",
+      "PYSEC-2023-254",
+      "PYSEC-2024-225",
+      "PYSEC-2026-1283",
+      "PYSEC-2026-1285",
+      "PYSEC-2026-35"
     ],
-    "pyjwt": [
-      "CVE-2022-29217",
-      "CVE-2025-45768",
-      "CVE-2026-32597",
-      "CVE-2026-48522",
-      "CVE-2026-48524",
-      "CVE-2026-48526",
-      "GHSA-752W-5FWX-JX9F",
-      "GHSA-993G-76C3-P5M4",
-      "GHSA-FFQJ-6FQR-9H24",
-      "GHSA-FHV5-28VV-H8M8",
-      "GHSA-XGMM-8J9V-C9WX",
-      "PYSEC-2022-202",
-      "PYSEC-2025-183",
-      "PYSEC-2026-120",
-      "PYSEC-2026-175",
-      "PYSEC-2026-177",
-      "PYSEC-2026-179"
+    "flask": [
+      "CVE-2023-30861",
+      "CVE-2026-27205",
+      "GHSA-68RP-WP8R-4726",
+      "GHSA-M2QF-HXJV-5GPQ",
+      "PYSEC-2023-62"
+    ],
+    "idna": [
+      "CVE-2024-3651",
+      "CVE-2026-45409",
+      "GHSA-65PC-FJ4G-8RJX",
+      "GHSA-JJG7-2V4V-X38H",
+      "PYSEC-2024-60",
+      "PYSEC-2026-215"
+    ],
+    "mako": [
+      "CVE-2022-40023",
+      "CVE-2026-41205",
+      "CVE-2026-44307",
+      "GHSA-2H4P-VJRC-8XPQ",
+      "GHSA-V92G-XGXW-VVMM",
+      "GHSA-V973-FXGF-6XHP",
+      "PYSEC-2022-260",
+      "PYSEC-2026-88"
+    ],
+    "pillow": [
+      "CVE-2023-50447",
+      "CVE-2024-28219",
+      "CVE-2026-42308",
+      "CVE-2026-42310",
+      "GHSA-3F63-HFP8-52JQ",
+      "GHSA-44WM-F244-XHP3",
+      "GHSA-R73J-PQJ5-W3X7",
+      "GHSA-WJX4-4JCJ-G98J",
+      "PYSEC-2026-165",
+      "PYSEC-2026-1793",
+      "PYSEC-2026-457"
+    ],
+    "pydantic": [
+      "CVE-2024-3772",
+      "GHSA-MR82-8J83-VXMV",
+      "PYSEC-2026-1812"
+    ],
+    "pymysql": [
+      "CVE-2024-36039",
+      "GHSA-V9HF-5J83-6XPP",
+      "PYSEC-2026-502"
+    ],
+    "python-dotenv": [
+      "CVE-2026-28684",
+      "GHSA-MF9W-MJ56-HR94"
+    ],
+    "requests": [
+      "CVE-2024-47081",
+      "CVE-2026-25645",
+      "GHSA-9HJG-9R4M-MVJ7",
+      "GHSA-GC5V-M9X4-R6X2",
+      "PYSEC-2026-1872"
     ],
     "urllib3": [
-      "CVE-2023-43804",
-      "CVE-2023-45803",
-      "CVE-2024-37891",
       "CVE-2025-50181",
       "CVE-2025-66418",
       "CVE-2025-66471",
       "CVE-2026-21441",
       "CVE-2026-44431",
       "GHSA-2XPW-W6GG-JR37",
-      "GHSA-34JH-P97F-MPXF",
       "GHSA-38JV-5279-WG99",
-      "GHSA-G4MX-Q9VG-27P4",
       "GHSA-GM62-XV2J-4W53",
       "GHSA-PQ67-6M6Q-MJ2V",
       "GHSA-QCCP-GFCP-XXVC",
-      "GHSA-V845-JXX5-VC9F",
-      "PYSEC-2023-192",
-      "PYSEC-2023-212",
       "PYSEC-2026-141",
       "PYSEC-2026-1994",
-      "PYSEC-2026-1995",
       "PYSEC-2026-1996",
       "PYSEC-2026-1998",
       "PYSEC-2026-1999"
+    ],
+    "werkzeug": [
+      "CVE-2022-29361",
+      "CVE-2023-23934",
+      "CVE-2023-25577",
+      "CVE-2023-46136",
+      "CVE-2024-34069",
+      "CVE-2024-49766",
+      "CVE-2024-49767",
+      "CVE-2025-66221",
+      "CVE-2026-21860",
+      "CVE-2026-27199",
+      "GHSA-29VQ-49WR-VM6X",
+      "GHSA-2G68-C3QC-8985",
+      "GHSA-87HC-H4R5-73F7",
+      "GHSA-F9VJ-2WH5-FJ8J",
+      "GHSA-HGF8-39GV-G3F2",
+      "GHSA-HRFV-MQP8-Q5RW",
+      "GHSA-PX8H-6QXV-M22Q",
+      "GHSA-Q34M-JH98-GWM2",
+      "GHSA-XG9F-G7G7-2323",
+      "PYSEC-2022-203",
+      "PYSEC-2023-221",
+      "PYSEC-2023-57",
+      "PYSEC-2023-58",
+      "PYSEC-2026-1860",
+      "PYSEC-2026-2043",
+      "PYSEC-2026-2044",
+      "PYSEC-2026-2045",
+      "PYSEC-2026-2046"
     ]
   },
   "maven": {
+    "ch.qos.logback:logback-core": [
+      "CVE-2024-12798",
+      "CVE-2024-12801",
+      "CVE-2025-11226",
+      "CVE-2026-10532",
+      "CVE-2026-1225",
+      "CVE-2026-9828"
+    ],
     "com.fasterxml.jackson.core:jackson-core": [
-      "CVE-2025-52999",
       "GHSA-72HV-8253-57QQ"
     ],
     "com.fasterxml.jackson.core:jackson-databind": [
-      "CVE-2020-36518",
-      "CVE-2021-46877",
-      "CVE-2022-42003",
-      "CVE-2022-42004",
-      "CVE-2026-50193",
       "CVE-2026-54512",
       "CVE-2026-54513",
       "CVE-2026-54514",
       "CVE-2026-54515"
     ],
-    "org.apache.commons:commons-configuration2": [
-      "CVE-2022-33980",
-      "CVE-2024-29131",
-      "CVE-2024-29133",
-      "CVE-2026-45205"
+    "com.nimbusds:nimbus-jose-jwt": [
+      "CVE-2023-52428",
+      "CVE-2025-53864"
+    ],
+    "com.sun.mail:jakarta.mail": [
+      "CVE-2025-7962"
+    ],
+    "commons-io:commons-io": [
+      "CVE-2024-47554"
+    ],
+    "io.pebbletemplates:pebble": [
+      "CVE-2025-1686"
+    ],
+    "mysql:mysql-connector-java": [
+      "CVE-2023-22102"
+    ],
+    "org.apache.commons:commons-compress": [
+      "CVE-2024-25710",
+      "CVE-2024-26308"
     ],
     "org.apache.commons:commons-lang3": [
       "CVE-2025-48924"
     ],
-    "org.apache.commons:commons-text": [
-      "CVE-2022-42889"
+    "org.codehaus.plexus:plexus-utils": [
+      "CVE-2025-67030"
+    ],
+    "org.cyclonedx:cyclonedx-core-java": [
+      "CVE-2024-38374",
+      "CVE-2025-64518"
+    ],
+    "org.postgresql:postgresql": [
+      "CVE-2024-1597",
+      "CVE-2026-42198"
     ]
   }
 }
