@@ -1,0 +1,58 @@
+{
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "service": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": false,
+      "test_stdout_tail": "    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic\n  /tmp/bomly-study-j99t5q3b/claude-bare-service-1-1783589565/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xfffef6fd3dd0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-j99t5q3b/claude-bare-service-1-1783589565/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xfffef62dcfe0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-j99t5q3b/claude-bare-service-1-1783589565/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xfffef69078f0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-j99t5q3b/claude-bare-service-1-1783589565/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xfffef626abd0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/users/test_auth.py::test_user_bad_login - AssertionError: assert...\nFAILED tests/users/test_auth.py::test_user_get_logout - AssertionError: asser...\nFAILED tests/users/test_auth.py::test_user_isnt_admin - AssertionError: asser...\nFAILED tests/users/test_auth.py::test_user_can_confirm_email - AssertionError...\nFAILED tests/users/test_auth.py::test_registration_code_required - AssertionE...\nFAILED tests/users/test_auth.py::test_registration_code_allows_numeric - Asse...\nFAILED tests/users/test_fields.py::test_user_needs_all_required_fields - Asse...\nFAILED tests/users/test_setup.py::test_ctfd_setup_redirect - AssertionError: ...\nFAILED tests/users/test_setup.py::test_ctfd_setup_verification - AssertionErr...\n9 failed, 73 passed, 889209 warnings in 76.78s (0:01:16)",
+      "test_stderr_tail": ""
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "S5",
+      "package": "mako",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "bomly_still_flagged": true,
+      "second_scanner_still_flagged": true,
+      "build_ok": false
+    },
+    {
+      "slot_id": "S8",
+      "package": "pydantic",
+      "ecosystem": "pypi",
+      "outcome": "NOT_ATTEMPTED",
+      "bomly_still_flagged": true,
+      "second_scanner_still_flagged": true,
+      "build_ok": false
+    }
+  ],
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 689.11,
+    "timeout": false,
+    "turns": 66,
+    "tool_calls": 65,
+    "mcp_calls": 0,
+    "tokens": {
+      "input": 129,
+      "output": 35780,
+      "cache_read": 5627074,
+      "cache_creation": 103468
+    },
+    "cost_usd": 2.8467591999999997,
+    "mcp_tool_errors": [
+      {
+        "tool": "toolu_01STkKXqrQ8NnuvxYKXpxhRr",
+        "error": "Exit code 1\n/bin/bash: line 5: .venv/bin/python: No such file or directory\n/bin/bash: line 9: .venv/bin/python: No such file or directory\ncat: '': No such file or directory"
+      }
+    ]
+  }
+}

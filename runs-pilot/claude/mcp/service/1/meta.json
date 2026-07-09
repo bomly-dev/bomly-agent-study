@@ -1,0 +1,31 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 1,
+  "pilot": true,
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "6d68d73",
+  "harness_sha": "6d68d73",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-09T09:33:10.322830+00:00",
+  "ended_at": "2026-07-09T09:43:43.618134+00:00",
+  "timeout": false,
+  "exit_code": 1,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_015xzd2FtSCq9pNndjJ5yPSy",
+      "error": "prepare scan: no subprojects discovered for execution target with the applied filters; discovery probe: found requirements.txt at service (pip); found .github/workflows/*.yml at service (github-actions); found setup.py at service/CTFd/forms (setuppy)"
+    },
+    {
+      "tool": "toolu_019savG1oBZavHRGNwzFdDzF",
+      "error": "Exit code 1\nfrom distutils.version import StrictVersion\n__version__ = \"3.7.7\"\n    utils.set_config(\"ctf_version\", __version__)\n        app.VERSION = __version__\n        version = utils.get_config(\"ctf_version\")\n---setup.cfg---\n[nosetests]\nstop=1\nverbosity=2\nwith-coverage=1\ncover-package=CTFd---python version---\nPython 3.12.3"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

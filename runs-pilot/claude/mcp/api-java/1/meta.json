@@ -1,0 +1,35 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 1,
+  "pilot": true,
+  "scope": "api-java",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "6d68d73",
+  "harness_sha": "6d68d73",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-09T09:33:17.945722+00:00",
+  "ended_at": "2026-07-09T09:44:08.096213+00:00",
+  "timeout": false,
+  "exit_code": 1,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_014jnzTPcv97b7p11UvHBRhe",
+      "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 10, in <module>\nTypeError: 'NoneType' object is not subscriptable\n===== 1 direct-bump org.postgresql:postgresql@42.6.0 rec= 42.7.11\n  override_advice: None"
+    },
+    {
+      "tool": "toolu_01DDMDs4TXfb4Yc2Cy7poaZv",
+      "error": "Exit code 143\nCommand timed out after 2m 0s\n{\n    \"responseHeader\": {\n        \"status\": 0,\n        \"QTime\": 1,\n        \"params\": {\n            \"q\": \"g:com.mysql AND a:mysql-connector-j\",\n            \"core\": \"gav\",\n            \"indent\": \"off\",\n            \"fl\": \"id,g,a,v,p,ec,timestamp,tags\",\n            \"start\": \"\",\n            \"sort\": \"score desc,timestamp desc,g asc,a asc,v desc\",\n            \"rows\": \"5\",\n            \"wt\": \"json\",\n            \"version\": \"2.2\"\n        }\n    },\n    \"response\": {"
+    },
+    {
+      "tool": "toolu_01WWfRvq5j67Ty7qy9gnvmqm",
+      "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

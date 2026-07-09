@@ -1,0 +1,81 @@
+{
+  "scope": "webapp",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "webapp": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "  duration_ms: 11.958625\n  type: 'test'\n  ...\n# Subtest: fetches a remote XML feed via request\nok 10 - fetches a remote XML feed via request\n  ---\n  duration_ms: 9.277125\n  type: 'test'\n  ...\n# Subtest: parses bookmarks out of the XML\nok 11 - parses bookmarks out of the XML\n  ---\n  duration_ms: 1.387125\n  type: 'test'\n  ...\n# Subtest: POST /import ingests an XML body\nok 12 - POST /import ingests an XML body\n  ---\n  duration_ms: 10.546208\n  type: 'test'\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 161.302667",
+      "test_stderr_tail": ""
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "S1",
+      "package": "axios",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S2",
+      "package": "jsonwebtoken",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S3",
+      "package": "tough-cookie",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S4",
+      "package": "path-to-regexp",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S7",
+      "package": "lodash",
+      "ecosystem": "npm",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    }
+  ],
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "codex",
+    "condition": "mcp",
+    "run_number": 1,
+    "wall_seconds": 268.66,
+    "timeout": false,
+    "turns": 1,
+    "tool_calls": 49,
+    "mcp_calls": 9,
+    "tokens": {
+      "input": 1660973,
+      "output": 9708,
+      "cache_read": 1530112,
+      "cache_creation": null,
+      "reasoning_output": 1961
+    },
+    "cost_usd": null,
+    "mcp_tool_errors": []
+  }
+}

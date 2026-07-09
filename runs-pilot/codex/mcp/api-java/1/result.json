@@ -1,0 +1,63 @@
+{
+  "scope": "api-java",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "api-java": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "[INFO] Tests run: 30, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.171 s - in org.dependencytrack.util.VulnerabilityUtilTest\n[INFO] Running org.dependencytrack.util.InternalComponentIdentificationUtilTest\n[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.095 s - in org.dependencytrack.util.InternalComponentIdentificationUtilTest\n[INFO] Running org.dependencytrack.util.VersionDistanceTest\n[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.05 s - in org.dependencytrack.util.VersionDistanceTest\n[INFO] Running org.dependencytrack.util.RoundRobinAccessorTest\n[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.043 s - in org.dependencytrack.util.RoundRobinAccessorTest\n[INFO] Running org.dependencytrack.util.HttpUtilTest\n[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.045 s - in org.dependencytrack.util.HttpUtilTest\n[INFO] Running org.dependencytrack.util.PersistenceUtilTest\n[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.574 s - in org.dependencytrack.util.PersistenceUtilTest\n[INFO] Running org.dependencytrack.util.DateUtilTest\n[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.05 s - in org.dependencytrack.util.DateUtilTest\n[INFO] Running org.dependencytrack.util.CacheStampedeBlockerTest\n[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.949 s - in org.dependencytrack.util.CacheStampedeBlockerTest\n[INFO] \n[INFO] Results:\n[INFO] \n[INFO] Tests run: 336, Failures: 0, Errors: 0, Skipped: 0\n[INFO] \n[INFO] \n[INFO] --- jacoco-maven-plugin:0.8.11:report (post-unit-test) @ dependency-track ---\n[INFO] Loading execution data file /tmp/bomly-study-e67268lj/codex-mcp-api-java-1-1783589636/repo/fixtures/api-java/target/jacoco.exec\n[INFO] Analyzed bundle 'Dependency-Track' with 418 classes\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  59.758 s\n[INFO] Finished at: 2026-07-09T09:42:58Z\n[INFO] ------------------------------------------------------------------------",
+      "test_stderr_tail": "SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nJul 09, 2026 9:42:00 AM org.hibernate.validator.internal.util.Version <clinit>\nINFO: HV000001: Hibernate Validator 6.2.5.Final\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.\nSLF4J: Failed to load class \"org.slf4j.impl.StaticLoggerBinder\".\nSLF4J: Defaulting to no-operation (NOP) logger implementation\nSLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details."
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "S6",
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "CORRECTLY_DECLINED",
+      "bomly_still_flagged": true,
+      "second_scanner_still_flagged": true,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S9",
+      "package": "com.nimbusds:nimbus-jose-jwt",
+      "ecosystem": "maven",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S10",
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    }
+  ],
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "codex",
+    "condition": "mcp",
+    "run_number": 1,
+    "wall_seconds": 480.19,
+    "timeout": false,
+    "turns": 1,
+    "tool_calls": 34,
+    "mcp_calls": 6,
+    "tokens": {
+      "input": 3099586,
+      "output": 14608,
+      "cache_read": 2897152,
+      "cache_creation": null,
+      "reasoning_output": 3507
+    },
+    "cost_usd": null,
+    "mcp_tool_errors": []
+  }
+}

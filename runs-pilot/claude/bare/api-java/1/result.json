@@ -1,0 +1,71 @@
+{
+  "scope": "api-java",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "api-java": {
+      "install_ok": false,
+      "build_ok": false,
+      "test_ok": false,
+      "test_stdout_tail": "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.095 s - in org.dependencytrack.util.PersistenceUtilTest\n[INFO] Running org.dependencytrack.util.DateUtilTest\n[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.046 s - in org.dependencytrack.util.DateUtilTest\n[INFO] Running org.dependencytrack.util.CacheStampedeBlockerTest\n[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.004 s - in org.dependencytrack.util.CacheStampedeBlockerTest\n[INFO] \n[INFO] Results:\n[INFO] \n[ERROR] Errors: \n[ERROR]   CycloneDXVexImporterTest.shouldAuditVulnerabilityFromAllSourcesUsingVex:45 \u00bb NoSuchMethod\n[INFO] \n[ERROR] Tests run: 336, Failures: 0, Errors: 1, Skipped: 0\n[INFO] \n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD FAILURE\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  55.618 s\n[INFO] Finished at: 2026-07-09T09:44:57Z\n[INFO] ------------------------------------------------------------------------\n[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:2.22.2:test (default-test) on project dependency-track: There are test failures.\n[ERROR] \n[ERROR] Please refer to /tmp/bomly-study-1wnbnesd/claude-bare-api-java-1-1783589572/repo/fixtures/api-java/target/surefire-reports for the individual test results.\n[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.\n[ERROR] -> [Help 1]\n[ERROR] \n[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.\n[ERROR] Re-run Maven using the -X switch to enable full debug logging.\n[ERROR] \n[ERROR] For more information about the errors and possible solutions, please read the following articles:\n[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException",
+      "test_stderr_tail": ""
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "S6",
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "bomly_still_flagged": true,
+      "second_scanner_still_flagged": true,
+      "build_ok": false
+    },
+    {
+      "slot_id": "S9",
+      "package": "com.nimbusds:nimbus-jose-jwt",
+      "ecosystem": "maven",
+      "outcome": "FIXED_BUILD_BROKEN",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": false
+    },
+    {
+      "slot_id": "S10",
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "FIXED_BUILD_BROKEN",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": false
+    }
+  ],
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 667.75,
+    "timeout": false,
+    "turns": 66,
+    "tool_calls": 65,
+    "mcp_calls": 0,
+    "tokens": {
+      "input": 127,
+      "output": 41780,
+      "cache_read": 6115382,
+      "cache_creation": 166849
+    },
+    "cost_usd": 3.4946836,
+    "mcp_tool_errors": [
+      {
+        "tool": "toolu_01EsKhZRGVr562i1BnmnWagM",
+        "error": "<tool_use_error>File does not exist. Note: your current working directory is /tmp/bomly-study-1wnbnesd/claude-bare-api-java-1-1783589572/repo/fixtures/api-java.</tool_use_error>"
+      },
+      {
+        "tool": "toolu_01Te5iYzTjnJ4mwevt9gA1s7",
+        "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+      }
+    ]
+  }
+}

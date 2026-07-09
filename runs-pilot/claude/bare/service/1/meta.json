@@ -1,0 +1,27 @@
+{
+  "agent": "claude",
+  "condition": "bare",
+  "run_number": 1,
+  "pilot": true,
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "6d68d73",
+  "harness_sha": "6d68d73",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-09T09:32:46.154130+00:00",
+  "ended_at": "2026-07-09T09:44:15.257631+00:00",
+  "timeout": false,
+  "exit_code": 1,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01STkKXqrQ8NnuvxYKXpxhRr",
+      "error": "Exit code 1\n/bin/bash: line 5: .venv/bin/python: No such file or directory\n/bin/bash: line 9: .venv/bin/python: No such file or directory\ncat: '': No such file or directory"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

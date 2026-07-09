@@ -1,0 +1,62 @@
+{
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "service": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": false,
+      "test_stdout_tail": "  /tmp/bomly-study-dfunpa6z/claude-mcp-service-1-1783589589/repo/fixtures/service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/sqltypes.py:2061: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).\n    epoch = dt.datetime.utcfromtimestamp(0)\n\n.venv/lib/python3.12/site-packages/marshmallow/__init__.py:19\n  /tmp/bomly-study-dfunpa6z/claude-mcp-service-1-1783589589/repo/fixtures/service/.venv/lib/python3.12/site-packages/marshmallow/__init__.py:19: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.\n    __version_info__ = tuple(LooseVersion(__version__).version)\n\n.venv/lib/python3.12/site-packages/flask_marshmallow/__init__.py:34\n  /tmp/bomly-study-dfunpa6z/claude-mcp-service-1-1783589589/repo/fixtures/service/.venv/lib/python3.12/site-packages/flask_marshmallow/__init__.py:34: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.\n    __version_info__ = tuple(LooseVersion(__version__).version)\n\n.venv/lib/python3.12/site-packages/passlib/utils/__init__.py:854\n  /tmp/bomly-study-dfunpa6z/claude-mcp-service-1-1783589589/repo/fixtures/service/.venv/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13\n    from crypt import crypt as _crypt\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/test_config.py\nERROR tests/users/test_auth.py\nERROR tests/users/test_challenges.py\nERROR tests/users/test_fields.py\nERROR tests/users/test_hints.py\nERROR tests/users/test_profile.py\nERROR tests/users/test_scoreboard.py\nERROR tests/users/test_settings.py\nERROR tests/users/test_setup.py\nERROR tests/users/test_submissions.py\nERROR tests/users/test_users.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 11 errors during collection !!!!!!!!!!!!!!!!!!!\n4 warnings, 11 errors in 0.48s",
+      "test_stderr_tail": ""
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "S5",
+      "package": "mako",
+      "ecosystem": "pypi",
+      "outcome": "FIXED_BUILD_BROKEN",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": false
+    },
+    {
+      "slot_id": "S8",
+      "package": "pydantic",
+      "ecosystem": "pypi",
+      "outcome": "FIXED_BUILD_BROKEN",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": false
+    }
+  ],
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "mcp",
+    "run_number": 1,
+    "wall_seconds": 633.3,
+    "timeout": false,
+    "turns": 57,
+    "tool_calls": 56,
+    "mcp_calls": 4,
+    "tokens": {
+      "input": 105,
+      "output": 32050,
+      "cache_read": 4353210,
+      "cache_creation": 105658
+    },
+    "cost_usd": 2.4217180000000003,
+    "mcp_tool_errors": [
+      {
+        "tool": "toolu_015xzd2FtSCq9pNndjJ5yPSy",
+        "error": "prepare scan: no subprojects discovered for execution target with the applied filters; discovery probe: found requirements.txt at service (pip); found .github/workflows/*.yml at service (github-actions); found setup.py at service/CTFd/forms (setuppy)"
+      },
+      {
+        "tool": "toolu_019savG1oBZavHRGNwzFdDzF",
+        "error": "Exit code 1\nfrom distutils.version import StrictVersion\n__version__ = \"3.7.7\"\n    utils.set_config(\"ctf_version\", __version__)\n        app.VERSION = __version__\n        version = utils.get_config(\"ctf_version\")\n---setup.cfg---\n[nosetests]\nstop=1\nverbosity=2\nwith-coverage=1\ncover-package=CTFd---python version---\nPython 3.12.3"
+      }
+    ]
+  }
+}

@@ -1,0 +1,501 @@
+diff --git a/fixtures/service/CTFd/__init__.py b/fixtures/service/CTFd/__init__.py
+index d4a27e0..91b9de9 100644
+--- a/fixtures/service/CTFd/__init__.py
++++ b/fixtures/service/CTFd/__init__.py
+@@ -6,7 +6,7 @@ import weakref
+ from distutils.version import StrictVersion
+ 
+ import jinja2
+-from flask import Flask, Request
++from flask import Flask, Request, Response
+ from flask_babel import Babel
+ from flask_migrate import upgrade
+ from jinja2 import FileSystemLoader
+@@ -48,7 +48,13 @@ class CTFdRequest(Request):
+         self.path = self.script_root + self.path
+ 
+ 
++class CTFdResponse(Response):
++    autocorrect_location_header = True
++
++
+ class CTFdFlask(Flask):
++    response_class = CTFdResponse
++
+     def __init__(self, *args, **kwargs):
+         """Overriden Jinja constructor setting a custom jinja_environment"""
+         self.jinja_environment = SandboxedBaseEnvironment
+diff --git a/fixtures/service/CTFd/utils/decorators/__init__.py b/fixtures/service/CTFd/utils/decorators/__init__.py
+index 5dbda30..08e1b19 100644
+--- a/fixtures/service/CTFd/utils/decorators/__init__.py
++++ b/fixtures/service/CTFd/utils/decorators/__init__.py
+@@ -1,4 +1,5 @@
+ import functools
++from urllib.parse import quote
+ 
+ from flask import abort, jsonify, redirect, request, url_for
+ from flask_babel import gettext
+@@ -11,6 +12,10 @@ from CTFd.utils.dates import ctf_ended, ctf_started, ctftime, view_after_ctf
+ from CTFd.utils.user import authed, get_current_team, get_current_user, is_admin
+ 
+ 
++def url_for_next(endpoint):
++    return url_for(endpoint) + "?next=" + quote(request.full_path, safe="")
++
++
+ def during_ctf_time_only(f):
+     """
+     Decorator to restrict an endpoint to only be seen during a CTF
+@@ -33,7 +38,7 @@ def during_ctf_time_only(f):
+                     abort(403, description=error)
+             if ctf_started() is False:
+                 if is_teams_mode() and get_current_team() is None:
+-                    return redirect(url_for("teams.private", next=request.full_path))
++                    return redirect(url_for_next("teams.private"))
+                 else:
+                     error = gettext(
+                         "%(ctf_name)s has not started yet", ctf_name=config.ctf_name()
+@@ -49,7 +54,7 @@ def require_authentication_if_config(config_key):
+         def __require_authentication_if_config(*args, **kwargs):
+             value = get_config(config_key)
+             if value and current_user.authed():
+-                return redirect(url_for("auth.login", next=request.full_path))
++                return redirect(url_for_next("auth.login"))
+             else:
+                 return f(*args, **kwargs)
+ 
+@@ -100,7 +105,7 @@ def authed_only(f):
+             ):
+                 abort(403)
+             else:
+-                return redirect(url_for("auth.login", next=request.full_path))
++                return redirect(url_for_next("auth.login"))
+ 
+     return authed_only_wrapper
+ 
+@@ -123,7 +128,7 @@ def registered_only(f):
+             ):
+                 abort(403)
+             else:
+-                return redirect(url_for("auth.register", next=request.full_path))
++                return redirect(url_for_next("auth.register"))
+ 
+     return _registered_only
+ 
+@@ -143,7 +148,7 @@ def admins_only(f):
+             if request.content_type == "application/json":
+                 abort(403)
+             else:
+-                return redirect(url_for("auth.login", next=request.full_path))
++                return redirect(url_for_next("auth.login"))
+ 
+     return admins_only_wrapper
+ 
+@@ -157,7 +162,7 @@ def require_team(f):
+                 if request.content_type == "application/json":
+                     abort(403)
+                 else:
+-                    return redirect(url_for("teams.private", next=request.full_path))
++                    return redirect(url_for_next("teams.private"))
+             return f(*args, **kwargs)
+         else:
+             abort(404)
+diff --git a/fixtures/service/CTFd/utils/decorators/visibility.py b/fixtures/service/CTFd/utils/decorators/visibility.py
+index 9e8289b..6a6a74b 100644
+--- a/fixtures/service/CTFd/utils/decorators/visibility.py
++++ b/fixtures/service/CTFd/utils/decorators/visibility.py
+@@ -1,4 +1,5 @@
+ import functools
++from urllib.parse import quote
+ 
+ from flask import abort, redirect, render_template, request, url_for
+ 
+@@ -13,6 +14,10 @@ from CTFd.utils import get_config
+ from CTFd.utils.user import authed, is_admin
+ 
+ 
++def url_for_next(endpoint):
++    return url_for(endpoint) + "?next=" + quote(request.full_path, safe="")
++
++
+ def check_score_visibility(f):
+     @functools.wraps(f)
+     def _check_score_visibility(*args, **kwargs):
+@@ -27,7 +32,7 @@ def check_score_visibility(f):
+                 if request.content_type == "application/json":
+                     abort(403)
+                 else:
+-                    return redirect(url_for("auth.login", next=request.full_path))
++                    return redirect(url_for_next("auth.login"))
+ 
+         elif v == ScoreVisibilityTypes.HIDDEN:
+             if is_admin():
+@@ -66,7 +71,7 @@ def check_challenge_visibility(f):
+                 if request.content_type == "application/json":
+                     abort(403)
+                 else:
+-                    return redirect(url_for("auth.login", next=request.full_path))
++                    return redirect(url_for_next("auth.login"))
+ 
+         elif v == ChallengeVisibilityTypes.ADMINS:
+             if is_admin():
+@@ -81,7 +86,7 @@ def check_challenge_visibility(f):
+                             description="Challenge Visibility is set to Admins Only",
+                         )
+                 else:
+-                    return redirect(url_for("auth.login", next=request.full_path))
++                    return redirect(url_for_next("auth.login"))
+ 
+     return _check_challenge_visibility
+ 
+@@ -100,7 +105,7 @@ def check_account_visibility(f):
+                 if request.content_type == "application/json":
+                     abort(403)
+                 else:
+-                    return redirect(url_for("auth.login", next=request.full_path))
++                    return redirect(url_for_next("auth.login"))
+ 
+         elif v == AccountVisibilityTypes.ADMINS:
+             if is_admin():
+diff --git a/fixtures/service/CTFd/utils/sessions/__init__.py b/fixtures/service/CTFd/utils/sessions/__init__.py
+index 0b687fa..e095114 100644
+--- a/fixtures/service/CTFd/utils/sessions/__init__.py
++++ b/fixtures/service/CTFd/utils/sessions/__init__.py
+@@ -64,7 +64,8 @@ class CachingSessionInterface(SessionInterface):
+         self.permanent = permanent
+ 
+     def open_session(self, app, request):
+-        sid = request.cookies.get(app.session_cookie_name)
++        cookie_name = self.get_cookie_name(app)
++        sid = request.cookies.get(cookie_name)
+         if not sid:
+             sid = self._generate_sid()
+             return self.session_class(sid=sid, permanent=self.permanent)
+@@ -89,6 +90,7 @@ class CachingSessionInterface(SessionInterface):
+         return self.session_class(sid=sid, permanent=self.permanent)
+ 
+     def save_session(self, app, session, response):
++        cookie_name = self.get_cookie_name(app)
+         domain = self.get_cookie_domain(app)
+         path = self.get_cookie_path(app)
+ 
+@@ -96,7 +98,7 @@ class CachingSessionInterface(SessionInterface):
+             if session.modified:
+                 cache.delete(self.key_prefix + session.sid)
+                 response.delete_cookie(
+-                    app.session_cookie_name, domain=domain, path=path
++                    cookie_name, domain=domain, path=path
+                 )
+             return
+ 
+@@ -117,12 +119,12 @@ class CachingSessionInterface(SessionInterface):
+             )
+ 
+             if self.use_signer:
+-                session_id = sign(want_bytes(session.sid))
++                session_id = sign(want_bytes(session.sid)).decode()
+             else:
+                 session_id = session.sid
+ 
+             response.set_cookie(
+-                app.session_cookie_name,
++                cookie_name,
+                 session_id,
+                 expires=expires,
+                 httponly=httponly,
+diff --git a/fixtures/service/CTFd/utils/user/__init__.py b/fixtures/service/CTFd/utils/user/__init__.py
+index 97c7195..4273634 100644
+--- a/fixtures/service/CTFd/utils/user/__init__.py
++++ b/fixtures/service/CTFd/utils/user/__init__.py
+@@ -1,5 +1,6 @@
+ import datetime  # noqa: I001
+ import re
++from urllib.parse import quote
+ 
+ from flask import abort
+ from flask import current_app as app
+@@ -15,6 +16,10 @@ from CTFd.utils.security.auth import logout_user
+ from CTFd.utils.security.signing import hmac
+ 
+ 
++def url_for_next(endpoint):
++    return url_for(endpoint) + "?next=" + quote(request.full_path, safe="")
++
++
+ def get_current_user():
+     if authed():
+         user = Users.query.filter_by(id=session["id"]).first()
+@@ -27,7 +32,7 @@ def get_current_user():
+                 if request.content_type == "application/json":
+                     error = 401
+                 else:
+-                    error = redirect(url_for("auth.login", next=request.full_path))
++                    error = redirect(url_for_next("auth.login"))
+                 abort(error)
+ 
+         return user
+diff --git a/fixtures/service/requirements.in b/fixtures/service/requirements.in
+index 4ea87fc..1169b2e 100644
+--- a/fixtures/service/requirements.in
++++ b/fixtures/service/requirements.in
+@@ -1,36 +1,40 @@
+-Flask==2.0.3
+-Werkzeug==2.0.3
++Flask==3.1.3
++Werkzeug==3.1.6
+ jinja2==3.1.6
+-Flask-SQLAlchemy==2.5.1
+-Flask-Caching==2.0.2
+-Flask-Migrate==2.5.3
++Flask-SQLAlchemy==3.0.5
++Flask-Caching==2.4.1
++Flask-Migrate==4.1.0
+ Flask-Script==2.0.6
+ SQLAlchemy==1.4.48
+ SQLAlchemy-Utils==0.41.1
+ passlib==1.7.4
+ bcrypt==4.0.1
+-requests==2.32.3
+-PyMySQL[rsa]==1.0.2
++requests==2.33.0
++PyMySQL[rsa]==1.1.1
+ gunicorn==23.0.0
+ dataset==1.6.2
+ cmarkgfm==2024.1.14
+ redis==4.5.5
+ gevent==23.9.1
+-python-dotenv==0.13.0
+-flask-restx==1.1.0
++python-dotenv==1.2.2
++flask-restx==1.3.2
+ flask-marshmallow==0.10.1
+ marshmallow-sqlalchemy==0.17.0
+ boto3==1.35.27
+ marshmallow==2.20.2
+-pydantic==1.6.2
++pydantic==1.10.13
+ WTForms==2.3.1
+ python-geoacumen-city==2023.4.15
+ maxminddb==1.5.4
+ tenacity==6.2.0
+ pybluemonday==0.0.14
+ freezegun==1.2.2
+-Flask-Babel==2.0.0
+-Pillow==10.1.0
++Flask-Babel==4.0.0
++Pillow==12.2.0
+ cffi==1.17.1
+ six==1.16.0
+-urllib3==1.26.20
++urllib3==2.7.0
++cryptography==45.0.7
++idna==3.15
++Mako==1.3.12
++attrs==25.4.0
+diff --git a/fixtures/service/requirements.txt b/fixtures/service/requirements.txt
+index d3eb8cd..7a2369c 100644
+--- a/fixtures/service/requirements.txt
++++ b/fixtures/service/requirements.txt
+@@ -1,23 +1,28 @@
+ #
+-# This file is autogenerated by pip-compile with Python 3.11
++# This file is autogenerated by pip-compile with Python 3.12
+ # by the following command:
+ #
+ #    ./scripts/pip-compile.sh
+ #
+-alembic==1.4.3
++alembic==1.18.5
+     # via
+     #   dataset
+     #   flask-migrate
+ aniso8601==8.0.0
+     # via flask-restx
+-attrs==20.3.0
+-    # via jsonschema
++attrs==25.4.0
++    # via
++    #   -r requirements.in
++    #   jsonschema
++    #   referencing
+ babel==2.12.1
+     # via flask-babel
+ banal==1.0.6
+     # via dataset
+ bcrypt==4.0.1
+     # via -r requirements.in
++blinker==1.9.0
++    # via flask
+ boto3==1.35.27
+     # via -r requirements.in
+ botocore==1.35.27
+@@ -36,15 +41,17 @@ cffi==1.17.1
+     #   pybluemonday
+ charset-normalizer==2.0.12
+     # via requests
+-click==7.1.2
++click==8.4.2
+     # via flask
+ cmarkgfm==2024.1.14
+     # via -r requirements.in
+-cryptography==40.0.2
+-    # via pymysql
++cryptography==45.0.7
++    # via
++    #   -r requirements.in
++    #   pymysql
+ dataset==1.6.2
+     # via -r requirements.in
+-flask==2.0.3
++flask==3.1.3
+     # via
+     #   -r requirements.in
+     #   flask-babel
+@@ -54,19 +61,19 @@ flask==2.0.3
+     #   flask-restx
+     #   flask-script
+     #   flask-sqlalchemy
+-flask-babel==2.0.0
++flask-babel==4.0.0
+     # via -r requirements.in
+-flask-caching==2.0.2
++flask-caching==2.4.1
+     # via -r requirements.in
+ flask-marshmallow==0.10.1
+     # via -r requirements.in
+-flask-migrate==2.5.3
++flask-migrate==4.1.0
+     # via -r requirements.in
+-flask-restx==1.1.0
++flask-restx==1.3.2
+     # via -r requirements.in
+ flask-script==2.0.6
+     # via -r requirements.in
+-flask-sqlalchemy==2.5.1
++flask-sqlalchemy==3.0.5
+     # via
+     #   -r requirements.in
+     #   flask-migrate
+@@ -80,9 +87,14 @@ greenlet==3.0.3
+     #   sqlalchemy
+ gunicorn==23.0.0
+     # via -r requirements.in
+-idna==2.10
+-    # via requests
+-itsdangerous==2.1.2
++idna==3.15
++    # via
++    #   -r requirements.in
++    #   requests
++    #   yarl
++importlib-resources==7.1.0
++    # via flask-restx
++itsdangerous==2.2.0
+     # via flask
+ jinja2==3.1.6
+     # via
+@@ -95,12 +107,16 @@ jmespath==0.10.0
+     #   botocore
+ jsonschema==3.2.0
+     # via flask-restx
+-mako==1.1.3
+-    # via alembic
++mako==1.3.12
++    # via
++    #   -r requirements.in
++    #   alembic
+ markupsafe==2.1.3
+     # via
++    #   flask
+     #   jinja2
+     #   mako
++    #   werkzeug
+     #   wtforms
+ marshmallow==2.20.2
+     # via
+@@ -113,42 +129,45 @@ maxminddb==1.5.4
+     # via
+     #   -r requirements.in
+     #   python-geoacumen-city
++multidict==6.7.1
++    # via yarl
+ packaging==24.2
+     # via gunicorn
+ passlib==1.7.4
+     # via -r requirements.in
+-pillow==10.1.0
++pillow==12.2.0
+     # via -r requirements.in
++propcache==0.5.2
++    # via yarl
+ pybluemonday==0.0.14
+     # via -r requirements.in
+ pycparser==2.20
+     # via cffi
+-pydantic==1.6.2
++pydantic==1.10.13
+     # via -r requirements.in
+-pymysql[rsa]==1.0.2
++pymysql[rsa]==1.1.1
+     # via
+     #   -r requirements.in
+     #   pymysql
+ pyrsistent==0.17.3
+-    # via jsonschema
++    # via
++    #   jsonschema
++    #   referencing
+ python-dateutil==2.8.1
+     # via
+-    #   alembic
+     #   botocore
+     #   freezegun
+-python-dotenv==0.13.0
++python-dotenv==1.2.2
+     # via -r requirements.in
+-python-editor==1.0.4
+-    # via alembic
+ python-geoacumen-city==2023.4.15
+     # via -r requirements.in
+-pytz==2020.4
+-    # via
+-    #   flask-babel
+-    #   flask-restx
++pytz==2026.2
++    # via flask-babel
+ redis==4.5.5
+     # via -r requirements.in
+-requests==2.32.3
++referencing==0.8.11
++    # via flask-restx
++requests==2.33.0
+     # via -r requirements.in
+ s3transfer==0.10.0
+     # via boto3
+@@ -171,18 +190,24 @@ sqlalchemy-utils==0.41.1
+     # via -r requirements.in
+ tenacity==6.2.0
+     # via -r requirements.in
+-urllib3==1.26.20
++typing-extensions==4.16.0
++    # via
++    #   alembic
++    #   pydantic
++urllib3==2.7.0
+     # via
+     #   -r requirements.in
+     #   botocore
+     #   requests
+-werkzeug==2.0.3
++werkzeug==3.1.6
+     # via
+     #   -r requirements.in
+     #   flask
+     #   flask-restx
+ wtforms==2.3.1
+     # via -r requirements.in
++yarl==1.24.2
++    # via referencing
+ zope-event==4.5.0
+     # via gevent
+ zope-interface==5.2.0

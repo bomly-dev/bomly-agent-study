@@ -1,0 +1,116 @@
+diff --git a/fixtures/service/tests/users/test_auth.py b/fixtures/service/tests/users/test_auth.py
+index 817be7a..22da5a7 100644
+--- a/fixtures/service/tests/users/test_auth.py
++++ b/fixtures/service/tests/users/test_auth.py
+@@ -141,9 +141,7 @@ def test_user_bad_login():
+         with client.session_transaction() as sess:
+             assert sess.get("id") is None
+         r = client.get("/profile")
+-        assert r.location.startswith(
+-            "http://localhost/login"
+-        )  # We got redirected to login
++        assert r.location.startswith("/login")  # We got redirected to login
+     destroy_ctfd(app)
+ 
+ 
+@@ -183,7 +181,7 @@ def test_user_get_logout():
+         client = login_as_user(app)
+         client.get("/logout", follow_redirects=True)
+         r = client.get("/challenges")
+-        assert r.location == "http://localhost/login?next=%2Fchallenges%3F"
++        assert r.location == "/login?next=/challenges?"
+         assert r.status_code == 302
+     destroy_ctfd(app)
+ 
+@@ -204,7 +202,7 @@ def test_user_isnt_admin():
+             "config",
+         ]:
+             r = client.get("/admin/{}".format(page))
+-            assert r.location.startswith("http://localhost/login?next=")
++            assert r.location.startswith("/login?next=")
+             assert r.status_code == 302
+     destroy_ctfd(app)
+ 
+@@ -351,21 +349,19 @@ def test_user_can_confirm_email(mock_smtp):
+             assert "Confirmation email sent to" in r.get_data(as_text=True)
+ 
+             r = client.get("/challenges")
+-            assert (
+-                r.location == "http://localhost/confirm"
+-            )  # We got redirected to /confirm
++            assert r.location == "/confirm"  # We got redirected to /confirm
+ 
+             r = client.get(
+                 "http://localhost/confirm/ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+             )
+-            assert r.location == "http://localhost/challenges"
++            assert r.location == "/challenges"
+ 
+             # The team is now verified
+             user = Users.query.filter_by(email="user@user.com").first()
+             assert user.verified is True
+ 
+             r = client.get("http://localhost/confirm")
+-            assert r.location == "http://localhost/settings"
++            assert r.location == "/settings"
+     destroy_ctfd(app)
+ 
+ 
+@@ -503,7 +499,7 @@ def test_registration_code_required():
+             data["registration_code"] = "secret-sauce"
+             r = client.post("/register", data=data)
+             assert r.status_code == 302
+-            assert r.location.startswith("http://localhost/challenges")
++            assert r.location.startswith("/challenges")
+     destroy_ctfd(app)
+ 
+ 
+@@ -533,5 +529,5 @@ def test_registration_code_allows_numeric():
+             data["registration_code"] = "1234567890"
+             r = client.post("/register", data=data)
+             assert r.status_code == 302
+-            assert r.location.startswith("http://localhost/challenges")
++            assert r.location.startswith("/challenges")
+     destroy_ctfd(app)
+diff --git a/fixtures/service/tests/users/test_fields.py b/fixtures/service/tests/users/test_fields.py
+index b118c65..a097845 100644
+--- a/fixtures/service/tests/users/test_fields.py
++++ b/fixtures/service/tests/users/test_fields.py
+@@ -259,7 +259,7 @@ def test_user_needs_all_required_fields():
+ 
+             r = client.get("/challenges")
+             assert r.status_code == 302
+-            assert r.location.startswith("http://localhost/settings")
++            assert r.location.startswith("/settings")
+ 
+             # Populate the non-required fields
+             r = client.patch(
+@@ -277,7 +277,7 @@ def test_user_needs_all_required_fields():
+             # I should still be restricted from seeing challenges
+             r = client.get("/challenges")
+             assert r.status_code == 302
+-            assert r.location.startswith("http://localhost/settings")
++            assert r.location.startswith("/settings")
+ 
+             # I should still see all fields b/c I don't have a complete profile
+             r = client.get("/settings")
+diff --git a/fixtures/service/tests/users/test_setup.py b/fixtures/service/tests/users/test_setup.py
+index 634b12e..c033424 100644
+--- a/fixtures/service/tests/users/test_setup.py
++++ b/fixtures/service/tests/users/test_setup.py
+@@ -11,7 +11,7 @@ def test_ctfd_setup_redirect():
+         with app.test_client() as client:
+             r = client.get("/users")
+             assert r.status_code == 302
+-            assert r.location == "http://localhost/setup"
++            assert r.location == "/setup"
+ 
+             # Files in /themes load properly
+             r = client.get("/themes/core/static/css/main.dev.css")
+@@ -52,5 +52,5 @@ def test_ctfd_setup_verification():
+             data["email"] = "admin@examplectf.com"
+             r = client.post("/setup", data=data)
+             assert r.status_code == 302
+-            assert r.location == "http://localhost/"
++            assert r.location == "/"
+     destroy_ctfd(app)

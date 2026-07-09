@@ -1,0 +1,31 @@
+{
+  "agent": "claude",
+  "condition": "bare",
+  "run_number": 1,
+  "pilot": true,
+  "scope": "api-java",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "6d68d73",
+  "harness_sha": "6d68d73",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-09T09:32:53.632315+00:00",
+  "ended_at": "2026-07-09T09:44:01.376303+00:00",
+  "timeout": false,
+  "exit_code": 1,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01EsKhZRGVr562i1BnmnWagM",
+      "error": "<tool_use_error>File does not exist. Note: your current working directory is /tmp/bomly-study-1wnbnesd/claude-bare-api-java-1-1783589572/repo/fixtures/api-java.</tool_use_error>"
+    },
+    {
+      "tool": "toolu_01Te5iYzTjnJ4mwevt9gA1s7",
+      "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

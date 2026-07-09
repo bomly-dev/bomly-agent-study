@@ -1,0 +1,54 @@
+{
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "service": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "  /tmp/bomly-study-dyb8su54/codex-bare-service-1-1783589609/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff2384df10> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_user_score_is_correct\ntests/users/test_scoreboard.py::test_user_score_is_correct\ntests/users/test_scoreboard.py::test_hidden_users_should_not_influence_scores\ntests/users/test_scoreboard.py::test_hidden_users_should_not_influence_scores\ntests/users/test_scoreboard.py::test_hidden_users_should_not_influence_scores\ntests/users/test_scoreboard.py::test_hidden_users_should_not_influence_scores\n  /tmp/bomly-study-dyb8su54/codex-bare-service-1-1783589609/repo/fixtures/service/tests/helpers.py:469: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    solve.date = datetime.datetime.utcnow()\n\ntests/users/test_scoreboard.py::test_top_10\n  /tmp/bomly-study-dyb8su54/codex-bare-service-1-1783589609/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff23774ce0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic\n  /tmp/bomly-study-dyb8su54/codex-bare-service-1-1783589609/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff2332cbf0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-dyb8su54/codex-bare-service-1-1783589609/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff233da600> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-dyb8su54/codex-bare-service-1-1783589609/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff235dff80> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n82 passed, 754 warnings in 54.85s",
+      "test_stderr_tail": ""
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "S5",
+      "package": "mako",
+      "ecosystem": "pypi",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    },
+    {
+      "slot_id": "S8",
+      "package": "pydantic",
+      "ecosystem": "pypi",
+      "outcome": "FIXED",
+      "bomly_still_flagged": false,
+      "second_scanner_still_flagged": false,
+      "build_ok": true
+    }
+  ],
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "codex",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 949.26,
+    "timeout": false,
+    "turns": 1,
+    "tool_calls": 63,
+    "mcp_calls": 0,
+    "tokens": {
+      "input": 5771716,
+      "output": 17851,
+      "cache_read": 5581184,
+      "cache_creation": null,
+      "reasoning_output": 3429
+    },
+    "cost_usd": null,
+    "mcp_tool_errors": []
+  }
+}

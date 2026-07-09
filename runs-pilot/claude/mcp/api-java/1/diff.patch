@@ -1,0 +1,133 @@
+diff --git a/fixtures/api-java/pom.xml b/fixtures/api-java/pom.xml
+index a629da2..11f4fb1 100644
+--- a/fixtures/api-java/pom.xml
++++ b/fixtures/api-java/pom.xml
+@@ -90,7 +90,7 @@
+         <lib.cpe-parser.version>2.1.0</lib.cpe-parser.version>
+         <lib.cvss-calculator.version>1.4.2</lib.cvss-calculator.version>
+         <lib.owasp-rr-calculator.version>1.0.1</lib.owasp-rr-calculator.version>
+-        <lib.cyclonedx-java.version>8.0.3</lib.cyclonedx-java.version>
++        <lib.cyclonedx-java.version>11.0.1</lib.cyclonedx-java.version>
+         <lib.greenmail.version>1.6.14</lib.greenmail.version>
+         <lib.jaxb.runtime.version>2.3.8</lib.jaxb.runtime.version>
+         <lib.json-unit.version>3.2.2</lib.json-unit.version>
+@@ -103,6 +103,8 @@
+         <lib.open-vulnerability-clients.version>5.1.0</lib.open-vulnerability-clients.version>
+         <lib.packageurl.version>1.4.1</lib.packageurl.version>
+         <lib.pebble.version>3.2.0</lib.pebble.version>
++        <!-- Overriding assertj-core version from alpine-parent to remediate GHSA-rqfh-9r24-8c9r (XXE) -->
++        <lib.assertj.version>3.27.7</lib.assertj.version>
+         <lib.resilience4j.version>2.1.0</lib.resilience4j.version>
+         <lib.woodstox.version>6.5.1</lib.woodstox.version>
+         <lib.junit-params.version>1.1.1</lib.junit-params.version>
+@@ -114,8 +116,8 @@
+         <!-- JDBC Drivers -->
+         <lib.jdbc-driver.mssql.version>12.4.2.jre11</lib.jdbc-driver.mssql.version>
+         <!-- Upgrading to 8.0.33 as https://github.com/datanucleus/datanucleus-rdbms/issues/446 is resolved! -->
+-        <lib.jdbc-driver.mysql.version>8.0.33</lib.jdbc-driver.mysql.version>
+-        <lib.jdbc-driver.postgresql.version>42.6.0</lib.jdbc-driver.postgresql.version>
++        <lib.jdbc-driver.mysql.version>8.2.0</lib.jdbc-driver.mysql.version>
++        <lib.jdbc-driver.postgresql.version>42.7.11</lib.jdbc-driver.postgresql.version>
+         <!-- Maven Plugin Properties -->
+         <plugin.cyclonedx.projectType>application</plugin.cyclonedx.projectType>
+         <plugin.cyclonedx.outputFormat>json</plugin.cyclonedx.outputFormat>
+@@ -294,8 +296,9 @@
+             <version>${lib.jdbc-driver.mssql.version}</version>
+         </dependency>
+         <dependency>
+-            <groupId>mysql</groupId>
+-            <artifactId>mysql-connector-java</artifactId>
++            <!-- Renamed from mysql:mysql-connector-java as of 8.1.0; old coordinates stop at 8.0.33. -->
++            <groupId>com.mysql</groupId>
++            <artifactId>mysql-connector-j</artifactId>
+             <version>${lib.jdbc-driver.mysql.version}</version>
+             <exclusions>
+                 <!--
+@@ -344,7 +347,7 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <version>1.26.0</version>
+         </dependency>
+         <!-- Resilience4J -->
+         <dependency>
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
+index 33d2123..5e2dbef 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
+@@ -18,7 +18,7 @@
+  */
+ package org.dependencytrack.parser.cyclonedx;
+ 
+-import org.cyclonedx.BomGeneratorFactory;
++import org.cyclonedx.generators.BomGeneratorFactory;
+ import org.cyclonedx.CycloneDxSchema;
+ import org.cyclonedx.exception.GeneratorException;
+ import org.cyclonedx.model.Bom;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
+index abbe25f..c3de6ec 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
+@@ -163,11 +163,11 @@ public class ModelConverter {
+             final List<org.cyclonedx.model.License> licenseOptions = new ArrayList<>();
+             if (licenseChoice.getExpression() != null) {
+                 final var expressionParser = new SpdxExpressionParser();
+-                final SpdxExpression parsedExpression = expressionParser.parse(licenseChoice.getExpression());
++                final SpdxExpression parsedExpression = expressionParser.parse(licenseChoice.getExpression().getValue());
+                 if (!Objects.equals(parsedExpression, SpdxExpression.INVALID)) {
+                     // store license expression, but don't overwrite manual changes to the field
+                     if (component.getLicenseExpression() == null) {
+-                        component.setLicenseExpression(licenseChoice.getExpression());
++                        component.setLicenseExpression(licenseChoice.getExpression().getValue());
+                     }
+                     // if the expression just consists of one license id, we can add it as another license option
+                     if (parsedExpression.getSpdxLicenseId() != null) {
+@@ -386,7 +386,7 @@ public class ModelConverter {
+             cycloneComponent.setLicenseChoice(licenseChoice);
+         }
+         if (component.getLicenseExpression() != null) {
+-            licenseChoice.setExpression(component.getLicenseExpression());
++            licenseChoice.setExpression(new org.cyclonedx.model.license.Expression(component.getLicenseExpression()));
+             cycloneComponent.setLicenseChoice(licenseChoice);
+         }
+ 
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
+index 8fc656e..6a980aa 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
+@@ -23,7 +23,7 @@ import alpine.event.framework.Event;
+ import alpine.event.framework.Subscriber;
+ import alpine.notification.Notification;
+ import alpine.notification.NotificationLevel;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.parsers.Parser;
+ import org.dependencytrack.event.BomUploadEvent;
+ import org.dependencytrack.event.NewVulnerableDependencyAnalysisEvent;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
+index 9d38087..ed6f2cd 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
+@@ -23,7 +23,7 @@ import alpine.event.framework.Event;
+ import alpine.event.framework.Subscriber;
+ import alpine.notification.Notification;
+ import alpine.notification.NotificationLevel;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.parsers.Parser;
+ import org.dependencytrack.event.VexUploadEvent;
+ import org.dependencytrack.model.ConfigPropertyConstants;
+diff --git a/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java b/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
+index 82a956f..7031c21 100644
+--- a/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
++++ b/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
+@@ -1,7 +1,7 @@
+ package org.dependencytrack.parser.cyclonedx;
+ 
+ import org.assertj.core.api.Assertions;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.exception.ParseException;
+ import org.dependencytrack.PersistenceCapableTest;
+ import org.dependencytrack.model.Analysis;

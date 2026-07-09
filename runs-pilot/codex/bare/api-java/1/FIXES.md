@@ -1,0 +1,37 @@
+# Vulnerability Remediation Notes
+
+- `org.apache.commons:commons-lang3` 3.13.0: OSV reported `GHSA-j288-q9x7-2f5v`. Overrode the inherited version to 3.18.0, the fixed version, because the package is used transitively by Alpine.
+- `commons-io:commons-io` 2.13.0: OSV reported `GHSA-78wr-2p64-hpwj`. Overrode the inherited version to 2.14.0, the fixed version, because the package is used transitively by Alpine.
+- `com.nimbusds:nimbus-jose-jwt` 9.30.2: OSV reported `GHSA-gvpg-vgmx-xg6w` and `GHSA-xwmg-2g98-w7v9`. Added dependency management for 9.37.4, which fixes both advisories while preserving the existing OAuth2 SDK.
+- `com.fasterxml.jackson.core:jackson-core` 2.15.2: OSV reported `GHSA-72hv-8253-57qq`. Overrode the Jackson line to 2.18.8, which includes the fixed `jackson-core`.
+- `com.fasterxml.jackson.core:jackson-databind` 2.15.2: OSV reported `GHSA-5jmj-h7xm-6q6v`, `GHSA-hgj6-7826-r7m5`, `GHSA-j3rv-43j4-c7qm`, and `GHSA-rmj7-2vxq-3g9f`. Overrode the Jackson line to 2.18.8, which fixes all but `GHSA-5jmj-h7xm-6q6v`; OSV lists a 3.1.4 fix for that remaining advisory, but `com.fasterxml.jackson.core:jackson-databind:3.1.4` is not available from Maven Central, so there is no usable Maven version to select.
+- `ch.qos.logback:logback-core` 1.2.13: OSV reported `GHSA-25qh-j22f-pwp8`, `GHSA-6v67-2wr5-gvf4`, `GHSA-jhq6-gfmj-v8fx`, `GHSA-p47f-322f-whfh`, `GHSA-pr98-23f8-jwxv`, and `GHSA-qqpg-mvqg-649v`. Tried the fixed 1.5.x line, but it requires SLF4J 2.x and caused the required DataNucleus enhancement step in `make test` to fail, so the version remains unchanged to keep the build passing.
+- `com.sun.mail:jakarta.mail` 1.6.7: OSV reported `GHSA-9342-92gg-6v29`. Overrode the inherited version to 1.6.8, the fixed version.
+- `org.cyclonedx:cyclonedx-core-java` 8.0.3: OSV reported `GHSA-683x-4444-jxh8` and `GHSA-6fhj-vr9j-g45r`. Updated to 11.0.1 and made the minimal import/license-expression API adjustments required by that version.
+- `io.pebbletemplates:pebble` 3.2.0: OSV reported `GHSA-p75g-cxfj-7wrx`. OSV reports no fixed version, so no version change can remediate this package.
+- `org.codehaus.plexus:plexus-utils` 3.5.1: OSV reported `GHSA-6fmv-xxpf-w3cw`. Added dependency management for 3.6.1, the fixed version.
+- `com.mysql:mysql-connector-j` 8.0.33: OSV reported `GHSA-m6vm-37g8-gqvh`. Moved from the old relocated `mysql:mysql-connector-java` coordinates to `com.mysql:mysql-connector-j` and updated to 8.2.0, the fixed version.
+- `org.postgresql:postgresql` 42.6.0: OSV reported `GHSA-24rp-q3w6-vc56` and `GHSA-98qh-xjc8-98pq`. Updated to 42.7.11, which fixes both advisories.
+- `org.apache.commons:commons-compress` 1.25.0: OSV reported `GHSA-4265-ccf5-phj5` and `GHSA-4g9r-vxhx-9pgx`. Updated the direct dependency to 1.26.0, the fixed version for both advisories.
+- `org.eclipse.jetty:jetty-server` 9.4.49.v20220914: OSV reported `GHSA-g8m5-722r-8whq`, `GHSA-p26g-97m4-6q7c`, `GHSA-q4rv-gq96-w7c5`, and `GHSA-qw69-rqj8-6qw8`. Added Jetty BOM management for 9.4.58.v20250814, which clears the advisories for this artifact while keeping WireMock 2.x test compatibility.
+- `org.eclipse.jetty:jetty-http` 9.4.49.v20220914: OSV reported `GHSA-355h-qmc2-wpwf`, `GHSA-hmr7-m48g-48f6`, `GHSA-qh8g-58pp-2wxh`, and `GHSA-wjpw-4j6x-6rwh`. Added Jetty BOM management for 9.4.58.v20250814, which clears part of the set; OSV still reports `GHSA-355h-qmc2-wpwf` and `GHSA-qh8g-58pp-2wxh` on the latest 9.4.x line. Moving to Jetty 12 requires WireMock 4, which removes the JUnit 4 `WireMockRule` API used by this test suite, so a version-only change cannot fully remediate this package while preserving the build.
+- `org.eclipse.jetty:jetty-servlets` 9.4.49.v20220914: OSV reported `GHSA-3gh6-v5v9-6v9j` and `GHSA-j26w-f9rq-mr2q`. Added Jetty BOM management for 9.4.58.v20250814, which clears the advisories for this artifact.
+- `org.eclipse.jetty:jetty-xml` 9.4.49.v20220914: OSV reported `GHSA-58qw-p7qm-5rvh`. Added Jetty BOM management for 9.4.58.v20250814, which clears the advisory.
+- `org.eclipse.jetty.http2:http2-server` 9.4.49.v20220914: OSV reported `GHSA-qppj-fm5r-hxr3`. Added Jetty BOM management for 9.4.58.v20250814, which clears the advisory.
+- `org.eclipse.jetty.http2:http2-common` 9.4.49.v20220914: OSV reported `GHSA-mmxm-8w33-wc4h`, `GHSA-qppj-fm5r-hxr3`, and `GHSA-rggv-cv7r-mw98`. Added Jetty BOM management for 9.4.58.v20250814, which clears the advisories.
+- `org.eclipse.jetty.http2:http2-hpack` 9.4.49.v20220914: OSV reported `GHSA-wgh7-54f2-x98r`. Added Jetty BOM management for 9.4.58.v20250814, which clears the advisory.
+- `org.xmlunit:xmlunit-core` 2.9.0: OSV reported `GHSA-chfm-68vv-pvw5`. Added dependency management for 2.10.0, the fixed version.
+- `com.jayway.jsonpath:json-path` 2.7.0: OSV reported `GHSA-pfh2-hfmq-phg5`. Added dependency management for 2.9.0, the fixed version.
+- `com.github.jknack:handlebars` 4.3.1: OSV reported `GHSA-r4gv-qr8j-p3pg`. Added dependency management for 4.5.2, the fixed version.
+- `commons-fileupload:commons-fileupload` 1.4: OSV reported `GHSA-hfrx-6qgj-fp6c` and `GHSA-vv7r-c36w-3prj`. Added dependency management for 1.6.0, which fixes both advisories.
+- `org.assertj:assertj-core` 3.24.2: OSV reported `GHSA-rqfh-9r24-8c9r`. Overrode the inherited test dependency version to 3.27.7, the fixed version.
+- `io.netty:netty-handler-proxy` 4.1.86.Final: OSV reported `GHSA-45q3-82m4-75jr`. Added Netty BOM management for 4.1.135.Final and updated MockServer to 7.4.0, which clears the advisory.
+- `io.netty:netty-codec` 4.1.86.Final: OSV reported `GHSA-3p8m-j85q-pgmj` and `GHSA-mj4r-2hfc-f8p6`. Added Netty BOM management for 4.1.135.Final and updated MockServer to 7.4.0, which clears both advisories.
+- `io.netty:netty-codec-http` 4.1.86.Final: OSV reported multiple HTTP parsing and request-handling advisories. Added Netty BOM management for 4.1.135.Final and updated MockServer to 7.4.0, which clears the advisories.
+- `io.netty:netty-codec-http2` 4.1.86.Final: OSV reported multiple HTTP/2 advisories. Added Netty BOM management for 4.1.135.Final and updated MockServer to 7.4.0, which clears the advisories.
+- `io.netty:netty-common` 4.1.86.Final: OSV reported `GHSA-389x-839f-4rhx` and `GHSA-xq3w-v528-46rv`. Added Netty BOM management for 4.1.135.Final and updated MockServer to 7.4.0, which clears both advisories.
+- `io.netty:netty-handler` 4.1.86.Final: OSV reported `GHSA-3qp7-7mw8-wx86`, `GHSA-6mjq-h674-j845`, `GHSA-c653-97m9-rcg9`, and `GHSA-x4gw-5cx5-pgmh`. Added Netty BOM management for 4.1.135.Final and updated MockServer to 7.4.0, which clears the advisories.
+- `org.bouncycastle:bcprov-jdk18on` 1.72: OSV reported multiple Bouncy Castle advisories. Added dependency management for 1.84, which clears the advisories.
+- `org.bouncycastle:bcpkix-jdk18on` 1.72: OSV reported multiple Bouncy Castle advisories. Added dependency management for 1.84, which clears the advisories.
+- `commons-beanutils:commons-beanutils` 1.9.4: OSV reported `GHSA-wxr5-93ph-8wr9`. Added dependency management for 1.11.0, the fixed version.
+- `org.mozilla:rhino` 1.7.7.2: OSV reported `GHSA-3w8q-xq97-5j7x`. Added dependency management for 1.7.15.1, a fixed version compatible with the test dependency graph.
