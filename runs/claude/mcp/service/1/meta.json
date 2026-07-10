@@ -1,0 +1,60 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 1,
+  "pilot": false,
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "13dc887",
+  "harness_sha": "13dc887",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-10T06:15:39.998048+00:00",
+  "ended_at": "2026-07-10T06:31:39.175539+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01E56PxUBJDUTDsY446CaM8f",
+      "error": "prepare scan: no subprojects discovered for execution target with the applied filters (active filters: --ecosystems npm); discovery probe: found requirements.txt at . (pip); found .github/workflows/*.yml at . (github-actions); found setup.py at CTFd/forms (setuppy); found yarn.lock at CTFd/themes/admin (yarn); found yarn.lock at CTFd/themes/core-beta (yarn); found .github/workflows/*.yml at CTFd/themes/core-beta (github-actions)"
+    },
+    {
+      "tool": "toolu_01QbH76xLNHaTqP3apgALib5",
+      "error": "prepare scan: unknown ecosystem selector(s): yarn\navailable ecosystems: alpm, apk, conda, cpp, dart, dotnet, dpkg, elixir, erlang, github-actions, go, haskell, homebrew, lua, maven, nix, npm, ocaml, php, portage, prolog, python, r, rpm, ruby, rust, sbom, scala, snap, swift, terraform, wordpress\nrun `bomly scan --help` for full selector details"
+    },
+    {
+      "tool": "toolu_01GUusCUCezetRtqbai5Tiic",
+      "error": "run explain pipeline: dependency not found: @vitejs/plugin-vue"
+    },
+    {
+      "tool": "toolu_014dLMgaGGnkkNjkaweE5Yc6",
+      "error": "run explain pipeline: dependency not found: vitejs/plugin-vue"
+    },
+    {
+      "tool": "toolu_01N7qJWqQJaf6mX1QvoFTrZr",
+      "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+    },
+    {
+      "tool": "toolu_017kMvxkzko5MvxA6gQPBpxx",
+      "error": "<tool_use_error>InputValidationError: TaskCreate failed due to the following issues:\nThe required parameter `subject` is missing\nThe required parameter `description` is missing\nAn unexpected parameter `tasks` was provided\n\nTaskCreate creates ONE task per call and has no `tasks` or `todos` parameter. Call TaskCreate once per task, passing `subject` (a brief title) and `description` (what needs to be done) as top-level string parameters.\n\nThis tool's schema was not sent to the API \u2014 it was not in "
+    },
+    {
+      "tool": "toolu_01Cz4ot7dgKXYwd3abVTLojD",
+      "error": "Exit code 127\nv22.23.1\n/usr/bin/corepack\nInternal Error: EACCES: permission denied, symlink '../lib/node_modules/corepack/dist/pnpm.js' -> '/usr/bin/pnpm'\n    at async Object.symlink (node:internal/fs/promises:1001:10)\n    at async EnableCommand.generatePosixLink (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:23218:5)\n    at async Promise.all (index 0)\n    at async EnableCommand.execute (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:23199:5)\n    at async EnableCommand.validateAndEx"
+    },
+    {
+      "tool": "toolu_01TBmmJsARhahyeKh3vVC1ht",
+      "error": "Exit code 127\nnpm error     at async /usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:638:20\nnpm error     at async Promise.allSettled (index 0)\nnpm error     at async [reifyPackages] (/usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:334:11)\nnpm error     at async Arborist.reify (/usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:149:5)\nnpm error     at async Install.exec (/usr/lib/node_modules/npm/lib/commands/"
+    },
+    {
+      "tool": "toolu_013foZhcNtgXJR1KFFibijY3",
+      "error": "Exit code 1\nPackage Version\n------- -------\npip     24.0\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nModuleNotFoundError: No module named 'distutils'\n---with setuptools import first---\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nModuleNotFoundError: No module named 'setuptools'"
+    }
+  ],
+  "stderr_tail": "Background tasks still running after 600s; terminating. Set CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 to wait indefinitely.\n",
+  "credential_copy_mode": "oauth-token-env-var"
+}

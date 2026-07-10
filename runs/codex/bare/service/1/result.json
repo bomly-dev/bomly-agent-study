@@ -1,0 +1,176 @@
+{
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "service": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "tests/users/test_scoreboard.py::test_top_10\n  /tmp/bomly-study-axojxka7/codex-bare-service-1-1783653318/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff3acb5910> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_top_10\n  /tmp/bomly-study-axojxka7/codex-bare-service-1-1783653318/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff3a967110> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic\n  /tmp/bomly-study-axojxka7/codex-bare-service-1-1783653318/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff3a863800> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic\n  /tmp/bomly-study-axojxka7/codex-bare-service-1-1783653318/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff3aadae70> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-axojxka7/codex-bare-service-1-1783653318/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff3a35ba70> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-axojxka7/codex-bare-service-1-1783653318/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff3a42b0b0> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\ntests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\n  /tmp/bomly-study-axojxka7/codex-bare-service-1-1783653318/repo/fixtures/service/tests/helpers.py:401: SAWarning: Flushing object <Flags at 0xffff3a430b00> with incompatible polymorphic identity 'static'; the object may not refresh and/or load correctly (this warning may be suppressed after 10 occurrences)\n    db.session.commit()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n82 passed, 757 warnings in 52.13s",
+      "test_stderr_tail": ""
+    }
+  },
+  "packages": [
+    {
+      "package": "cryptography",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 9,
+      "fixable_resolved": 9,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 3,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-537C-GMF6-5CCF",
+        "GHSA-M959-CC7F-WV43",
+        "GHSA-R6PH-V2QM-Q3C2"
+      ],
+      "build_ok": true
+    },
+    {
+      "package": "flask",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "idna",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "mako",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "pillow",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 4,
+      "fixable_resolved": 4,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "pydantic",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "pymysql",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "python-dotenv",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "requests",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "urllib3",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 5,
+      "fixable_resolved": 5,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "werkzeug",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED",
+      "fixable_total": 9,
+      "fixable_resolved": 9,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    }
+  ],
+  "completeness": 1.0,
+  "fixable_total": 39,
+  "fixable_resolved": 39,
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "codex",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 800.52,
+    "timeout": false,
+    "incomplete": false,
+    "turns": 1,
+    "tool_calls": 63,
+    "mcp_calls": 0,
+    "tokens": {
+      "input": 3857674,
+      "output": 15251,
+      "cache_read": 3675648,
+      "cache_creation": null,
+      "reasoning_output": 4265
+    },
+    "cost_usd": null,
+    "mcp_tool_errors": []
+  }
+}

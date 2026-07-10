@@ -1,0 +1,48 @@
+{
+  "agent": "claude",
+  "condition": "bare",
+  "run_number": 1,
+  "pilot": false,
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "1d579f8",
+  "harness_sha": "1d579f8",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-10T02:38:57.011531+00:00",
+  "ended_at": "2026-07-10T02:52:56.557593+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 1,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01Y1KSx9iwMvVUHsF1Bc4RbA",
+      "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 3, in <module>\n  File \"/usr/lib/python3.12/json/__init__.py\", line 293, in load\n    return loads(fp.read(),\n           ^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/__init__.py\", line 346, in loads\n    return _default_decoder.decode(s)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/decoder.py\", line 337, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ^^^^^^^^^^^^^^^^"
+    },
+    {
+      "tool": "toolu_011XY5LZpYpxS4m1R7mFPBz7",
+      "error": "Exit code 2\n/bin/bash: eval: line 8: syntax error near unexpected token `2'\n/bin/bash: eval: line 8: `cd /tmp/pkgcheck && for f in *.whl *.tar.gz 2>/dev/null; do :; done'"
+    },
+    {
+      "tool": "toolu_01Wh3ry4VKMy7MU9w1z1VvST",
+      "error": "Exit code 2\nugrep: warning: CTFd: No such file or directory"
+    },
+    {
+      "tool": "toolu_01BXfMAVg5NqAsWPUaWBDjk4",
+      "error": "Exit code 1\n== flask-babel==2.0.0 ==\n== flask-caching==2.0.2 ==\n--Flask_Babel-2.0.0-py3-none-any.whl--\nRequires-Dist: pytz\nRequires-Dist: Flask\nRequires-Dist: Babel (>=2.3)\nRequires-Dist: Jinja2 (>=2.5)\nRequires-Dist: pytest ; extra == 'dev'\nRequires-Dist: pytest-mock ; extra == 'dev'\nRequires-Dist: bumpversion ; extra == 'dev'\nRequires-Dist: ghp-import ; extra == 'dev'\nRequires-Dist: sphinx ; extra == 'dev'\nRequires-Dist: Pallets-Sphinx-Themes ; extra == 'dev'\n--Flask_Caching-2.0.2-py3-none-any"
+    },
+    {
+      "tool": "toolu_01QXarxrB5ti4rY2Tz9ZfgRG",
+      "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 3, in <module>\n  File \"/usr/lib/python3.12/zipfile/__init__.py\", line 1347, in __init__\n    self.fp = io.open(file, filemode)\n              ^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'flask-2.2.5-py3-none-any.whl'"
+    },
+    {
+      "tool": "toolu_01XvL8QobennrzB76fVae58Z",
+      "error": "Exit code 1\nWerkzeug-2.2.3-py3-none-any.whl\nwerkzeug-2.3.8-py3-none-any.whl\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n  File \"/usr/lib/python3.12/zipfile/__init__.py\", line 1347, in __init__\n    self.fp = io.open(file, filemode)\n              ^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'werkzeug-2.2.3-py3-none-any.whl'"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

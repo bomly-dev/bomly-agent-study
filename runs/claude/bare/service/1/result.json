@@ -1,0 +1,221 @@
+{
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "service": {
+      "install_ok": false,
+      "build_ok": false,
+      "test_ok": false,
+      "test_stdout_tail": "",
+      "test_stderr_tail": "ERROR: Cannot install -r requirements.txt (line 47) and werkzeug==2.0.3 because these package versions have conflicting dependencies.\nERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts"
+    }
+  },
+  "packages": [
+    {
+      "package": "cryptography",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_SILENT_ON_UNFIXABLE_BUILD_BROKEN",
+      "fixable_total": 9,
+      "fixable_resolved": 9,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 3,
+      "unfixable_remaining_ids": [
+        "GHSA-537C-GMF6-5CCF",
+        "GHSA-M959-CC7F-WV43",
+        "GHSA-R6PH-V2QM-Q3C2"
+      ],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "flask",
+      "ecosystem": "pypi",
+      "outcome": "ATTEMPTED_NOT_FIXED",
+      "fixable_total": 2,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [
+        "GHSA-68RP-WP8R-4726"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "idna",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "mako",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "pillow",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 4,
+      "fixable_resolved": 4,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "pydantic",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "pymysql",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "python-dotenv",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "requests",
+      "ecosystem": "pypi",
+      "outcome": "ATTEMPTED_NOT_FIXED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-9HJG-9R4M-MVJ7",
+        "GHSA-GC5V-M9X4-R6X2"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "urllib3",
+      "ecosystem": "pypi",
+      "outcome": "ATTEMPTED_NOT_FIXED",
+      "fixable_total": 5,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-2XPW-W6GG-JR37",
+        "GHSA-38JV-5279-WG99",
+        "GHSA-GM62-XV2J-4W53",
+        "GHSA-PQ67-6M6Q-MJ2V",
+        "GHSA-QCCP-GFCP-XXVC"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "werkzeug",
+      "ecosystem": "pypi",
+      "outcome": "ATTEMPTED_NOT_FIXED",
+      "fixable_total": 9,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-29VQ-49WR-VM6X",
+        "GHSA-2G68-C3QC-8985",
+        "GHSA-87HC-H4R5-73F7",
+        "GHSA-F9VJ-2WH5-FJ8J",
+        "GHSA-HGF8-39GV-G3F2",
+        "GHSA-HRFV-MQP8-Q5RW",
+        "GHSA-PX8H-6QXV-M22Q",
+        "GHSA-Q34M-JH98-GWM2",
+        "GHSA-XG9F-G7G7-2323"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    }
+  ],
+  "completeness": 0.5641025641025641,
+  "fixable_total": 39,
+  "fixable_resolved": 22,
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 839.51,
+    "timeout": false,
+    "incomplete": false,
+    "turns": 110,
+    "tool_calls": 109,
+    "mcp_calls": 0,
+    "tokens": {
+      "input": 215,
+      "output": 50315,
+      "cache_read": 10548260,
+      "cache_creation": 168934
+    },
+    "cost_usd": 5.001304200000002,
+    "mcp_tool_errors": [
+      {
+        "tool": "toolu_01Y1KSx9iwMvVUHsF1Bc4RbA",
+        "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 3, in <module>\n  File \"/usr/lib/python3.12/json/__init__.py\", line 293, in load\n    return loads(fp.read(),\n           ^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/__init__.py\", line 346, in loads\n    return _default_decoder.decode(s)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/decoder.py\", line 337, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ^^^^^^^^^^^^^^^^"
+      },
+      {
+        "tool": "toolu_011XY5LZpYpxS4m1R7mFPBz7",
+        "error": "Exit code 2\n/bin/bash: eval: line 8: syntax error near unexpected token `2'\n/bin/bash: eval: line 8: `cd /tmp/pkgcheck && for f in *.whl *.tar.gz 2>/dev/null; do :; done'"
+      },
+      {
+        "tool": "toolu_01Wh3ry4VKMy7MU9w1z1VvST",
+        "error": "Exit code 2\nugrep: warning: CTFd: No such file or directory"
+      },
+      {
+        "tool": "toolu_01BXfMAVg5NqAsWPUaWBDjk4",
+        "error": "Exit code 1\n== flask-babel==2.0.0 ==\n== flask-caching==2.0.2 ==\n--Flask_Babel-2.0.0-py3-none-any.whl--\nRequires-Dist: pytz\nRequires-Dist: Flask\nRequires-Dist: Babel (>=2.3)\nRequires-Dist: Jinja2 (>=2.5)\nRequires-Dist: pytest ; extra == 'dev'\nRequires-Dist: pytest-mock ; extra == 'dev'\nRequires-Dist: bumpversion ; extra == 'dev'\nRequires-Dist: ghp-import ; extra == 'dev'\nRequires-Dist: sphinx ; extra == 'dev'\nRequires-Dist: Pallets-Sphinx-Themes ; extra == 'dev'\n--Flask_Caching-2.0.2-py3-none-any"
+      },
+      {
+        "tool": "toolu_01QXarxrB5ti4rY2Tz9ZfgRG",
+        "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 3, in <module>\n  File \"/usr/lib/python3.12/zipfile/__init__.py\", line 1347, in __init__\n    self.fp = io.open(file, filemode)\n              ^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'flask-2.2.5-py3-none-any.whl'"
+      },
+      {
+        "tool": "toolu_01XvL8QobennrzB76fVae58Z",
+        "error": "Exit code 1\nWerkzeug-2.2.3-py3-none-any.whl\nwerkzeug-2.3.8-py3-none-any.whl\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n  File \"/usr/lib/python3.12/zipfile/__init__.py\", line 1347, in __init__\n    self.fp = io.open(file, filemode)\n              ^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'werkzeug-2.2.3-py3-none-any.whl'"
+      }
+    ]
+  }
+}

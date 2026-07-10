@@ -1,0 +1,212 @@
+{
+  "scope": "service",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "service": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": false,
+      "test_stdout_tail": "FAILED tests/users/test_hints.py::test_unlocking_hints_with_cost_during_ctf_with_points\nFAILED tests/users/test_hints.py::test_unlocking_hints_with_cost_during_ctf_without_points\nFAILED tests/users/test_hints.py::test_unlocking_hints_with_cost_before_ctf\nFAILED tests/users/test_hints.py::test_unlocking_hints_with_cost_during_ended_ctf\nFAILED tests/users/test_hints.py::test_unlocking_hints_with_cost_during_frozen_ctf\nFAILED tests/users/test_hints.py::test_unlocking_hint_for_unicode_challenge\nFAILED tests/users/test_profile.py::test_email_cannot_be_changed_without_password\nFAILED tests/users/test_scoreboard.py::test_user_get_scoreboard_components - ...\nFAILED tests/users/test_scoreboard.py::test_user_score_is_correct - Attribute...\nFAILED tests/users/test_scoreboard.py::test_top_10 - AttributeError: 'CTFdFla...\nFAILED tests/users/test_scoreboard.py::test_scoring_logic - AttributeError: '...\nFAILED tests/users/test_scoreboard.py::test_scoring_logic_with_zero_point_challenges\nFAILED tests/users/test_scoreboard.py::test_hidden_users_should_not_influence_scores\nFAILED tests/users/test_settings.py::test_user_set_profile - AttributeError: ...\nFAILED tests/users/test_settings.py::test_user_can_change_password - Attribut...\nFAILED tests/users/test_setup.py::test_ctfd_setup_redirect - AttributeError: ...\nFAILED tests/users/test_setup.py::test_ctfd_setup_verification - AttributeErr...\nFAILED tests/users/test_submissions.py::test_user_get_private_solves - Attrib...\nFAILED tests/users/test_submissions.py::test_user_get_public_solves - Attribu...\nFAILED tests/users/test_submissions.py::test_user_get_another_public_solves\nFAILED tests/users/test_submissions.py::test_user_get_private_fails - Attribu...\nFAILED tests/users/test_submissions.py::test_user_get_public_fails - Attribut...\nFAILED tests/users/test_submissions.py::test_user_get_another_public_fails - ...\nFAILED tests/users/test_submissions.py::test_user_get_public_team_page - Attr...\nFAILED tests/users/test_submissions.py::test_user_get_another_public_team_page\nFAILED tests/users/test_submissions.py::test_user_get_private_team_page - Att...\nFAILED tests/users/test_users.py::test_accessing_hidden_users - AttributeErro...\nFAILED tests/users/test_users.py::test_hidden_user_visibility - AttributeErro...\nFAILED tests/users/test_users.py::test_num_users_limit - AttributeError: 'CTF...\n82 failed, 250 warnings in 5.14s",
+      "test_stderr_tail": ""
+    }
+  },
+  "packages": [
+    {
+      "package": "cryptography",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_SILENT_ON_UNFIXABLE_BUILD_BROKEN",
+      "fixable_total": 9,
+      "fixable_resolved": 9,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 3,
+      "unfixable_remaining_ids": [
+        "GHSA-537C-GMF6-5CCF",
+        "GHSA-M959-CC7F-WV43",
+        "GHSA-R6PH-V2QM-Q3C2"
+      ],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "flask",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "idna",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "mako",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "pillow",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 4,
+      "fixable_resolved": 4,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "pydantic",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "pymysql",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "python-dotenv",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "requests",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "urllib3",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 5,
+      "fixable_resolved": 5,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "werkzeug",
+      "ecosystem": "pypi",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 9,
+      "fixable_resolved": 9,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    }
+  ],
+  "completeness": 1.0,
+  "fixable_total": 39,
+  "fixable_resolved": 39,
+  "regressions": [],
+  "unrelated_changes_flag": true,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "mcp",
+    "run_number": 1,
+    "wall_seconds": 959.19,
+    "timeout": false,
+    "incomplete": false,
+    "turns": 28,
+    "tool_calls": 198,
+    "mcp_calls": 10,
+    "tokens": {
+      "input": 39,
+      "output": 27685,
+      "cache_read": 1727989,
+      "cache_creation": 110280
+    },
+    "cost_usd": 1.9648776000000003,
+    "mcp_tool_errors": [
+      {
+        "tool": "toolu_01E56PxUBJDUTDsY446CaM8f",
+        "error": "prepare scan: no subprojects discovered for execution target with the applied filters (active filters: --ecosystems npm); discovery probe: found requirements.txt at . (pip); found .github/workflows/*.yml at . (github-actions); found setup.py at CTFd/forms (setuppy); found yarn.lock at CTFd/themes/admin (yarn); found yarn.lock at CTFd/themes/core-beta (yarn); found .github/workflows/*.yml at CTFd/themes/core-beta (github-actions)"
+      },
+      {
+        "tool": "toolu_01QbH76xLNHaTqP3apgALib5",
+        "error": "prepare scan: unknown ecosystem selector(s): yarn\navailable ecosystems: alpm, apk, conda, cpp, dart, dotnet, dpkg, elixir, erlang, github-actions, go, haskell, homebrew, lua, maven, nix, npm, ocaml, php, portage, prolog, python, r, rpm, ruby, rust, sbom, scala, snap, swift, terraform, wordpress\nrun `bomly scan --help` for full selector details"
+      },
+      {
+        "tool": "toolu_01GUusCUCezetRtqbai5Tiic",
+        "error": "run explain pipeline: dependency not found: @vitejs/plugin-vue"
+      },
+      {
+        "tool": "toolu_014dLMgaGGnkkNjkaweE5Yc6",
+        "error": "run explain pipeline: dependency not found: vitejs/plugin-vue"
+      },
+      {
+        "tool": "toolu_01N7qJWqQJaf6mX1QvoFTrZr",
+        "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+      },
+      {
+        "tool": "toolu_017kMvxkzko5MvxA6gQPBpxx",
+        "error": "<tool_use_error>InputValidationError: TaskCreate failed due to the following issues:\nThe required parameter `subject` is missing\nThe required parameter `description` is missing\nAn unexpected parameter `tasks` was provided\n\nTaskCreate creates ONE task per call and has no `tasks` or `todos` parameter. Call TaskCreate once per task, passing `subject` (a brief title) and `description` (what needs to be done) as top-level string parameters.\n\nThis tool's schema was not sent to the API \u2014 it was not in "
+      },
+      {
+        "tool": "toolu_01Cz4ot7dgKXYwd3abVTLojD",
+        "error": "Exit code 127\nv22.23.1\n/usr/bin/corepack\nInternal Error: EACCES: permission denied, symlink '../lib/node_modules/corepack/dist/pnpm.js' -> '/usr/bin/pnpm'\n    at async Object.symlink (node:internal/fs/promises:1001:10)\n    at async EnableCommand.generatePosixLink (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:23218:5)\n    at async Promise.all (index 0)\n    at async EnableCommand.execute (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:23199:5)\n    at async EnableCommand.validateAndEx"
+      },
+      {
+        "tool": "toolu_01TBmmJsARhahyeKh3vVC1ht",
+        "error": "Exit code 127\nnpm error     at async /usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:638:20\nnpm error     at async Promise.allSettled (index 0)\nnpm error     at async [reifyPackages] (/usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:334:11)\nnpm error     at async Arborist.reify (/usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:149:5)\nnpm error     at async Install.exec (/usr/lib/node_modules/npm/lib/commands/"
+      },
+      {
+        "tool": "toolu_013foZhcNtgXJR1KFFibijY3",
+        "error": "Exit code 1\nPackage Version\n------- -------\npip     24.0\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nModuleNotFoundError: No module named 'distutils'\n---with setuptools import first---\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nModuleNotFoundError: No module named 'setuptools'"
+      }
+    ]
+  }
+}
