@@ -1,0 +1,470 @@
+{
+  "scope": "api-java",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "api-java": {
+      "install_ok": false,
+      "build_ok": false,
+      "test_ok": false,
+      "test_stdout_tail": "[ERROR]   location: package org.cyclonedx\n[ERROR] /tmp/bomly-study-2tazjngb/claude-bare-api-java-1-1783667832/repo/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java:[26,21] cannot find symbol\n[ERROR]   symbol:   class BomParserFactory\n[ERROR]   location: package org.cyclonedx\n[ERROR] /tmp/bomly-study-2tazjngb/claude-bare-api-java-1-1783667832/repo/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java:[105,21] cannot find symbol\n[ERROR]   symbol:   variable BomParserFactory\n[ERROR]   location: class org.dependencytrack.tasks.BomUploadProcessingTask\n[ERROR] /tmp/bomly-study-2tazjngb/claude-bare-api-java-1-1783667832/repo/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java:[110,47] cannot find symbol\n[ERROR]   symbol:   variable BomParserFactory\n[ERROR]   location: class org.dependencytrack.tasks.BomUploadProcessingTask\n[ERROR] /tmp/bomly-study-2tazjngb/claude-bare-api-java-1-1783667832/repo/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java:[389,71] incompatible types: java.lang.String cannot be converted to org.cyclonedx.model.license.Expression\n[ERROR] /tmp/bomly-study-2tazjngb/claude-bare-api-java-1-1783667832/repo/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java:[99,20] cannot find symbol\n[ERROR]   symbol:   variable BomGeneratorFactory\n[ERROR]   location: class org.dependencytrack.parser.cyclonedx.CycloneDXExporter\n[ERROR] /tmp/bomly-study-2tazjngb/claude-bare-api-java-1-1783667832/repo/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java:[101,20] cannot find symbol\n[ERROR]   symbol:   variable BomGeneratorFactory\n[ERROR]   location: class org.dependencytrack.parser.cyclonedx.CycloneDXExporter\n[ERROR] /tmp/bomly-study-2tazjngb/claude-bare-api-java-1-1783667832/repo/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java:[73,21] cannot find symbol\n[ERROR]   symbol:   variable BomParserFactory\n[ERROR]   location: class org.dependencytrack.tasks.VexUploadProcessingTask\n[ERROR] /tmp/bomly-study-2tazjngb/claude-bare-api-java-1-1783667832/repo/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java:[77,47] cannot find symbol\n[ERROR]   symbol:   variable BomParserFactory\n[ERROR]   location: class org.dependencytrack.tasks.VexUploadProcessingTask\n[ERROR] -> [Help 1]\n[ERROR] \n[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.\n[ERROR] Re-run Maven using the -X switch to enable full debug logging.\n[ERROR] \n[ERROR] For more information about the errors and possible solutions, please read the following articles:\n[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException",
+      "test_stderr_tail": ""
+    }
+  },
+  "packages": [
+    {
+      "package": "ch.qos.logback:logback-core",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 6,
+      "fixable_resolved": 6,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "com.fasterxml.jackson.core:jackson-core",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-5JMJ-H7XM-6Q6V"
+      ],
+      "build_ok": false
+    },
+    {
+      "package": "com.github.jknack:handlebars",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "com.jayway.jsonpath:json-path",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "com.mysql:mysql-connector-j",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "com.nimbusds:nimbus-jose-jwt",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "com.sun.mail:jakarta.mail",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "commons-beanutils:commons-beanutils",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "commons-fileupload:commons-fileupload",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "commons-io:commons-io",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "io.netty:netty-codec",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "io.netty:netty-codec-http",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 11,
+      "fixable_resolved": 11,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "io.netty:netty-codec-http2",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 7,
+      "fixable_resolved": 7,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "io.netty:netty-common",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "io.netty:netty-handler",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 4,
+      "fixable_resolved": 4,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "io.netty:netty-handler-proxy",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "io.pebbletemplates:pebble",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 0,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-P75G-CXFJ-7WRX"
+      ],
+      "build_ok": false
+    },
+    {
+      "package": "org.apache.commons:commons-compress",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.apache.commons:commons-lang3",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.assertj:assertj-core",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.bouncycastle:bcpkix-jdk18on",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.bouncycastle:bcprov-jdk18on",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 7,
+      "fixable_resolved": 7,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.codehaus.plexus:plexus-utils",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.cyclonedx:cyclonedx-core-java",
+      "ecosystem": "maven",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 2,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [
+        "GHSA-6FHJ-VR9J-G45R"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.eclipse.jetty.http2:http2-common",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.eclipse.jetty.http2:http2-hpack",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.eclipse.jetty.http2:http2-server",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.eclipse.jetty:jetty-http",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_SILENT_ON_UNFIXABLE_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 3,
+      "unfixable_remaining_ids": [
+        "GHSA-355H-QMC2-WPWF",
+        "GHSA-QH8G-58PP-2WXH"
+      ],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-WJPW-4J6X-6RWH"
+      ],
+      "build_ok": false
+    },
+    {
+      "package": "org.eclipse.jetty:jetty-server",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 4,
+      "fixable_resolved": 4,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.eclipse.jetty:jetty-servlets",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.eclipse.jetty:jetty-xml",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.mozilla:rhino",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.postgresql:postgresql",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    },
+    {
+      "package": "org.xmlunit:xmlunit-core",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED_BUILD_BROKEN",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": false
+    }
+  ],
+  "completeness": 0.9876543209876543,
+  "fixable_total": 81,
+  "fixable_resolved": 80,
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 968.61,
+    "timeout": false,
+    "incomplete": false,
+    "turns": 78,
+    "tool_calls": 77,
+    "mcp_calls": 0,
+    "tokens": {
+      "input": 153,
+      "output": 67399,
+      "cache_read": 9773081,
+      "cache_creation": 173627
+    },
+    "cost_usd": 5.0707047,
+    "mcp_tool_errors": []
+  }
+}

@@ -1,0 +1,329 @@
+diff --git a/fixtures/api-java/pom.xml b/fixtures/api-java/pom.xml
+index a629da2..10f8646 100644
+--- a/fixtures/api-java/pom.xml
++++ b/fixtures/api-java/pom.xml
+@@ -83,6 +83,7 @@
+         <!-- Dependency Versions -->
+         <frontend.version>4.10.0</frontend.version>
+         <lib.alpine.version>${project.parent.version}</lib.alpine.version>
++        <lib.assertj.version>3.27.7</lib.assertj.version>
+         <lib.awaitility.version>4.2.0</lib.awaitility.version>
+         <lib.cloud-sql-connector-jdbc-sqlserver.version>1.15.0</lib.cloud-sql-connector-jdbc-sqlserver.version>
+         <lib.cloud-sql-mysql-socket-factory-connector-j-8.version>1.15.0</lib.cloud-sql-mysql-socket-factory-connector-j-8.version>
+@@ -90,7 +91,7 @@
+         <lib.cpe-parser.version>2.1.0</lib.cpe-parser.version>
+         <lib.cvss-calculator.version>1.4.2</lib.cvss-calculator.version>
+         <lib.owasp-rr-calculator.version>1.0.1</lib.owasp-rr-calculator.version>
+-        <lib.cyclonedx-java.version>8.0.3</lib.cyclonedx-java.version>
++        <lib.cyclonedx-java.version>11.0.1</lib.cyclonedx-java.version>
+         <lib.greenmail.version>1.6.14</lib.greenmail.version>
+         <lib.jaxb.runtime.version>2.3.8</lib.jaxb.runtime.version>
+         <lib.json-unit.version>3.2.2</lib.json-unit.version>
+@@ -114,8 +115,8 @@
+         <!-- JDBC Drivers -->
+         <lib.jdbc-driver.mssql.version>12.4.2.jre11</lib.jdbc-driver.mssql.version>
+         <!-- Upgrading to 8.0.33 as https://github.com/datanucleus/datanucleus-rdbms/issues/446 is resolved! -->
+-        <lib.jdbc-driver.mysql.version>8.0.33</lib.jdbc-driver.mysql.version>
+-        <lib.jdbc-driver.postgresql.version>42.6.0</lib.jdbc-driver.postgresql.version>
++        <lib.jdbc-driver.mysql.version>8.2.0</lib.jdbc-driver.mysql.version>
++        <lib.jdbc-driver.postgresql.version>42.7.11</lib.jdbc-driver.postgresql.version>
+         <!-- Maven Plugin Properties -->
+         <plugin.cyclonedx.projectType>application</plugin.cyclonedx.projectType>
+         <plugin.cyclonedx.outputFormat>json</plugin.cyclonedx.outputFormat>
+@@ -140,6 +141,170 @@
+         </repository>
+     </repositories>
+ 
++    <dependencyManagement>
++        <dependencies>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-bom</artifactId>
++                <version>12.0.33</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty.ee10</groupId>
++                <artifactId>jetty-ee10-bom</artifactId>
++                <version>12.0.33</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <dependency>
++                <groupId>ch.qos.logback</groupId>
++                <artifactId>logback-classic</artifactId>
++                <version>1.5.35</version>
++            </dependency>
++            <dependency>
++                <groupId>ch.qos.logback</groupId>
++                <artifactId>logback-core</artifactId>
++                <version>1.5.35</version>
++            </dependency>
++            <dependency>
++                <groupId>com.fasterxml.jackson.core</groupId>
++                <artifactId>jackson-core</artifactId>
++                <version>2.18.8</version>
++            </dependency>
++            <dependency>
++                <groupId>com.fasterxml.jackson.core</groupId>
++                <artifactId>jackson-databind</artifactId>
++                <version>2.18.8</version>
++            </dependency>
++            <dependency>
++                <groupId>com.github.jknack</groupId>
++                <artifactId>handlebars</artifactId>
++                <version>4.5.3</version>
++            </dependency>
++            <dependency>
++                <groupId>com.jayway.jsonpath</groupId>
++                <artifactId>json-path</artifactId>
++                <version>2.9.0</version>
++            </dependency>
++            <dependency>
++                <groupId>com.nimbusds</groupId>
++                <artifactId>nimbus-jose-jwt</artifactId>
++                <version>9.37.4</version>
++            </dependency>
++            <dependency>
++                <groupId>com.sun.mail</groupId>
++                <artifactId>jakarta.mail</artifactId>
++                <version>1.6.8</version>
++            </dependency>
++            <dependency>
++                <groupId>commons-beanutils</groupId>
++                <artifactId>commons-beanutils</artifactId>
++                <version>1.11.0</version>
++            </dependency>
++            <dependency>
++                <groupId>commons-fileupload</groupId>
++                <artifactId>commons-fileupload</artifactId>
++                <version>1.6.0</version>
++            </dependency>
++            <dependency>
++                <groupId>commons-io</groupId>
++                <artifactId>commons-io</artifactId>
++                <version>2.14.0</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-buffer</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-codec</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-codec-http</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-codec-http2</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-codec-socks</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-common</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-handler</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-handler-proxy</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-resolver</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-transport</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-transport-native-unix-common</artifactId>
++                <version>4.1.135.Final</version>
++            </dependency>
++            <dependency>
++                <groupId>org.apache.commons</groupId>
++                <artifactId>commons-lang3</artifactId>
++                <version>3.18.0</version>
++            </dependency>
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcpkix-jdk18on</artifactId>
++                <version>1.84</version>
++            </dependency>
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcprov-jdk18on</artifactId>
++                <version>1.84</version>
++            </dependency>
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcutil-jdk18on</artifactId>
++                <version>1.84</version>
++            </dependency>
++            <dependency>
++                <groupId>org.codehaus.plexus</groupId>
++                <artifactId>plexus-utils</artifactId>
++                <version>3.6.1</version>
++            </dependency>
++            <dependency>
++                <groupId>org.mozilla</groupId>
++                <artifactId>rhino</artifactId>
++                <version>1.7.14.1</version>
++            </dependency>
++            <dependency>
++                <groupId>org.xmlunit</groupId>
++                <artifactId>xmlunit-core</artifactId>
++                <version>2.10.0</version>
++            </dependency>
++        </dependencies>
++    </dependencyManagement>
++
+     <dependencies>
+         <!-- Alpine -->
+         <dependency>
+@@ -294,8 +459,8 @@
+             <version>${lib.jdbc-driver.mssql.version}</version>
+         </dependency>
+         <dependency>
+-            <groupId>mysql</groupId>
+-            <artifactId>mysql-connector-java</artifactId>
++            <groupId>com.mysql</groupId>
++            <artifactId>mysql-connector-j</artifactId>
+             <version>${lib.jdbc-driver.mysql.version}</version>
+             <exclusions>
+                 <!--
+@@ -344,7 +509,7 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <version>1.26.0</version>
+         </dependency>
+         <!-- Resilience4J -->
+         <dependency>
+@@ -407,9 +572,9 @@
+ 
+         </dependency>
+         <dependency>
+-            <groupId>com.github.tomakehurst</groupId>
+-            <artifactId>wiremock-jre8</artifactId>
+-            <version>2.35.1</version>
++            <groupId>org.wiremock</groupId>
++            <artifactId>wiremock-jetty12</artifactId>
++            <version>3.13.2</version>
+             <scope>test</scope>
+         </dependency>
+ 
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
+index 33d2123..7032b56 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
+@@ -18,9 +18,9 @@
+  */
+ package org.dependencytrack.parser.cyclonedx;
+ 
+-import org.cyclonedx.BomGeneratorFactory;
+ import org.cyclonedx.CycloneDxSchema;
+ import org.cyclonedx.exception.GeneratorException;
++import org.cyclonedx.generators.BomGeneratorFactory;
+ import org.cyclonedx.model.Bom;
+ import org.dependencytrack.model.Component;
+ import org.dependencytrack.model.Finding;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
+index abbe25f..de6c58a 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
+@@ -28,6 +28,7 @@ import org.cyclonedx.model.Dependency;
+ import org.cyclonedx.model.Hash;
+ import org.cyclonedx.model.LicenseChoice;
+ import org.cyclonedx.model.Swid;
++import org.cyclonedx.model.license.Expression;
+ import org.dependencytrack.model.Analysis;
+ import org.dependencytrack.model.AnalysisJustification;
+ import org.dependencytrack.model.AnalysisResponse;
+@@ -162,12 +163,13 @@ public class ModelConverter {
+         if (licenseChoice != null) {
+             final List<org.cyclonedx.model.License> licenseOptions = new ArrayList<>();
+             if (licenseChoice.getExpression() != null) {
++                final String licenseExpression = licenseChoice.getExpression().getValue();
+                 final var expressionParser = new SpdxExpressionParser();
+-                final SpdxExpression parsedExpression = expressionParser.parse(licenseChoice.getExpression());
++                final SpdxExpression parsedExpression = expressionParser.parse(licenseExpression);
+                 if (!Objects.equals(parsedExpression, SpdxExpression.INVALID)) {
+                     // store license expression, but don't overwrite manual changes to the field
+                     if (component.getLicenseExpression() == null) {
+-                        component.setLicenseExpression(licenseChoice.getExpression());
++                        component.setLicenseExpression(licenseExpression);
+                     }
+                     // if the expression just consists of one license id, we can add it as another license option
+                     if (parsedExpression.getSpdxLicenseId() != null) {
+@@ -386,7 +388,7 @@ public class ModelConverter {
+             cycloneComponent.setLicenseChoice(licenseChoice);
+         }
+         if (component.getLicenseExpression() != null) {
+-            licenseChoice.setExpression(component.getLicenseExpression());
++            licenseChoice.setExpression(new Expression(component.getLicenseExpression()));
+             cycloneComponent.setLicenseChoice(licenseChoice);
+         }
+ 
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
+index 8fc656e..4fc10aa 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
+@@ -23,8 +23,8 @@ import alpine.event.framework.Event;
+ import alpine.event.framework.Subscriber;
+ import alpine.notification.Notification;
+ import alpine.notification.NotificationLevel;
+-import org.cyclonedx.BomParserFactory;
+ import org.cyclonedx.parsers.Parser;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.dependencytrack.event.BomUploadEvent;
+ import org.dependencytrack.event.NewVulnerableDependencyAnalysisEvent;
+ import org.dependencytrack.event.PolicyEvaluationEvent;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
+index 9d38087..7498311 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
+@@ -23,8 +23,8 @@ import alpine.event.framework.Event;
+ import alpine.event.framework.Subscriber;
+ import alpine.notification.Notification;
+ import alpine.notification.NotificationLevel;
+-import org.cyclonedx.BomParserFactory;
+ import org.cyclonedx.parsers.Parser;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.dependencytrack.event.VexUploadEvent;
+ import org.dependencytrack.model.ConfigPropertyConstants;
+ import org.dependencytrack.model.Project;
+diff --git a/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java b/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
+index 82a956f..7031c21 100644
+--- a/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
++++ b/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
+@@ -1,7 +1,7 @@
+ package org.dependencytrack.parser.cyclonedx;
+ 
+ import org.assertj.core.api.Assertions;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.exception.ParseException;
+ import org.dependencytrack.PersistenceCapableTest;
+ import org.dependencytrack.model.Analysis;

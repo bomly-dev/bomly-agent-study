@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 1,
+  "pilot": false,
+  "scope": "api-java",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "38da997",
+  "harness_sha": "38da997",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-10T15:19:33.173833+00:00",
+  "ended_at": "2026-07-10T15:33:05.600218+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01TepaAk7RfzU4QuHr8DC4y7",
+      "error": "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

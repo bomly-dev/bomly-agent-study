@@ -1,0 +1,375 @@
+diff --git a/fixtures/api-java/pom.xml b/fixtures/api-java/pom.xml
+index a629da2..d53b1b4 100644
+--- a/fixtures/api-java/pom.xml
++++ b/fixtures/api-java/pom.xml
+@@ -90,7 +90,7 @@
+         <lib.cpe-parser.version>2.1.0</lib.cpe-parser.version>
+         <lib.cvss-calculator.version>1.4.2</lib.cvss-calculator.version>
+         <lib.owasp-rr-calculator.version>1.0.1</lib.owasp-rr-calculator.version>
+-        <lib.cyclonedx-java.version>8.0.3</lib.cyclonedx-java.version>
++        <lib.cyclonedx-java.version>11.0.1</lib.cyclonedx-java.version>
+         <lib.greenmail.version>1.6.14</lib.greenmail.version>
+         <lib.jaxb.runtime.version>2.3.8</lib.jaxb.runtime.version>
+         <lib.json-unit.version>3.2.2</lib.json-unit.version>
+@@ -114,8 +114,25 @@
+         <!-- JDBC Drivers -->
+         <lib.jdbc-driver.mssql.version>12.4.2.jre11</lib.jdbc-driver.mssql.version>
+         <!-- Upgrading to 8.0.33 as https://github.com/datanucleus/datanucleus-rdbms/issues/446 is resolved! -->
+-        <lib.jdbc-driver.mysql.version>8.0.33</lib.jdbc-driver.mysql.version>
+-        <lib.jdbc-driver.postgresql.version>42.6.0</lib.jdbc-driver.postgresql.version>
++        <lib.jdbc-driver.mysql.version>8.2.0</lib.jdbc-driver.mysql.version>
++        <lib.jdbc-driver.postgresql.version>42.7.11</lib.jdbc-driver.postgresql.version>
++        <!-- Security remediation overrides (see FIXES.md) -->
++        <lib.assertj.version>3.27.7</lib.assertj.version>
++        <lib.jackson-bom.version>2.18.8</lib.jackson-bom.version>
++        <lib.netty-bom.version>4.1.135.Final</lib.netty-bom.version>
++        <lib.commons-lang3.version>3.18.0</lib.commons-lang3.version>
++        <lib.commons-io.version>2.14.0</lib.commons-io.version>
++        <lib.nimbus-jose-jwt.version>9.37.4</lib.nimbus-jose-jwt.version>
++        <lib.logback.version>1.5.35</lib.logback.version>
++        <lib.jakarta-mail.version>1.6.8</lib.jakarta-mail.version>
++        <lib.plexus-utils.version>3.6.1</lib.plexus-utils.version>
++        <lib.jetty94.version>9.4.58.v20250814</lib.jetty94.version>
++        <lib.commons-fileupload.version>1.6.0</lib.commons-fileupload.version>
++        <lib.json-path.version>2.9.0</lib.json-path.version>
++        <lib.handlebars.version>4.5.2</lib.handlebars.version>
++        <lib.xmlunit.version>2.10.0</lib.xmlunit.version>
++        <lib.bouncycastle.version>1.80.2</lib.bouncycastle.version>
++        <lib.commons-beanutils.version>1.11.0</lib.commons-beanutils.version>
+         <!-- Maven Plugin Properties -->
+         <plugin.cyclonedx.projectType>application</plugin.cyclonedx.projectType>
+         <plugin.cyclonedx.outputFormat>json</plugin.cyclonedx.outputFormat>
+@@ -140,6 +157,226 @@
+         </repository>
+     </repositories>
+ 
++    <!--
++      Security remediation: pin transitive dependencies pulled in (indirectly)
++      by us.springett:alpine-*, org.apache.maven:maven-artifact,
++      com.github.tomakehurst:wiremock-jre8 and org.mock-server:mockserver-netty
++      to versions with known vulnerabilities fixed. See FIXES.md for details.
++    -->
++    <dependencyManagement>
++        <dependencies>
++            <dependency>
++                <groupId>com.fasterxml.jackson</groupId>
++                <artifactId>jackson-bom</artifactId>
++                <version>${lib.jackson-bom.version}</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-bom</artifactId>
++                <version>${lib.netty-bom.version}</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <dependency>
++                <groupId>org.apache.commons</groupId>
++                <artifactId>commons-lang3</artifactId>
++                <version>${lib.commons-lang3.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>commons-io</groupId>
++                <artifactId>commons-io</artifactId>
++                <version>${lib.commons-io.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>com.nimbusds</groupId>
++                <artifactId>nimbus-jose-jwt</artifactId>
++                <version>${lib.nimbus-jose-jwt.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>ch.qos.logback</groupId>
++                <artifactId>logback-core</artifactId>
++                <version>${lib.logback.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>ch.qos.logback</groupId>
++                <artifactId>logback-classic</artifactId>
++                <version>${lib.logback.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>com.sun.mail</groupId>
++                <artifactId>jakarta.mail</artifactId>
++                <version>${lib.jakarta-mail.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.codehaus.plexus</groupId>
++                <artifactId>plexus-utils</artifactId>
++                <version>${lib.plexus-utils.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>commons-fileupload</groupId>
++                <artifactId>commons-fileupload</artifactId>
++                <version>${lib.commons-fileupload.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>com.jayway.jsonpath</groupId>
++                <artifactId>json-path</artifactId>
++                <version>${lib.json-path.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>com.github.jknack</groupId>
++                <artifactId>handlebars</artifactId>
++                <version>${lib.handlebars.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>com.github.jknack</groupId>
++                <artifactId>handlebars-helpers</artifactId>
++                <version>${lib.handlebars.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.xmlunit</groupId>
++                <artifactId>xmlunit-core</artifactId>
++                <version>${lib.xmlunit.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.xmlunit</groupId>
++                <artifactId>xmlunit-legacy</artifactId>
++                <version>${lib.xmlunit.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.xmlunit</groupId>
++                <artifactId>xmlunit-placeholders</artifactId>
++                <version>${lib.xmlunit.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcprov-jdk18on</artifactId>
++                <version>${lib.bouncycastle.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcpkix-jdk18on</artifactId>
++                <version>${lib.bouncycastle.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>commons-beanutils</groupId>
++                <artifactId>commons-beanutils</artifactId>
++                <version>${lib.commons-beanutils.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-server</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-http</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-io</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-util</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-util-ajax</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-servlet</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-servlets</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-security</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-continuation</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-webapp</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-xml</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-proxy</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-client</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-alpn-server</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-alpn-java-server</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-alpn-openjdk8-server</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-alpn-client</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-alpn-java-client</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-alpn-openjdk8-client</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty.http2</groupId>
++                <artifactId>http2-common</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty.http2</groupId>
++                <artifactId>http2-hpack</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.eclipse.jetty.http2</groupId>
++                <artifactId>http2-server</artifactId>
++                <version>${lib.jetty94.version}</version>
++            </dependency>
++        </dependencies>
++    </dependencyManagement>
++
+     <dependencies>
+         <!-- Alpine -->
+         <dependency>
+@@ -294,8 +531,8 @@
+             <version>${lib.jdbc-driver.mssql.version}</version>
+         </dependency>
+         <dependency>
+-            <groupId>mysql</groupId>
+-            <artifactId>mysql-connector-java</artifactId>
++            <groupId>com.mysql</groupId>
++            <artifactId>mysql-connector-j</artifactId>
+             <version>${lib.jdbc-driver.mysql.version}</version>
+             <exclusions>
+                 <!--
+@@ -344,7 +581,7 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <version>1.26.0</version>
+         </dependency>
+         <!-- Resilience4J -->
+         <dependency>
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
+index 33d2123..5e2dbef 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
+@@ -18,7 +18,7 @@
+  */
+ package org.dependencytrack.parser.cyclonedx;
+ 
+-import org.cyclonedx.BomGeneratorFactory;
++import org.cyclonedx.generators.BomGeneratorFactory;
+ import org.cyclonedx.CycloneDxSchema;
+ import org.cyclonedx.exception.GeneratorException;
+ import org.cyclonedx.model.Bom;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
+index abbe25f..85a26de 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
+@@ -27,6 +27,7 @@ import org.cyclonedx.model.Bom;
+ import org.cyclonedx.model.Dependency;
+ import org.cyclonedx.model.Hash;
+ import org.cyclonedx.model.LicenseChoice;
++import org.cyclonedx.model.license.Expression;
+ import org.cyclonedx.model.Swid;
+ import org.dependencytrack.model.Analysis;
+ import org.dependencytrack.model.AnalysisJustification;
+@@ -163,11 +164,11 @@ public class ModelConverter {
+             final List<org.cyclonedx.model.License> licenseOptions = new ArrayList<>();
+             if (licenseChoice.getExpression() != null) {
+                 final var expressionParser = new SpdxExpressionParser();
+-                final SpdxExpression parsedExpression = expressionParser.parse(licenseChoice.getExpression());
++                final SpdxExpression parsedExpression = expressionParser.parse(licenseChoice.getExpression().getValue());
+                 if (!Objects.equals(parsedExpression, SpdxExpression.INVALID)) {
+                     // store license expression, but don't overwrite manual changes to the field
+                     if (component.getLicenseExpression() == null) {
+-                        component.setLicenseExpression(licenseChoice.getExpression());
++                        component.setLicenseExpression(licenseChoice.getExpression().getValue());
+                     }
+                     // if the expression just consists of one license id, we can add it as another license option
+                     if (parsedExpression.getSpdxLicenseId() != null) {
+@@ -386,7 +387,7 @@ public class ModelConverter {
+             cycloneComponent.setLicenseChoice(licenseChoice);
+         }
+         if (component.getLicenseExpression() != null) {
+-            licenseChoice.setExpression(component.getLicenseExpression());
++            licenseChoice.setExpression(new Expression(component.getLicenseExpression()));
+             cycloneComponent.setLicenseChoice(licenseChoice);
+         }
+ 
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
+index 8fc656e..6a980aa 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
+@@ -23,7 +23,7 @@ import alpine.event.framework.Event;
+ import alpine.event.framework.Subscriber;
+ import alpine.notification.Notification;
+ import alpine.notification.NotificationLevel;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.parsers.Parser;
+ import org.dependencytrack.event.BomUploadEvent;
+ import org.dependencytrack.event.NewVulnerableDependencyAnalysisEvent;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
+index 9d38087..ed6f2cd 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
+@@ -23,7 +23,7 @@ import alpine.event.framework.Event;
+ import alpine.event.framework.Subscriber;
+ import alpine.notification.Notification;
+ import alpine.notification.NotificationLevel;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.parsers.Parser;
+ import org.dependencytrack.event.VexUploadEvent;
+ import org.dependencytrack.model.ConfigPropertyConstants;
+diff --git a/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java b/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
+index 82a956f..7031c21 100644
+--- a/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
++++ b/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
+@@ -1,7 +1,7 @@
+ package org.dependencytrack.parser.cyclonedx;
+ 
+ import org.assertj.core.api.Assertions;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.exception.ParseException;
+ import org.dependencytrack.PersistenceCapableTest;
+ import org.dependencytrack.model.Analysis;

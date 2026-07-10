@@ -1,0 +1,452 @@
+diff --git a/fixtures/api-java/pom.xml b/fixtures/api-java/pom.xml
+index a629da2..9e0160e 100644
+--- a/fixtures/api-java/pom.xml
++++ b/fixtures/api-java/pom.xml
+@@ -84,25 +84,35 @@
+         <frontend.version>4.10.0</frontend.version>
+         <lib.alpine.version>${project.parent.version}</lib.alpine.version>
+         <lib.awaitility.version>4.2.0</lib.awaitility.version>
++        <lib.assertj.version>3.27.7</lib.assertj.version>
++        <lib.bouncycastle.version>1.84</lib.bouncycastle.version>
+         <lib.cloud-sql-connector-jdbc-sqlserver.version>1.15.0</lib.cloud-sql-connector-jdbc-sqlserver.version>
+         <lib.cloud-sql-mysql-socket-factory-connector-j-8.version>1.15.0</lib.cloud-sql-mysql-socket-factory-connector-j-8.version>
+         <lib.cloud-sql-postgres-socket-factory.version>1.15.0</lib.cloud-sql-postgres-socket-factory.version>
++        <lib.commons.io.version>2.22.0</lib.commons.io.version>
++        <lib.commons.lang3.version>3.20.0</lib.commons.lang3.version>
+         <lib.cpe-parser.version>2.1.0</lib.cpe-parser.version>
+         <lib.cvss-calculator.version>1.4.2</lib.cvss-calculator.version>
+         <lib.owasp-rr-calculator.version>1.0.1</lib.owasp-rr-calculator.version>
+-        <lib.cyclonedx-java.version>8.0.3</lib.cyclonedx-java.version>
++        <lib.cyclonedx-java.version>11.0.1</lib.cyclonedx-java.version>
+         <lib.greenmail.version>1.6.14</lib.greenmail.version>
+         <lib.jaxb.runtime.version>2.3.8</lib.jaxb.runtime.version>
+         <lib.json-unit.version>3.2.2</lib.json-unit.version>
++        <lib.jackson.version>2.18.8</lib.jackson.version>
++        <lib.jackson-databind.version>2.18.8</lib.jackson-databind.version>
++        <lib.javamail.version>1.6.8</lib.javamail.version>
++        <lib.jetty.version>12.1.11</lib.jetty.version>
+         <!--
+           Overriding logstash-logback-encoder version as a temporary workaround until
+           https://github.com/stevespringett/Alpine/pull/517 is merged and released.
+         -->
+-        <lib.logstash-logback-encoder.version>7.3</lib.logstash-logback-encoder.version>
++        <lib.logback.version>1.5.35</lib.logback.version>
++        <lib.logstash-logback-encoder.version>9.0</lib.logstash-logback-encoder.version>
+         <lib.lucene.version>8.11.2</lib.lucene.version>
++        <lib.nimbus-jose-jwt.version>9.37.4</lib.nimbus-jose-jwt.version>
+         <lib.open-vulnerability-clients.version>5.1.0</lib.open-vulnerability-clients.version>
+         <lib.packageurl.version>1.4.1</lib.packageurl.version>
+-        <lib.pebble.version>3.2.0</lib.pebble.version>
++        <lib.pebble.version>3.2.4</lib.pebble.version>
+         <lib.resilience4j.version>2.1.0</lib.resilience4j.version>
+         <lib.woodstox.version>6.5.1</lib.woodstox.version>
+         <lib.junit-params.version>1.1.1</lib.junit-params.version>
+@@ -110,12 +120,18 @@
+         <lib.httpclient.version>4.5.14</lib.httpclient.version>
+         <lib.httpclient5.version>5.2.1</lib.httpclient5.version>
+         <lib.log4j-over-slf4j.version>2.0.9</lib.log4j-over-slf4j.version>
++        <lib.mockserver.version>7.4.0</lib.mockserver.version>
++        <lib.netty.version>4.1.135.Final</lib.netty.version>
+         <lib.org-kohsuke-github-api.version>1.318</lib.org-kohsuke-github-api.version>
++        <lib.slf4j.version>2.0.18</lib.slf4j.version>
++        <lib.tools-jackson.version>3.1.4</lib.tools-jackson.version>
++        <lib.wiremock.version>4.0.0-beta.38</lib.wiremock.version>
++        <maven.datanucleus.plugin.version>6.0.1</maven.datanucleus.plugin.version>
+         <!-- JDBC Drivers -->
+         <lib.jdbc-driver.mssql.version>12.4.2.jre11</lib.jdbc-driver.mssql.version>
+         <!-- Upgrading to 8.0.33 as https://github.com/datanucleus/datanucleus-rdbms/issues/446 is resolved! -->
+-        <lib.jdbc-driver.mysql.version>8.0.33</lib.jdbc-driver.mysql.version>
+-        <lib.jdbc-driver.postgresql.version>42.6.0</lib.jdbc-driver.postgresql.version>
++        <lib.jdbc-driver.mysql.version>8.2.0</lib.jdbc-driver.mysql.version>
++        <lib.jdbc-driver.postgresql.version>42.7.13</lib.jdbc-driver.postgresql.version>
+         <!-- Maven Plugin Properties -->
+         <plugin.cyclonedx.projectType>application</plugin.cyclonedx.projectType>
+         <plugin.cyclonedx.outputFormat>json</plugin.cyclonedx.outputFormat>
+@@ -140,6 +156,90 @@
+         </repository>
+     </repositories>
+ 
++    <dependencyManagement>
++        <dependencies>
++            <dependency>
++                <groupId>org.eclipse.jetty</groupId>
++                <artifactId>jetty-bom</artifactId>
++                <version>${lib.jetty.version}</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <dependency>
++                <groupId>org.codehaus.plexus</groupId>
++                <artifactId>plexus-utils</artifactId>
++                <version>3.6.1</version>
++            </dependency>
++            <dependency>
++                <groupId>commons-beanutils</groupId>
++                <artifactId>commons-beanutils</artifactId>
++                <version>1.11.0</version>
++            </dependency>
++            <dependency>
++                <groupId>commons-fileupload</groupId>
++                <artifactId>commons-fileupload</artifactId>
++                <version>1.6.0</version>
++            </dependency>
++            <dependency>
++                <groupId>com.github.jknack</groupId>
++                <artifactId>handlebars</artifactId>
++                <version>4.5.3</version>
++            </dependency>
++            <dependency>
++                <groupId>com.jayway.jsonpath</groupId>
++                <artifactId>json-path</artifactId>
++                <version>2.10.0</version>
++            </dependency>
++            <dependency>
++                <groupId>com.nimbusds</groupId>
++                <artifactId>nimbus-jose-jwt</artifactId>
++                <version>${lib.nimbus-jose-jwt.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-bom</artifactId>
++                <version>${lib.netty.version}</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <dependency>
++                <groupId>org.apache.commons</groupId>
++                <artifactId>commons-compress</artifactId>
++                <version>1.28.0</version>
++            </dependency>
++            <dependency>
++                <groupId>tools.jackson.core</groupId>
++                <artifactId>jackson-core</artifactId>
++                <version>${lib.tools-jackson.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>tools.jackson.core</groupId>
++                <artifactId>jackson-databind</artifactId>
++                <version>${lib.tools-jackson.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcprov-jdk18on</artifactId>
++                <version>${lib.bouncycastle.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcpkix-jdk18on</artifactId>
++                <version>${lib.bouncycastle.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.mozilla</groupId>
++                <artifactId>rhino</artifactId>
++                <version>1.8.1</version>
++            </dependency>
++            <dependency>
++                <groupId>org.xmlunit</groupId>
++                <artifactId>xmlunit-core</artifactId>
++                <version>2.12.0</version>
++            </dependency>
++        </dependencies>
++    </dependencyManagement>
++
+     <dependencies>
+         <!-- Alpine -->
+         <dependency>
+@@ -196,6 +296,11 @@
+             <artifactId>javax.activation-api</artifactId>
+             <version>1.2.0</version>
+         </dependency>
++        <dependency>
++            <groupId>javax.servlet</groupId>
++            <artifactId>javax.servlet-api</artifactId>
++            <scope>provided</scope>
++        </dependency>
+         <!-- org.json
+         This was previously transitively included with Unirest. However, Unirest v3.x removed reliance on org.json
+         in favor of their own API compatible replacement. Therefore, it was necessary to directly include org.json.
+@@ -294,8 +399,8 @@
+             <version>${lib.jdbc-driver.mssql.version}</version>
+         </dependency>
+         <dependency>
+-            <groupId>mysql</groupId>
+-            <artifactId>mysql-connector-java</artifactId>
++            <groupId>com.mysql</groupId>
++            <artifactId>mysql-connector-j</artifactId>
+             <version>${lib.jdbc-driver.mysql.version}</version>
+             <exclusions>
+                 <!--
+@@ -344,7 +449,7 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <version>1.28.0</version>
+         </dependency>
+         <!-- Resilience4J -->
+         <dependency>
+@@ -407,9 +512,15 @@
+ 
+         </dependency>
+         <dependency>
+-            <groupId>com.github.tomakehurst</groupId>
+-            <artifactId>wiremock-jre8</artifactId>
+-            <version>2.35.1</version>
++            <groupId>org.wiremock</groupId>
++            <artifactId>wiremock</artifactId>
++            <version>${lib.wiremock.version}</version>
++            <scope>test</scope>
++        </dependency>
++        <dependency>
++            <groupId>org.wiremock</groupId>
++            <artifactId>wiremock-junit4</artifactId>
++            <version>${lib.wiremock.version}</version>
+             <scope>test</scope>
+         </dependency>
+ 
+@@ -435,7 +546,7 @@
+         <dependency>
+             <groupId>org.mock-server</groupId>
+             <artifactId>mockserver-netty</artifactId>
+-            <version>5.15.0</version>
++            <version>${lib.mockserver.version}</version>
+             <scope>test</scope>
+         </dependency>
+         <dependency>
+@@ -535,6 +646,18 @@
+                     </execution>
+                 </executions>
+             </plugin>
++            <plugin>
++                <groupId>org.datanucleus</groupId>
++                <artifactId>datanucleus-maven-plugin</artifactId>
++                <version>${maven.datanucleus.plugin.version}</version>
++                <dependencies>
++                    <dependency>
++                        <groupId>org.slf4j</groupId>
++                        <artifactId>slf4j-simple</artifactId>
++                        <version>${lib.slf4j.version}</version>
++                    </dependency>
++                </dependencies>
++            </plugin>
+             <plugin>
+                 <artifactId>maven-antrun-plugin</artifactId>
+                 <version>3.1.0</version>
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
+index 33d2123..7032b56 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDXExporter.java
+@@ -18,9 +18,9 @@
+  */
+ package org.dependencytrack.parser.cyclonedx;
+ 
+-import org.cyclonedx.BomGeneratorFactory;
+ import org.cyclonedx.CycloneDxSchema;
+ import org.cyclonedx.exception.GeneratorException;
++import org.cyclonedx.generators.BomGeneratorFactory;
+ import org.cyclonedx.model.Bom;
+ import org.dependencytrack.model.Component;
+ import org.dependencytrack.model.Finding;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
+index abbe25f..8c577ab 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java
+@@ -28,6 +28,7 @@ import org.cyclonedx.model.Dependency;
+ import org.cyclonedx.model.Hash;
+ import org.cyclonedx.model.LicenseChoice;
+ import org.cyclonedx.model.Swid;
++import org.cyclonedx.model.license.Expression;
+ import org.dependencytrack.model.Analysis;
+ import org.dependencytrack.model.AnalysisJustification;
+ import org.dependencytrack.model.AnalysisResponse;
+@@ -162,12 +163,13 @@ public class ModelConverter {
+         if (licenseChoice != null) {
+             final List<org.cyclonedx.model.License> licenseOptions = new ArrayList<>();
+             if (licenseChoice.getExpression() != null) {
++                final String licenseExpression = licenseChoice.getExpression().getValue();
+                 final var expressionParser = new SpdxExpressionParser();
+-                final SpdxExpression parsedExpression = expressionParser.parse(licenseChoice.getExpression());
++                final SpdxExpression parsedExpression = expressionParser.parse(licenseExpression);
+                 if (!Objects.equals(parsedExpression, SpdxExpression.INVALID)) {
+                     // store license expression, but don't overwrite manual changes to the field
+                     if (component.getLicenseExpression() == null) {
+-                        component.setLicenseExpression(licenseChoice.getExpression());
++                        component.setLicenseExpression(licenseExpression);
+                     }
+                     // if the expression just consists of one license id, we can add it as another license option
+                     if (parsedExpression.getSpdxLicenseId() != null) {
+@@ -179,7 +181,7 @@ public class ModelConverter {
+                     LOGGER.warn("""
+                             Encountered invalid license expression "%s" for \
+                             Component{group=%s, name=%s, version=%s, bomRef=%s}; Skipping\
+-                            """.formatted(licenseChoice.getExpression(), component.getGroup(),
++                            """.formatted(licenseExpression, component.getGroup(),
+                             component.getName(), component.getVersion(), component.getBomRef()));
+                 }
+             }
+@@ -386,7 +388,7 @@ public class ModelConverter {
+             cycloneComponent.setLicenseChoice(licenseChoice);
+         }
+         if (component.getLicenseExpression() != null) {
+-            licenseChoice.setExpression(component.getLicenseExpression());
++            licenseChoice.setExpression(new Expression(component.getLicenseExpression()));
+             cycloneComponent.setLicenseChoice(licenseChoice);
+         }
+ 
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
+index 8fc656e..6a980aa 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java
+@@ -23,7 +23,7 @@ import alpine.event.framework.Event;
+ import alpine.event.framework.Subscriber;
+ import alpine.notification.Notification;
+ import alpine.notification.NotificationLevel;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.parsers.Parser;
+ import org.dependencytrack.event.BomUploadEvent;
+ import org.dependencytrack.event.NewVulnerableDependencyAnalysisEvent;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
+index 9d38087..ed6f2cd 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/tasks/VexUploadProcessingTask.java
+@@ -23,7 +23,7 @@ import alpine.event.framework.Event;
+ import alpine.event.framework.Subscriber;
+ import alpine.notification.Notification;
+ import alpine.notification.NotificationLevel;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.parsers.Parser;
+ import org.dependencytrack.event.VexUploadEvent;
+ import org.dependencytrack.model.ConfigPropertyConstants;
+diff --git a/fixtures/api-java/src/main/java/org/dependencytrack/util/CompressUtil.java b/fixtures/api-java/src/main/java/org/dependencytrack/util/CompressUtil.java
+index c5ad62e..79bd34d 100644
+--- a/fixtures/api-java/src/main/java/org/dependencytrack/util/CompressUtil.java
++++ b/fixtures/api-java/src/main/java/org/dependencytrack/util/CompressUtil.java
+@@ -19,7 +19,6 @@
+ package org.dependencytrack.util;
+ 
+ import org.apache.commons.compress.archivers.ArchiveEntry;
+-import org.apache.commons.compress.archivers.ArchiveException;
+ import org.apache.commons.compress.archivers.ArchiveInputStream;
+ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+ import org.apache.commons.io.IOUtils;
+@@ -46,7 +45,7 @@ public final class CompressUtil {
+             if (ais.canReadEntryData(entry)) {
+                 return IOUtils.toByteArray(ais);
+             }
+-        } catch (ArchiveException | IOException e) {
++        } catch (IOException e) {
+             // throw it away and return the original byte array
+         }
+         return input;
+diff --git a/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java b/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
+index 82a956f..7031c21 100644
+--- a/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
++++ b/fixtures/api-java/src/test/java/org/dependencytrack/parser/cyclonedx/CycloneDXVexImporterTest.java
+@@ -1,7 +1,7 @@
+ package org.dependencytrack.parser.cyclonedx;
+ 
+ import org.assertj.core.api.Assertions;
+-import org.cyclonedx.BomParserFactory;
++import org.cyclonedx.parsers.BomParserFactory;
+ import org.cyclonedx.exception.ParseException;
+ import org.dependencytrack.PersistenceCapableTest;
+ import org.dependencytrack.model.Analysis;
+diff --git a/fixtures/api-java/src/test/java/org/dependencytrack/tasks/RepoMetaAnalysisTaskTest.java b/fixtures/api-java/src/test/java/org/dependencytrack/tasks/RepoMetaAnalysisTaskTest.java
+index b33ba4d..c8c4562 100644
+--- a/fixtures/api-java/src/test/java/org/dependencytrack/tasks/RepoMetaAnalysisTaskTest.java
++++ b/fixtures/api-java/src/test/java/org/dependencytrack/tasks/RepoMetaAnalysisTaskTest.java
+@@ -3,8 +3,6 @@ package org.dependencytrack.tasks;
+ import alpine.event.framework.EventService;
+ import com.github.packageurl.PackageURL;
+ import com.github.tomakehurst.wiremock.client.WireMock;
+-import com.github.tomakehurst.wiremock.http.Body;
+-import com.github.tomakehurst.wiremock.http.ContentTypeHeader;
+ import com.github.tomakehurst.wiremock.junit.WireMockRule;
+ import org.dependencytrack.PersistenceCapableTest;
+ import org.dependencytrack.event.RepositoryMetaEvent;
+@@ -19,7 +17,6 @@ import org.junit.Before;
+ import org.junit.Rule;
+ import org.junit.Test;
+ 
+-import javax.ws.rs.core.MediaType;
+ import java.util.List;
+ 
+ import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+@@ -51,7 +48,7 @@ public class RepoMetaAnalysisTaskTest extends PersistenceCapableTest {
+         WireMock.stubFor(WireMock.get(WireMock.anyUrl()).withHeader("Authorization", containing("Basic"))
+                 .willReturn(WireMock.aResponse()
+                         .withStatus(200)
+-                        .withResponseBody(Body.ofBinaryOrText("""
++                        .withBody("""
+                                                                <metadata>
+                                                                <groupId>junit</groupId>
+                                                                <artifactId>junit</artifactId>
+@@ -71,8 +68,7 @@ public class RepoMetaAnalysisTaskTest extends PersistenceCapableTest {
+                                                                <lastUpdated>20210213164433</lastUpdated>
+                                                                </versioning>
+                                                                </metadata>     
+-                                """.getBytes(), new ContentTypeHeader(MediaType.APPLICATION_JSON))
+-                        )
++                                """)
+                         .withHeader("X-CheckSum-MD5", "md5hash")
+                         .withHeader("X-Checksum-SHA1", "sha1hash")
+                         .withHeader("X-Checksum-SHA512", "sha512hash")
+@@ -97,7 +93,7 @@ public class RepoMetaAnalysisTaskTest extends PersistenceCapableTest {
+         WireMock.stubFor(WireMock.get(WireMock.anyUrl()).withHeader("Authorization", containing("Basic"))
+                 .willReturn(WireMock.aResponse()
+                         .withStatus(200)
+-                        .withResponseBody(Body.ofBinaryOrText("""
++                        .withBody("""
+                                                                <metadata>
+                                                                <groupId>test1</groupId>
+                                                                <artifactId>test1</artifactId>
+@@ -117,8 +113,7 @@ public class RepoMetaAnalysisTaskTest extends PersistenceCapableTest {
+                                                                <lastUpdated>20210213164433</lastUpdated>
+                                                                </versioning>
+                                                                </metadata>     
+-                                """.getBytes(), new ContentTypeHeader(MediaType.APPLICATION_JSON))
+-                        )
++                                """)
+                         .withHeader("X-CheckSum-MD5", "md5hash")
+                         .withHeader("X-Checksum-SHA1", "sha1hash")
+                         .withHeader("X-Checksum-SHA512", "sha512hash")
+@@ -143,7 +138,7 @@ public class RepoMetaAnalysisTaskTest extends PersistenceCapableTest {
+         WireMock.stubFor(WireMock.get(WireMock.anyUrl())
+                 .willReturn(WireMock.aResponse()
+                         .withStatus(200)
+-                        .withResponseBody(Body.ofBinaryOrText("""
++                        .withBody("""
+                                                                <metadata>
+                                                                <groupId>test2</groupId>
+                                                                <artifactId>test2</artifactId>
+@@ -163,8 +158,7 @@ public class RepoMetaAnalysisTaskTest extends PersistenceCapableTest {
+                                                                <lastUpdated>20210213164433</lastUpdated>
+                                                                </versioning>
+                                                                </metadata>     
+-                                """.getBytes(), new ContentTypeHeader(MediaType.APPLICATION_JSON))
+-                        )
++                                """)
+                         .withHeader("X-CheckSum-MD5", "md5hash")
+                         .withHeader("X-Checksum-SHA1", "sha1hash")
+                         .withHeader("X-Checksum-SHA512", "sha512hash")
+@@ -189,7 +183,7 @@ public class RepoMetaAnalysisTaskTest extends PersistenceCapableTest {
+         WireMock.stubFor(WireMock.get(WireMock.anyUrl())
+                 .willReturn(WireMock.aResponse()
+                         .withStatus(200)
+-                        .withResponseBody(Body.ofBinaryOrText("""
++                        .withBody("""
+                                                                <metadata>
+                                                                <groupId>test3</groupId>
+                                                                <artifactId>test3</artifactId>
+@@ -209,8 +203,7 @@ public class RepoMetaAnalysisTaskTest extends PersistenceCapableTest {
+                                                                <lastUpdated>20210213164433</lastUpdated>
+                                                                </versioning>
+                                                                </metadata>     
+-                                """.getBytes(), new ContentTypeHeader(MediaType.APPLICATION_JSON))
+-                        )
++                                """)
+                         .withHeader("X-CheckSum-MD5", "md5hash")
+                         .withHeader("X-Checksum-SHA1", "sha1hash")
+                         .withHeader("X-Checksum-SHA512", "sha512hash")
