@@ -10,7 +10,7 @@
 PYTHON ?= python3.12
 
 .PHONY: test test-webapp test-service test-java clean \
-        reproduce-one verify-only aggregate study
+        reproduce-one verify-only aggregate study batch
 
 test: test-webapp test-service test-java ## Build + test all three fixtures from clean
 
@@ -67,3 +67,8 @@ SCOPES ?= webapp,service,api-java
 
 study: ## Run the full agent x condition x fixture x N matrix (one fixture per session), resuming past any already-valid runs. Safe to re-invoke after a session-limit interruption — only re-executes missing/invalid sessions. DRY=1 to preview without running.
 	$(PYTHON) harness/run_study.py --agents $(AGENTS) --conditions $(CONDITIONS) --scopes $(SCOPES) --n $(N) $(PILOT_FLAG) $(if $(DRY),--dry-run,)
+
+batch: ## Run ONE human-gated fixture-batch = both agents x both conditions for one fixture at one run-number (4 sessions), then stop. Set FIXTURE and RUN, e.g. make batch FIXTURE=webapp RUN=1. DRY=1 to preview. The N=5 study runs as 15 of these, one per Ahmed go/no-go (2026-07-09).
+	@test -n "$(FIXTURE)" || { echo "set FIXTURE=webapp|service|api-java"; exit 2; }
+	@test -n "$(RUN)" || { echo "set RUN=<run-number>"; exit 2; }
+	$(PYTHON) harness/run_study.py --agents $(AGENTS) --conditions $(CONDITIONS) --scopes $(FIXTURE) --only-n $(RUN) $(PILOT_FLAG) $(if $(DRY),--dry-run,)

@@ -127,8 +127,8 @@ def _cell_status(cell_dir: Path) -> tuple[str, str]:
     return "valid", "ok"
 
 
-def build_matrix(agents: list[str], conditions: list[str], scopes: list[str], n: int) -> list[tuple[str, str, str, int]]:
-    return [(a, c, s, i) for a in agents for c in conditions for s in scopes for i in range(1, n + 1)]
+def build_matrix(agents: list[str], conditions: list[str], scopes: list[str], n_values: list[int]) -> list[tuple[str, str, str, int]]:
+    return [(a, c, s, i) for a in agents for c in conditions for s in scopes for i in n_values]
 
 
 def main() -> int:
@@ -137,6 +137,15 @@ def main() -> int:
     ap.add_argument("--conditions", default="bare,mcp")
     ap.add_argument("--scopes", default="webapp,service,api-java")
     ap.add_argument("--n", type=int, default=5)
+    ap.add_argument(
+        "--only-n",
+        type=int,
+        default=None,
+        help="Run exactly this single run-number instead of the 1..N range. "
+        "Combined with a single --scopes value this is one fixture-batch "
+        "(both agents x both conditions at one n = 4 sessions) — the "
+        "human-gated checkpoint unit for the N=5 study (Ahmed, 2026-07-09).",
+    )
     ap.add_argument("--pilot", action="store_true", help="Write to runs-pilot/ instead of runs/")
     ap.add_argument("--dry-run", action="store_true", help="Print the plan only; run nothing")
     args = ap.parse_args()
@@ -144,7 +153,13 @@ def main() -> int:
     agents = [a.strip() for a in args.agents.split(",") if a.strip()]
     conditions = [c.strip() for c in args.conditions.split(",") if c.strip()]
     scopes = [s.strip() for s in args.scopes.split(",") if s.strip()]
-    matrix = build_matrix(agents, conditions, scopes, args.n)
+    if args.only_n is not None:
+        if args.only_n < 1:
+            ap.error("--only-n must be >= 1")
+        n_values = [args.only_n]
+    else:
+        n_values = list(range(1, args.n + 1))
+    matrix = build_matrix(agents, conditions, scopes, n_values)
     runs_root = REPO_ROOT / ("runs-pilot" if args.pilot else "runs")
 
     statuses = {}
@@ -155,9 +170,10 @@ def main() -> int:
     incomplete = [k for k, (status, _) in statuses.items() if status == "incomplete"]
     pending = [k for k, (status, _) in statuses.items() if status != "valid"]
 
+    n_label = f"n={n_values[0]}" if len(n_values) == 1 else f"N={args.n}"
     print(
         f"Matrix: {len(agents)} agent(s) x {len(conditions)} condition(s) x "
-        f"{len(scopes)} fixture(s) x N={args.n} = {len(matrix)} sessions"
+        f"{len(scopes)} fixture(s) x {n_label} = {len(matrix)} sessions"
     )
     print(f"  already valid: {len(valid)}")
     print(f"  pending (missing/invalid/incomplete): {len(pending)}")
