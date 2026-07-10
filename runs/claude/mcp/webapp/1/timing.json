@@ -1,0 +1,17 @@
+{
+  "started_at": "2026-07-10T01:14:50.709436+00:00",
+  "ended_at": "2026-07-10T01:19:40.937521+00:00",
+  "wall_seconds": 290.23,
+  "timeout": false,
+  "incomplete_reason": null,
+  "turns": 39,
+  "tool_calls": 38,
+  "mcp_calls": 4,
+  "tokens": {
+    "input": 63,
+    "output": 22416,
+    "cache_read": 2306720,
+    "cache_creation": 81501
+  },
+  "cost_usd": 1.5182219999999997
+}

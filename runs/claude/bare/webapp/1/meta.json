@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "condition": "bare",
+  "run_number": 1,
+  "pilot": false,
+  "scope": "webapp",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "5a0526f",
+  "harness_sha": "5a0526f",
+  "bomly_version": "bomly 0.17.0",
+  "bomly_sha256": "47a3d2b8346d2ccc9358722726103efd63c1a37234665fa7ccc868cd00aa8d92",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "started_at": "2026-07-10T01:11:31.698811+00:00",
+  "ended_at": "2026-07-10T01:14:24.583005+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01GDKCeS997xCCchr5hya9VQ",
+      "error": "Exit code 1\n/bin/bash: line 11: cd: fixtures/webapp: No such file or directory\nTraceback (most recent call last):\n  File \"<string>\", line 3, in <module>\nFileNotFoundError: [Errno 2] No such file or directory: '/tmp/audit.json'"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

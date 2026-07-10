@@ -1,0 +1,209 @@
+{
+  "scope": "webapp",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "webapp": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "  duration_ms: 12.10275\n  type: 'test'\n  ...\n# Subtest: fetches a remote XML feed via request\nok 10 - fetches a remote XML feed via request\n  ---\n  duration_ms: 6.707\n  type: 'test'\n  ...\n# Subtest: parses bookmarks out of the XML\nok 11 - parses bookmarks out of the XML\n  ---\n  duration_ms: 1.353208\n  type: 'test'\n  ...\n# Subtest: POST /import ingests an XML body\nok 12 - POST /import ingests an XML body\n  ---\n  duration_ms: 11.555917\n  type: 'test'\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 130.471709",
+      "test_stderr_tail": ""
+    }
+  },
+  "packages": [
+    {
+      "package": "axios",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 25,
+      "fixable_resolved": 25,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "body-parser",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "cookie",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "express",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "form-data",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "jsonwebtoken",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "lodash",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 5,
+      "fixable_resolved": 5,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "path-to-regexp",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "qs",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "request",
+      "ecosystem": "npm",
+      "outcome": "NOT_ATTEMPTED",
+      "fixable_total": 0,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-P8P7-X288-28G6"
+      ],
+      "build_ok": true
+    },
+    {
+      "package": "send",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "serve-static",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "tough-cookie",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "uuid",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    }
+  ],
+  "completeness": 1.0,
+  "fixable_total": 46,
+  "fixable_resolved": 46,
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "mcp",
+    "run_number": 1,
+    "wall_seconds": 290.23,
+    "timeout": false,
+    "incomplete": false,
+    "turns": 39,
+    "tool_calls": 38,
+    "mcp_calls": 4,
+    "tokens": {
+      "input": 63,
+      "output": 22416,
+      "cache_read": 2306720,
+      "cache_creation": 81501
+    },
+    "cost_usd": 1.5182219999999997,
+    "mcp_tool_errors": []
+  }
+}

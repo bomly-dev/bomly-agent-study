@@ -1,0 +1,214 @@
+{
+  "scope": "webapp",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "webapp": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "  duration_ms: 10.764291\n  type: 'test'\n  ...\n# Subtest: fetches a remote XML feed\nok 10 - fetches a remote XML feed\n  ---\n  duration_ms: 7.39025\n  type: 'test'\n  ...\n# Subtest: parses bookmarks out of the XML\nok 11 - parses bookmarks out of the XML\n  ---\n  duration_ms: 1.456041\n  type: 'test'\n  ...\n# Subtest: POST /import ingests an XML body\nok 12 - POST /import ingests an XML body\n  ---\n  duration_ms: 11.355917\n  type: 'test'\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 128.155333",
+      "test_stderr_tail": ""
+    }
+  },
+  "packages": [
+    {
+      "package": "axios",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 25,
+      "fixable_resolved": 25,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "body-parser",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "cookie",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "express",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "form-data",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "jsonwebtoken",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "lodash",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 5,
+      "fixable_resolved": 5,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "path-to-regexp",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "qs",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "request",
+      "ecosystem": "npm",
+      "outcome": "HALLUCINATED",
+      "fixable_total": 0,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-P8P7-X288-28G6"
+      ],
+      "build_ok": true
+    },
+    {
+      "package": "send",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "serve-static",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "tough-cookie",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "uuid",
+      "ecosystem": "npm",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    }
+  ],
+  "completeness": 1.0,
+  "fixable_total": 46,
+  "fixable_resolved": 46,
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "claude",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 172.88,
+    "timeout": false,
+    "incomplete": false,
+    "turns": 31,
+    "tool_calls": 30,
+    "mcp_calls": 0,
+    "tokens": {
+      "input": 61,
+      "output": 11211,
+      "cache_read": 1448256,
+      "cache_creation": 39881
+    },
+    "cost_usd": 0.8428817999999999,
+    "mcp_tool_errors": [
+      {
+        "tool": "toolu_01GDKCeS997xCCchr5hya9VQ",
+        "error": "Exit code 1\n/bin/bash: line 11: cd: fixtures/webapp: No such file or directory\nTraceback (most recent call last):\n  File \"<string>\", line 3, in <module>\nFileNotFoundError: [Errno 2] No such file or directory: '/tmp/audit.json'"
+      }
+    ]
+  }
+}
