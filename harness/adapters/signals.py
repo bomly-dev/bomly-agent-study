@@ -8,20 +8,21 @@ Under v3's full-surface scoring, this matters more than it used to: a
 partial remediation of a "fix everything" task looks like genuine low
 completeness unless the run is flagged as never having finished.
 
-No real usage-limit event has been observed in any of the ~26 real Claude
-Code / Codex runs collected so far (checked directly against every
-committed transcript before writing this) — both agents' documented
-structured-error signals (Claude's `result.subtype`, Codex's per-event
-schema) have no confirmed usage-limit-specific shape to match on yet. This
-starts from the one incident that DID happen for real this session (a
-dropped API connection mid-task, "API Error: Connection closed mid-response"
-— see TRUNCATION_SIGNATURES below, originally found in harness/run_study.py)
-plus the plainest, most likely human-readable phrasing either CLI would use
-for a subscription/rate limit, matched as text against the raw transcript
-and stderr rather than a specific structured event. Grow this list from real
-occurrences as they happen, the same discipline used everywhere else in this
-harness — do not invent an elaborate structured-event parser for a failure
-mode that hasn't been observed yet.
+A real usage-limit event was FIRST observed on 2026-07-10 during CS-A3
+batch 2 (claude/mcp/service, n=1): Claude Code wrapped it as
+`"Agent terminated early due to an API error: You've hit your session limit
+· resets 6:10am (UTC)"`. That exposed a real bug in the original ordering —
+the generic network phrase "api error" (checked first) shadowed the true
+cause, mislabelling a usage limit as a network truncation. Since the label
+drives retry TIMING (a network blip can retry immediately; a session limit
+must wait for the reset), the specific categories (usage_limit, rate_limit)
+are now checked BEFORE the generic network_truncation, and "session limit"
+is a usage_limit signature. Everything else here still follows the same
+discipline used across this harness: grow the phrase list from real
+occurrences, matched as text against the raw transcript + stderr, not an
+elaborate structured-event parser for shapes not yet seen. The earlier
+confirmed incident (a dropped connection mid-task, "API Error: Connection
+closed mid-response") remains under network_truncation.
 """
 from __future__ import annotations
 
@@ -31,29 +32,39 @@ import re
 # agent's own task — a dropped connection, a rate limit, or a subscription
 # usage cap — as opposed to the agent choosing to stop, decline, or run out
 # of turns on its own. Checked against raw transcript text + stderr.
+# Order matters: the SPECIFIC subscription/rate categories come first, so a
+# session-limit message that Claude Code happens to wrap as "an API error"
+# is labelled by its true cause (usage_limit) rather than the generic
+# network phrase that also matches it. detect_incomplete_reason returns the
+# first category with any hit.
 INCOMPLETE_SIGNATURES: dict[str, tuple[str, ...]] = {
-    "network_truncation": (
-        # The one real incident this session had: a dropped connection
-        # mid-task, confirmed via a real pilot run (27 real tool calls, zero
-        # diff, this exact phrase in the final result text).
-        "api error",
-        "connection closed",
-        "connection reset",
-        "overloaded_error",
+    "usage_limit": (
+        # Confirmed 2026-07-10 (claude/mcp/service, CS-A3 batch 2): Claude
+        # Code prints "You've hit your session limit · resets <time>". The
+        # rest are the plainest phrasing either CLI's usage-limit messaging
+        # would plausibly use; extend/correct from real occurrences.
+        "session limit",
+        "usage limit",
+        "quota exceeded",
+        "resets at",
+        "upgrade your plan",
     ),
     "rate_limit": (
         "rate_limit_error",
         "rate limit exceeded",
         "429 too many requests",
     ),
-    "usage_limit": (
-        # Not yet observed in a real transcript — the plainest phrasing
-        # either CLI's own usage-limit messaging would plausibly use.
-        # Extend/correct from a real occurrence, don't guess further.
-        "usage limit",
-        "quota exceeded",
-        "resets at",
-        "upgrade your plan",
+    "network_truncation": (
+        # The first real incident this project had: a dropped connection
+        # mid-task, confirmed via a real pilot run (27 real tool calls, zero
+        # diff, this exact phrase in the final result text). "api error" is
+        # deliberately LAST — Claude Code also wraps a session limit as "an
+        # API error", so a genuine network drop is only what reaches here
+        # without matching a more specific category above.
+        "api error",
+        "connection closed",
+        "connection reset",
+        "overloaded_error",
     ),
 }
 
@@ -61,10 +72,11 @@ INCOMPLETE_SIGNATURES: dict[str, tuple[str, ...]] = {
 def detect_incomplete_reason(text: str) -> str | None:
     """text should be the raw transcript + stderr, lowercased already or not
     (matching is case-insensitive). Returns the first matching category name,
-    or None. Category order matters only for the returned label when
-    multiple phrases could match the same incident — check network_truncation
-    first since that category's phrases are the ones actually confirmed
-    against a real run."""
+    or None. Category order matters for the returned label when multiple
+    phrases could match the same incident — the specific subscription/rate
+    categories are checked before the generic network_truncation (see the
+    INCOMPLETE_SIGNATURES comment and the 2026-07-10 real occurrence in the
+    module docstring)."""
     lowered = text.lower()
     for reason, phrases in INCOMPLETE_SIGNATURES.items():
         if any(p in lowered for p in phrases):
