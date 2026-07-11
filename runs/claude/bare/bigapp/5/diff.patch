@@ -1,0 +1,196 @@
+diff --git a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+index 4907509d..f7efe656 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+@@ -45,7 +45,7 @@
+         <dependency>
+             <groupId>org.bitbucket.b_c</groupId>
+             <artifactId>jose4j</artifactId>
+-            <version>0.9.3</version>
++            <version>0.9.6</version>
+         </dependency>
+         <dependency>
+             <groupId>com.box</groupId>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml b/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
+index 498f59aa..bfb0869b 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
+@@ -41,7 +41,7 @@
+         <maven.compiler.source>17</maven.compiler.source>
+         <maven.compiler.target>17</maven.compiler.target>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-        <pac4j.version>5.7.2</pac4j.version>
++        <pac4j.version>5.7.10</pac4j.version>
+         <javaee-pac4j.version>7.1.0</javaee-pac4j.version>
+         <slf4j.version>2.0.13</slf4j.version>
+     </properties>
+@@ -130,7 +130,7 @@
+         <dependency>
+             <groupId>org.apache.tomcat</groupId>
+             <artifactId>tomcat-catalina</artifactId>
+-            <version>8.5.60</version>
++            <version>9.0.118</version>
+             <scope>provided</scope>
+         </dependency>
+         <dependency>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+index 415e1cd5..7b3655d0 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+@@ -43,7 +43,7 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <version>1.26.0</version>
+         </dependency>
+         <dependency>
+             <groupId>commons-httpclient</groupId>
+diff --git a/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml b/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
+index 0479e792..d4e58052 100644
+--- a/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
+@@ -52,12 +52,12 @@
+     <dependency>
+         <groupId>org.apache.activemq</groupId>
+         <artifactId>activemq-broker</artifactId>
+-        <version>5.19.2</version>
++        <version>5.19.7</version>
+     </dependency>
+     <dependency>
+         <groupId>org.apache.activemq</groupId>
+         <artifactId>activemq-jaas</artifactId>
+-        <version>5.19.2</version>
++        <version>5.19.7</version>
+     </dependency>
+   </dependencies>
+     
+diff --git a/fixtures/bigapp/grouper-misc/test-plugin/pom.xml b/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
+index 291c8a4f..4ee11d70 100644
+--- a/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
++++ b/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
+@@ -17,7 +17,7 @@
+     <dependency>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-lang3</artifactId>
+-        <version>3.12.0</version>
++        <version>3.18.0</version>
+     </dependency>
+   </dependencies>
+   <build>
+diff --git a/fixtures/bigapp/grouper-parent/pom.xml b/fixtures/bigapp/grouper-parent/pom.xml
+index 4d50b531..fe62e7ad 100644
+--- a/fixtures/bigapp/grouper-parent/pom.xml
++++ b/fixtures/bigapp/grouper-parent/pom.xml
+@@ -154,7 +154,7 @@
+         <jboss.logging.version>3.3.1.Final</jboss.logging.version>
+         <jetty.version>6.1.26</jetty.version>
+         <jetty.util.version>6.1.26</jetty.util.version>
+-        <opensaml.version>2.6.4</opensaml.version>
++        <opensaml.version>2.6.5</opensaml.version>
+         <openspml2.version>192-20100413</openspml2.version>
+         <quartz.version>2.3.2</quartz.version>
+         <slf4j.version>1.7.32</slf4j.version>
+@@ -185,7 +185,7 @@
+         <amqp-client.version>5.20.0</amqp-client.version>
+         
+         <!-- note, jackson version is also in grouper ws pom and should be adjusted accordingly -->
+-        <jackson.databind>2.18.2</jackson.databind>        
++        <jackson.databind>2.18.8</jackson.databind>
+         <jsoup.version>1.15.3</jsoup.version>        
+         <java-ipv6.version>0.17</java-ipv6.version>
+         
+@@ -226,6 +226,15 @@
+             <id>central</id>
+             <url>https://repo1.maven.org/maven2</url>
+         </repository>
++        <!-- Shibboleth releases: hosts the patched opensaml 2.6.5 (CVE-2015-1796 fix),
++             which is not published to Maven Central (only 2.6.4 is there). -->
++        <repository>
++            <id>shibboleth-releases</id>
++            <url>https://build.shibboleth.net/maven/releases/</url>
++            <snapshots>
++                <enabled>false</enabled>
++            </snapshots>
++        </repository>
+     </repositories>
+ 
+     <!-- Dependencies required by every project module. -->
+diff --git a/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml b/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
+index fe1179d2..a5b9030b 100644
+--- a/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
++++ b/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
+@@ -66,6 +66,14 @@
+             <groupId>org.apache.ws.security</groupId>
+             <artifactId>wss4j</artifactId>
+             <version>1.6.19</version>
++            <exclusions>
++                <!-- wss4j pulls a very old bcprov-jdk15on transitively; exclude it so the
++                     patched bcprov-jdk18on declared below is the only Bouncy Castle on the classpath -->
++                <exclusion>
++                    <groupId>org.bouncycastle</groupId>
++                    <artifactId>bcprov-jdk15on</artifactId>
++                </exclusion>
++            </exclusions>
+         </dependency>
+         <dependency>
+             <groupId>commons-lang</groupId>
+@@ -95,11 +103,14 @@
+             </exclusions>
+         </dependency>
+         <!-- rampart-core 1.6.3 depends on bcprov-jdk15on 1.49, while grouper-ws-scim
+-             has a transitive dependency on bcprov-jdk15on 1.59 -->
++             has a transitive dependency on bcprov-jdk15on 1.59.
++             bcprov-jdk15on has no fixed release past 1.70 (that artifact line is retired);
++             use the drop-in successor bcprov-jdk18on 1.84 (same org.bouncycastle packages),
++             matching the version already managed in grouper-parent. -->
+         <dependency>
+             <groupId>org.bouncycastle</groupId>
+-            <artifactId>bcprov-jdk15on</artifactId>
+-            <version>1.70</version>
++            <artifactId>bcprov-jdk18on</artifactId>
++            <version>${bouncyCastle.version}</version>
+         </dependency>
+ 
+ 
+diff --git a/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml b/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
+index 5c0aadf1..8184e744 100644
+--- a/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
++++ b/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
+@@ -214,12 +214,12 @@
+         <dependency>
+             <groupId>com.fasterxml.jackson.jaxrs</groupId>
+             <artifactId>jackson-jaxrs-base</artifactId>
+-            <version>2.18.2</version>
++            <version>2.18.8</version>
+         </dependency>
+         <dependency>
+             <groupId>com.fasterxml.jackson.jaxrs</groupId>
+             <artifactId>jackson-jaxrs-json-provider</artifactId>
+-            <version>2.18.2</version>
++            <version>2.18.8</version>
+         </dependency>
+ 
+         <dependency>
+@@ -252,7 +252,7 @@
+         <dependency>
+             <groupId>com.fasterxml.jackson.datatype</groupId>
+             <artifactId>jackson-datatype-jsr310</artifactId>
+-            <version>2.18.2</version>
++            <version>2.18.8</version>
+         </dependency>
+         <dependency>
+             <groupId>javax</groupId>
+diff --git a/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml b/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
+index 87a9faaa..46637c73 100644
+--- a/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
++++ b/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
+@@ -17,7 +17,7 @@
+     <dependency>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-lang3</artifactId>
+-        <version>3.12.0</version>
++        <version>3.18.0</version>
+     </dependency>
+   </dependencies>
+   <build>

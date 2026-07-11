@@ -1,0 +1,187 @@
+diff --git a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+index 4907509d..9d5c04f7 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+@@ -45,7 +45,8 @@
+         <dependency>
+             <groupId>org.bitbucket.b_c</groupId>
+             <artifactId>jose4j</artifactId>
+-            <version>0.9.3</version>
++            <!-- 0.9.6 fixes GHSA-3677-xxcr-wjqv and GHSA-6qvw-249j-h44c -->
++            <version>0.9.6</version>
+         </dependency>
+         <dependency>
+             <groupId>com.box</groupId>
+@@ -56,8 +57,31 @@
+                     <groupId>org.bitbucket.b_c</groupId>
+                     <artifactId>jose4j</artifactId>
+                 </exclusion>
++                <!-- box-java-sdk pulls the abandoned bcprov/bcpkix-jdk15on 1.52
++                     (many high/medium CVEs; the jdk15on artifact line ended at
++                     1.70 and cannot reach the fixed 1.78/1.79/1.84). Drop it and
++                     rely on the class-compatible bc*-jdk18on 1.84 declared below
++                     (same org.bouncycastle.* packages, managed in grouper-parent). -->
++                <exclusion>
++                    <groupId>org.bouncycastle</groupId>
++                    <artifactId>bcprov-jdk15on</artifactId>
++                </exclusion>
++                <exclusion>
++                    <groupId>org.bouncycastle</groupId>
++                    <artifactId>bcpkix-jdk15on</artifactId>
++                </exclusion>
+             </exclusions>
+         </dependency>
++        <!-- Replacement for the excluded bc*-jdk15on above (version 1.84 from
++             grouper-parent dependencyManagement). -->
++        <dependency>
++            <groupId>org.bouncycastle</groupId>
++            <artifactId>bcprov-jdk18on</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.bouncycastle</groupId>
++            <artifactId>bcpkix-jdk18on</artifactId>
++        </dependency>
+         <dependency>
+             <groupId>commons-logging</groupId>
+             <artifactId>commons-logging</artifactId>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+index 415e1cd5..3934c12b 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+@@ -43,7 +43,8 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <!-- 1.26.0 fixes CVE-2024-25710 and CVE-2024-26308 (DoS) -->
++            <version>1.26.0</version>
+         </dependency>
+         <dependency>
+             <groupId>commons-httpclient</groupId>
+diff --git a/fixtures/bigapp/grouper-parent/pom.xml b/fixtures/bigapp/grouper-parent/pom.xml
+index 4d50b531..f50cd676 100644
+--- a/fixtures/bigapp/grouper-parent/pom.xml
++++ b/fixtures/bigapp/grouper-parent/pom.xml
+@@ -185,7 +185,8 @@
+         <amqp-client.version>5.20.0</amqp-client.version>
+         
+         <!-- note, jackson version is also in grouper ws pom and should be adjusted accordingly -->
+-        <jackson.databind>2.18.2</jackson.databind>        
++        <!-- 2.18.9 fixes CVE-2026-54512/54513/54514/54515 (jackson-databind deserialization) -->
++        <jackson.databind>2.18.9</jackson.databind>
+         <jsoup.version>1.15.3</jsoup.version>        
+         <java-ipv6.version>0.17</java-ipv6.version>
+         
+@@ -991,6 +992,83 @@
+                 <version>${amqp-client.version}</version>
+             </dependency>
+ 
++            <!-- ============================================================= -->
++            <!-- Security remediation: force fixed versions of vulnerable      -->
++            <!-- transitive dependencies. See FIXES.md at the repo root.       -->
++            <!-- ============================================================= -->
++
++            <!-- Netty 4.1.72 had numerous high/medium CVEs; 4.1.135.Final is  -->
++            <!-- the first release that fixes all of them across all modules.  -->
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-bom</artifactId>
++                <version>4.1.135.Final</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++
++            <!-- jackson-core: CVE-2025-52999 (deeply nested value DoS), fixed 2.18.6+ -->
++            <dependency>
++                <groupId>com.fasterxml.jackson.core</groupId>
++                <artifactId>jackson-core</artifactId>
++                <version>2.18.9</version>
++            </dependency>
++
++            <!-- neethi: GHSA-2hfh-9h53-qc24 / GHSA-g36m-9g3m-2vmp (XML DoS), fixed 3.2.2 -->
++            <dependency>
++                <groupId>org.apache.neethi</groupId>
++                <artifactId>neethi</artifactId>
++                <version>3.2.2</version>
++            </dependency>
++
++            <!-- apache-mime4j-core: GHSA-jw7r-rxff-gv24 (DoS), fixed 0.8.10 -->
++            <dependency>
++                <groupId>org.apache.james</groupId>
++                <artifactId>apache-mime4j-core</artifactId>
++                <version>0.8.10</version>
++            </dependency>
++
++            <!-- protobuf-java: GHSA-735f-pc8j-v9w8 (recursion DoS), fixed 4.27.5 -->
++            <dependency>
++                <groupId>com.google.protobuf</groupId>
++                <artifactId>protobuf-java</artifactId>
++                <version>4.27.5</version>
++            </dependency>
++
++            <!-- nimbus-jose-jwt: GHSA-gvpg-vgmx-xg6w / GHSA-xwmg-2g98-w7v9, fixed 9.37.4 -->
++            <dependency>
++                <groupId>com.nimbusds</groupId>
++                <artifactId>nimbus-jose-jwt</artifactId>
++                <version>9.37.4</version>
++            </dependency>
++
++            <!-- google-oauth-client: GHSA-hw42-3568-wj87 (IDToken verification), fixed 1.33.3 -->
++            <dependency>
++                <groupId>com.google.oauth-client</groupId>
++                <artifactId>google-oauth-client</artifactId>
++                <version>1.33.3</version>
++            </dependency>
++
++            <!-- commons-compress: CVE-2024-25710 / CVE-2024-26308 (DoS), fixed 1.26.0 -->
++            <dependency>
++                <groupId>org.apache.commons</groupId>
++                <artifactId>commons-compress</artifactId>
++                <version>1.26.0</version>
++            </dependency>
++
++            <!-- guava: CVE-2023-2976 (temp dir) / CVE-2020-8908, fixed 32.0.0-jre+ -->
++            <dependency>
++                <groupId>com.google.guava</groupId>
++                <artifactId>guava</artifactId>
++                <version>32.1.3-jre</version>
++            </dependency>
++
++            <!-- jose4j: GHSA-3677-xxcr-wjqv / GHSA-6qvw-249j-h44c, fixed 0.9.4+ -->
++            <dependency>
++                <groupId>org.bitbucket.b_c</groupId>
++                <artifactId>jose4j</artifactId>
++                <version>0.9.6</version>
++            </dependency>
+ 
+         </dependencies>
+     </dependencyManagement>
+diff --git a/fixtures/bigapp/grouper/pom.xml b/fixtures/bigapp/grouper/pom.xml
+index 25029243..dac82790 100644
+--- a/fixtures/bigapp/grouper/pom.xml
++++ b/fixtures/bigapp/grouper/pom.xml
+@@ -108,8 +108,24 @@
+                     <groupId>com.fasterxml.jackson.core</groupId>
+                     <artifactId>jackson-databind</artifactId>
+                 </exclusion>
++                <!-- aws-java-sdk-core pulls software.amazon.ion:ion-java 1.0.2,
++                     vulnerable to CVE-2024-21634 (StackOverflow DoS). That
++                     coordinate is abandoned (last release 1.5.1, still affected);
++                     the fix lives on com.amazon.ion:ion-java (same com.amazon.ion.*
++                     packages). Exclude here and add the fixed 1.10.5 below. -->
++                <exclusion>
++                    <groupId>software.amazon.ion</groupId>
++                    <artifactId>ion-java</artifactId>
++                </exclusion>
+             </exclusions>
+         </dependency>
++        <!-- Replacement for the excluded software.amazon.ion:ion-java above;
++             1.10.5 fixes CVE-2024-21634 (GHSA-264p-99wq-f4j6). -->
++        <dependency>
++            <groupId>com.amazon.ion</groupId>
++            <artifactId>ion-java</artifactId>
++            <version>1.10.5</version>
++        </dependency>
+         <dependency>
+             <groupId>com.fasterxml.jackson.core</groupId>
+             <artifactId>jackson-databind</artifactId>
