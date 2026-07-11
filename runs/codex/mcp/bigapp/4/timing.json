@@ -1,12 +1,18 @@
 {
-  "started_at": "2026-07-11T08:24:39.312172+00:00",
-  "ended_at": "2026-07-11T08:24:42.795240+00:00",
-  "wall_seconds": 3.48,
+  "started_at": "2026-07-11T09:30:28.414086+00:00",
+  "ended_at": "2026-07-11T09:37:03.701496+00:00",
+  "wall_seconds": 395.29,
   "timeout": false,
-  "incomplete_reason": "usage_limit",
-  "turns": 0,
-  "tool_calls": 0,
-  "mcp_calls": 0,
-  "tokens": null,
+  "incomplete_reason": null,
+  "turns": 1,
+  "tool_calls": 53,
+  "mcp_calls": 15,
+  "tokens": {
+    "input": 2719043,
+    "output": 13467,
+    "cache_read": 2542208,
+    "cache_creation": null,
+    "reasoning_output": 2603
+  },
   "cost_usd": null
 }
