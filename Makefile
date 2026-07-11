@@ -33,11 +33,11 @@ test-java: ## Maven fixture (vendored Dependency-Track 4.10.0): bounded surefire
 	# test fails with NucleusUserException before ever reaching test logic.
 	cd fixtures/api-java && mvn -B -P enhance test -Dtest="org.dependencytrack.model.**,org.dependencytrack.util.**,org.dependencytrack.parser.**" -DfailIfNoTests=false
 
-test-bigapp: ## Large Maven fixture (vendored Grouper 4.x, 13-module reactor): compile + build only, no test run
-	# COMPILE + SCAN only (BOMLY_ONLY_FIXTURES): the reactor is large and its
-	# tests need external infra, so build_ok means "the reactor still compiles".
-	# -DskipTests (NOT -Dmaven.test.skip): the `grouper` module needs
-	# grouperClient's test-jar, which -Dmaven.test.skip would not build.
+test-bigapp: ## Large Maven fixture (vendored Grouper 4.x, 13-module reactor): compile + build, no test run
+	# The reactor's tests need external infrastructure, so this compiles and
+	# builds the modules without running them. -DskipTests (NOT
+	# -Dmaven.test.skip): the `grouper` module depends on grouperClient's
+	# test-jar, which -Dmaven.test.skip would not build.
 	cd fixtures/bigapp/grouper-parent && mvn -B -DskipTests install
 
 clean: ## Remove build artifacts and virtualenvs

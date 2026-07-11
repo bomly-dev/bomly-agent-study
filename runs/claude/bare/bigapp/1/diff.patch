@@ -1,0 +1,295 @@
+diff --git a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+index 4907509d..16cec484 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+@@ -45,7 +45,8 @@
+         <dependency>
+             <groupId>org.bitbucket.b_c</groupId>
+             <artifactId>jose4j</artifactId>
+-            <version>0.9.3</version>
++            <!-- security: 0.9.3 -> 0.9.6 for CVE-2024-29371, CVE-2023-51775 -->
++            <version>0.9.6</version>
+         </dependency>
+         <dependency>
+             <groupId>com.box</groupId>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml b/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
+index 498f59aa..2a5486f4 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
+@@ -41,7 +41,8 @@
+         <maven.compiler.source>17</maven.compiler.source>
+         <maven.compiler.target>17</maven.compiler.target>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-        <pac4j.version>5.7.2</pac4j.version>
++        <!-- security: 5.7.2 -> 5.7.10 for CVE-2026-40458 (last patch of the 5.7.x line) -->
++        <pac4j.version>5.7.10</pac4j.version>
+         <javaee-pac4j.version>7.1.0</javaee-pac4j.version>
+         <slf4j.version>2.0.13</slf4j.version>
+     </properties>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+index 415e1cd5..9fc25aeb 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+@@ -43,7 +43,8 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <!-- security: 1.25.0 -> 1.27.1 for CVE-2024-25710, CVE-2024-26308 -->
++            <version>1.27.1</version>
+         </dependency>
+         <dependency>
+             <groupId>commons-httpclient</groupId>
+diff --git a/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml b/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
+index 0479e792..bd21d05b 100644
+--- a/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
+@@ -52,7 +52,10 @@
+     <dependency>
+         <groupId>org.apache.activemq</groupId>
+         <artifactId>activemq-broker</artifactId>
+-        <version>5.19.2</version>
++        <!-- security: 5.19.2 -> 5.19.7 for the ActiveMQ 5.19.x advisories
++             (CVE-2026-34197/39304/40466/41044/42588/45505/33227/41043/49270);
++             this also raises the transitive activemq-client to 5.19.7 -->
++        <version>5.19.7</version>
+     </dependency>
+     <dependency>
+         <groupId>org.apache.activemq</groupId>
+diff --git a/fixtures/bigapp/grouper-misc/test-plugin/pom.xml b/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
+index 291c8a4f..a26c2eae 100644
+--- a/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
++++ b/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
+@@ -17,7 +17,8 @@
+     <dependency>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-lang3</artifactId>
+-        <version>3.12.0</version>
++        <!-- security: 3.12.0 -> 3.18.0 for CVE-2025-48924 -->
++        <version>3.18.0</version>
+     </dependency>
+   </dependencies>
+   <build>
+diff --git a/fixtures/bigapp/grouper-parent/pom.xml b/fixtures/bigapp/grouper-parent/pom.xml
+index 4d50b531..d064cac1 100644
+--- a/fixtures/bigapp/grouper-parent/pom.xml
++++ b/fixtures/bigapp/grouper-parent/pom.xml
+@@ -154,7 +154,8 @@
+         <jboss.logging.version>3.3.1.Final</jboss.logging.version>
+         <jetty.version>6.1.26</jetty.version>
+         <jetty.util.version>6.1.26</jetty.util.version>
+-        <opensaml.version>2.6.4</opensaml.version>
++        <!-- security: bumped 2.6.4 -> 2.6.5 for CVE-2015-1796 (last 2.x release) -->
++        <opensaml.version>2.6.5</opensaml.version>
+         <openspml2.version>192-20100413</openspml2.version>
+         <quartz.version>2.3.2</quartz.version>
+         <slf4j.version>1.7.32</slf4j.version>
+@@ -185,7 +186,9 @@
+         <amqp-client.version>5.20.0</amqp-client.version>
+         
+         <!-- note, jackson version is also in grouper ws pom and should be adjusted accordingly -->
+-        <jackson.databind>2.18.2</jackson.databind>        
++        <!-- security: bumped 2.18.2 -> 2.18.9 for GHSA-72hv-8253-57qq (jackson-core) and
++             CVE-2026-54512/54513/54514/54515 (jackson-databind); stays on the 2.18.x line -->
++        <jackson.databind>2.18.9</jackson.databind>
+         <jsoup.version>1.15.3</jsoup.version>        
+         <java-ipv6.version>0.17</java-ipv6.version>
+         
+@@ -237,6 +240,12 @@
+             <artifactId>log4j-core</artifactId>
+             <version>${log4j.version}</version>
+         </dependency>
++        <!-- security: patched replacement for the excluded software.amazon.ion:ion-java
++             (CVE-2024-21634); version managed above -->
++        <dependency>
++            <groupId>com.amazon.ion</groupId>
++            <artifactId>ion-java</artifactId>
++        </dependency>
+         <!-- Provided Dependencies -->
+ 
+         <!-- Runtime Dependencies -->
+@@ -256,6 +265,102 @@
+     <!-- Dependencies not required by every project module. Defines versions. -->
+     <dependencyManagement>
+         <dependencies>
++            <!-- ============================================================
++                 SECURITY REMEDIATION: force safe versions of vulnerable
++                 dependencies that are pulled in transitively across modules.
++                 These pins raise each library to its nearest patched release
++                 within a compile-compatible line. See FIXES.md for the CVE
++                 mapping. Pinning here (dependencyManagement) overrides the
++                 versions selected by transitive resolution without touching
++                 each consuming module.
++                 ============================================================ -->
++            <!-- jackson-core CVE GHSA-72hv-8253-57qq (databind pinned via ${jackson.databind}) -->
++            <dependency>
++                <groupId>com.fasterxml.jackson.core</groupId>
++                <artifactId>jackson-core</artifactId>
++                <version>${jackson.databind}</version>
++            </dependency>
++            <!-- netty CVE-2024-47535, CVE-2025-25193, CVE-2023-34462, CVE-2024-29025,
++                 CVE-2022-24823 and the 2025/2026 codec/handler/http advisories -->
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-bom</artifactId>
++                <version>4.1.135.Final</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <!-- guava CVE-2023-2976, CVE-2020-8908 -->
++            <dependency>
++                <groupId>com.google.guava</groupId>
++                <artifactId>guava</artifactId>
++                <version>32.1.3-jre</version>
++            </dependency>
++            <!-- google-oauth-client CVE-2021-22573 -->
++            <dependency>
++                <groupId>com.google.oauth-client</groupId>
++                <artifactId>google-oauth-client</artifactId>
++                <version>1.34.1</version>
++            </dependency>
++            <!-- protobuf-java CVE-2024-7254 -->
++            <dependency>
++                <groupId>com.google.protobuf</groupId>
++                <artifactId>protobuf-java</artifactId>
++                <version>4.28.2</version>
++            </dependency>
++            <!-- nimbus-jose-jwt CVE-2023-52428, CVE-2025-53864 (stays on 9.37.x line) -->
++            <dependency>
++                <groupId>com.nimbusds</groupId>
++                <artifactId>nimbus-jose-jwt</artifactId>
++                <version>9.37.4</version>
++            </dependency>
++            <!-- ion-java CVE-2024-21634. The fix (1.10.5) is only published under the
++                 relocated coordinates com.amazon.ion:ion-java; the old
++                 software.amazon.ion:ion-java line (pulled transitively by aws-java-sdk 1.12.267)
++                 tops out at 1.5.1 and has no patched release. So the old artifact is excluded
++                 from the AWS SDK entries below and replaced with com.amazon.ion:ion-java. -->
++            <dependency>
++                <groupId>com.amazon.ion</groupId>
++                <artifactId>ion-java</artifactId>
++                <version>1.10.5</version>
++            </dependency>
++            <!-- xalan CVE-2014-0107, CVE-2022-34169 -->
++            <dependency>
++                <groupId>xalan</groupId>
++                <artifactId>xalan</artifactId>
++                <version>2.7.3</version>
++            </dependency>
++            <dependency>
++                <groupId>xalan</groupId>
++                <artifactId>serializer</artifactId>
++                <version>2.7.3</version>
++            </dependency>
++            <!-- apache-mime4j-core CVE-2024-21742 -->
++            <dependency>
++                <groupId>org.apache.james</groupId>
++                <artifactId>apache-mime4j-core</artifactId>
++                <version>0.8.10</version>
++            </dependency>
++            <!-- neethi CVE-2026-42402, CVE-2026-42403, CVE-2026-42404 -->
++            <dependency>
++                <groupId>org.apache.neethi</groupId>
++                <artifactId>neethi</artifactId>
++                <version>3.2.2</version>
++            </dependency>
++            <!-- bouncycastle jdk15on: raise the transitively-pulled 1.51/1.52 to 1.70
++                 (the last jdk15on release) which clears the CVE-2016-*/CVE-2018-1000180/
++                 CVE-2020-15522/CVE-2020-26939 set. Residual post-1.70 CVEs are only fixed in
++                 the jdk18on artifact (parent already ships bc*-jdk18on 1.84 for its own use). -->
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcprov-jdk15on</artifactId>
++                <version>1.70</version>
++            </dependency>
++            <dependency>
++                <groupId>org.bouncycastle</groupId>
++                <artifactId>bcpkix-jdk15on</artifactId>
++                <version>1.70</version>
++            </dependency>
++
+             <!-- Compile Dependencies -->
+             <dependency>
+                 <groupId>antlr</groupId>
+@@ -299,25 +404,52 @@
+                 <artifactId>backport-util-concurrent</artifactId>
+                 <version>${backport.util.version}</version>
+             </dependency>
++            <!-- security: exclude the unpatched, transitively-pulled
++                 software.amazon.ion:ion-java (CVE-2024-21634); the patched
++                 com.amazon.ion:ion-java:1.10.5 is supplied as a managed dependency instead -->
+             <dependency>
+               <groupId>com.amazonaws</groupId>
+               <artifactId>aws-java-sdk-core</artifactId>
+               <version>${aws.java.sdk.core}</version>
++              <exclusions>
++                <exclusion>
++                  <groupId>software.amazon.ion</groupId>
++                  <artifactId>ion-java</artifactId>
++                </exclusion>
++              </exclusions>
+             </dependency>
+             <dependency>
+               <groupId>com.amazonaws</groupId>
+               <artifactId>aws-java-sdk-s3</artifactId>
+               <version>${aws.java.sdk.s3}</version>
++              <exclusions>
++                <exclusion>
++                  <groupId>software.amazon.ion</groupId>
++                  <artifactId>ion-java</artifactId>
++                </exclusion>
++              </exclusions>
+             </dependency>
+             <dependency>
+               <groupId>com.amazonaws</groupId>
+               <artifactId>aws-java-sdk-sqs</artifactId>
+               <version>${aws.java.sdk.sqs}</version>
++              <exclusions>
++                <exclusion>
++                  <groupId>software.amazon.ion</groupId>
++                  <artifactId>ion-java</artifactId>
++                </exclusion>
++              </exclusions>
+             </dependency>
+             <dependency>
+               <groupId>com.amazonaws</groupId>
+               <artifactId>aws-java-sdk-sns</artifactId>
+               <version>${aws.java.sdk.sns}</version>
++              <exclusions>
++                <exclusion>
++                  <groupId>software.amazon.ion</groupId>
++                  <artifactId>ion-java</artifactId>
++                </exclusion>
++              </exclusions>
+             </dependency>
+             <dependency>
+                 <groupId>com.github.mwiede</groupId>
+diff --git a/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml b/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
+index fe1179d2..baf350de 100644
+--- a/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
++++ b/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
+@@ -99,6 +99,10 @@
+         <dependency>
+             <groupId>org.bouncycastle</groupId>
+             <artifactId>bcprov-jdk15on</artifactId>
++            <!-- 1.70 is the LAST release of the jdk15on line; residual CVEs
++                 (CVE-2023-33201, CVE-2024-29857/30171/34447) are only fixed in
++                 bcprov-jdk18on 1.78+, which conflicts with rampart-core 1.6.3's
++                 hard requirement on the jdk15on artifact. See FIXES.md. -->
+             <version>1.70</version>
+         </dependency>
+ 
+diff --git a/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml b/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
+index 87a9faaa..fb51697a 100644
+--- a/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
++++ b/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
+@@ -17,7 +17,8 @@
+     <dependency>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-lang3</artifactId>
+-        <version>3.12.0</version>
++        <!-- security: 3.12.0 -> 3.18.0 for CVE-2025-48924 -->
++        <version>3.18.0</version>
+     </dependency>
+   </dependencies>
+   <build>

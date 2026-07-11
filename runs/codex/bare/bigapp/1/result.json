@@ -1,0 +1,312 @@
+{
+  "scope": "bigapp",
+  "fixture_ref": "HEAD",
+  "build_results": {
+    "bigapp": {
+      "install_ok": true,
+      "build_ok": true,
+      "test_ok": true,
+      "test_stdout_tail": "[WARN] /tmp/bomly-study-9vselqqi/codex-bare-bigapp-1-1783743993/repo/fixtures/bigapp/grouper-misc/grouper-azure/src/main/java/edu/internet2/middleware/grouper/azure/AzureGroupType.java:1: Missing a header - not enough lines in file. [RegexpHeader]\nAudit done.\n[INFO] \n[INFO] --- maven-install-plugin:2.4:install (default-install) @ grouper-azure-provisioner ---\n[INFO] Installing /tmp/bomly-study-9vselqqi/codex-bare-bigapp-1-1783743993/repo/fixtures/bigapp/grouper-misc/grouper-azure/target/grouper-azure-provisioner-4.0.0-SNAPSHOT.jar to /home/ubuntu/.m2/repository/edu/internet2/middleware/grouper/grouper-azure-provisioner/4.0.0-SNAPSHOT/grouper-azure-provisioner-4.0.0-SNAPSHOT.jar\n[INFO] Installing /tmp/bomly-study-9vselqqi/codex-bare-bigapp-1-1783743993/repo/fixtures/bigapp/grouper-misc/grouper-azure/pom.xml to /home/ubuntu/.m2/repository/edu/internet2/middleware/grouper/grouper-azure-provisioner/4.0.0-SNAPSHOT/grouper-azure-provisioner-4.0.0-SNAPSHOT.pom\n[INFO] Installing /tmp/bomly-study-9vselqqi/codex-bare-bigapp-1-1783743993/repo/fixtures/bigapp/grouper-misc/grouper-azure/target/grouper-azure-provisioner-4.0.0-SNAPSHOT-tests.jar to /home/ubuntu/.m2/repository/edu/internet2/middleware/grouper/grouper-azure-provisioner/4.0.0-SNAPSHOT/grouper-azure-provisioner-4.0.0-SNAPSHOT-tests.jar\n[INFO] Installing /tmp/bomly-study-9vselqqi/codex-bare-bigapp-1-1783743993/repo/fixtures/bigapp/grouper-misc/grouper-azure/target/grouper-azure-provisioner-4.0.0-SNAPSHOT-sources.jar to /home/ubuntu/.m2/repository/edu/internet2/middleware/grouper/grouper-azure-provisioner/4.0.0-SNAPSHOT/grouper-azure-provisioner-4.0.0-SNAPSHOT-sources.jar\n[INFO] ------------------------------------------------------------------------\n[INFO] Reactor Summary for Grouper 4.0.0-SNAPSHOT:\n[INFO] \n[INFO] Grouper ............................................ SUCCESS [  0.457 s]\n[INFO] Grouper Client ..................................... SUCCESS [  1.812 s]\n[INFO] Grouper API ........................................ SUCCESS [  2.330 s]\n[INFO] Grouper SCIM ....................................... SUCCESS [  0.035 s]\n[INFO] Grouper UI ......................................... SUCCESS [  0.529 s]\n[INFO] Grouper WS Parent .................................. SUCCESS [  0.011 s]\n[INFO] Grouper WS ......................................... SUCCESS [  0.363 s]\n[INFO] Grouper Installer .................................. SUCCESS [  0.447 s]\n[INFO] Grouper PSP-NG ..................................... SUCCESS [  0.443 s]\n[INFO] Grouper Box ........................................ SUCCESS [  0.028 s]\n[INFO] Grouper Duo ........................................ SUCCESS [  0.030 s]\n[INFO] Grouper Google Apps Provisioner .................... SUCCESS [  0.029 s]\n[INFO] Grouper Office365 and Azure Provisioner ............ SUCCESS [  0.020 s]\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  6.603 s\n[INFO] Finished at: 2026-07-11T04:42:45Z\n[INFO] ------------------------------------------------------------------------",
+      "test_stderr_tail": ""
+    }
+  },
+  "packages": [
+    {
+      "package": "com.fasterxml.jackson.core:jackson-core",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "com.fasterxml.jackson.core:jackson-databind",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-5JMJ-H7XM-6Q6V"
+      ],
+      "build_ok": true
+    },
+    {
+      "package": "com.google.guava:guava",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "com.google.oauth-client:google-oauth-client",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "com.google.protobuf:protobuf-java",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "com.nimbusds:nimbus-jose-jwt",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "commons-httpclient:commons-httpclient",
+      "ecosystem": "maven",
+      "outcome": "HALLUCINATED",
+      "fixable_total": 0,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [
+        "GHSA-3832-9276-X7GF"
+      ],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "commons-lang:commons-lang",
+      "ecosystem": "maven",
+      "outcome": "CORRECTLY_DECLINED",
+      "fixable_total": 0,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [
+        "GHSA-J288-Q9X7-2F5V"
+      ],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-codec",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-codec-http",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 12,
+      "fixable_resolved": 12,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-common",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "io.netty:netty-handler",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 4,
+      "fixable_resolved": 4,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.apache.axis2:axis2-transport-http",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.apache.commons:commons-compress",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.apache.james:apache-mime4j-core",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 1,
+      "fixable_resolved": 1,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.apache.neethi:neethi",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 3,
+      "fixable_resolved": 3,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.bitbucket.b_c:jose4j",
+      "ecosystem": "maven",
+      "outcome": "RESOLVED",
+      "fixable_total": 2,
+      "fixable_resolved": 2,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.bouncycastle:bcpkix-jdk15on",
+      "ecosystem": "maven",
+      "outcome": "INCORRECTLY_DECLINED",
+      "fixable_total": 2,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [
+        "GHSA-4CX2-FC23-5WG6",
+        "GHSA-WG6Q-6289-32HP"
+      ],
+      "unfixable_total": 0,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "org.bouncycastle:bcprov-jdk15on",
+      "ecosystem": "maven",
+      "outcome": "INCORRECTLY_DECLINED",
+      "fixable_total": 15,
+      "fixable_resolved": 13,
+      "fixable_remaining_ids": [
+        "GHSA-8XFC-GM6G-VGPV",
+        "GHSA-V435-XC8X-WVR9"
+      ],
+      "unfixable_total": 2,
+      "unfixable_remaining_ids": [
+        "GHSA-HR8G-6V94-X4M9"
+      ],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-WJXJ-5M7G-MG7Q"
+      ],
+      "build_ok": true
+    },
+    {
+      "package": "org.hibernate:hibernate-core",
+      "ecosystem": "maven",
+      "outcome": "CORRECTLY_DECLINED",
+      "fixable_total": 0,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [
+        "GHSA-2P5W-CVG5-GC5C"
+      ],
+      "unfixable_resolved_bonus_ids": [],
+      "build_ok": true
+    },
+    {
+      "package": "software.amazon.ion:ion-java",
+      "ecosystem": "maven",
+      "outcome": "HALLUCINATED",
+      "fixable_total": 0,
+      "fixable_resolved": 0,
+      "fixable_remaining_ids": [],
+      "unfixable_total": 1,
+      "unfixable_remaining_ids": [],
+      "unfixable_resolved_bonus_ids": [
+        "GHSA-264P-99WQ-F4J6"
+      ],
+      "build_ok": true
+    }
+  ],
+  "completeness": 0.9285714285714286,
+  "fixable_total": 56,
+  "fixable_resolved": 52,
+  "regressions": [],
+  "unrelated_changes_flag": false,
+  "run_meta": {
+    "agent": "codex",
+    "condition": "bare",
+    "run_number": 1,
+    "wall_seconds": 961.33,
+    "timeout": false,
+    "incomplete": false,
+    "turns": 1,
+    "tool_calls": 67,
+    "mcp_calls": 0,
+    "tokens": {
+      "input": 5718127,
+      "output": 24155,
+      "cache_read": 5527680,
+      "cache_creation": null,
+      "reasoning_output": 4605
+    },
+    "cost_usd": null,
+    "mcp_tool_errors": []
+  }
+}

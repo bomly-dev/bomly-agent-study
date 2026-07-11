@@ -1,0 +1,40 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 1,
+  "pilot": false,
+  "scope": "bigapp",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "097079d2",
+  "harness_sha": "097079d2",
+  "bomly_version": "bomly 0.17.1",
+  "bomly_sha256": "a0e4fdd6aeeba409548c9d642ea42271fba172f4742d840bb76014b59aa18651",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-opus-4-8",
+  "effort": "high",
+  "started_at": "2026-07-11T04:11:00.072236+00:00",
+  "ended_at": "2026-07-11T04:26:23.706224+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01V1Nbq7e5c9yivAU26ckv4F",
+      "error": "prepare scan: no subprojects discovered for execution target with the applied filters; discovery probe: found pom.xml at apacheds-ldappc-schema (maven); found pom.xml at grouper (maven); found pom.xml at grouper-container/grouper-api-container (maven); found pom.xml at grouper-container/grouper-uiDaemon-container (maven); found pom.xml at grouper-container/grouper-ws-container (maven); found pom.xml at grouper-misc/googleapps-grouper-provisioner (maven); found pom.xml at grouper-misc/grouper-azu"
+    },
+    {
+      "tool": "toolu_018fShkww2pvsMoKGVL3RhG3",
+      "error": "Exit code 2\nexit=4\n\n\nError: unsupported output format \"/tmp/fullscan.json\"\nls: cannot access '/tmp/fullscan.json': No such file or directory"
+    },
+    {
+      "tool": "toolu_01HadFCqsCJ5BtjcMsnAQQ5V",
+      "error": "Exit code 1\n=== bcprov-jdk15on ===\n=== bcpkix-jdk15on ===\n=== jose4j ===\n=== nimbus-jose-jwt ===\n=== google-oauth-client ===\n=== protobuf-java ===\n=== jackson-databind ===\n449:                <artifactId>jackson-databind</artifactId>\n=== jackson-core ===\n=== guava ===\n=== commons-compress ===\n=== apache-mime4j ===\n=== neethi ===\n=== axis2-transport-http ===\n=== hibernate-core ===\n734:                <artifactId>hibernate-core</artifactId>\n=== ion-java ===\n=== commons-httpclient ===\n=== commons-l"
+    },
+    {
+      "tool": "toolu_01HXbo7zkvcuYqfafty6fjHx",
+      "error": "<tool_use_error>Blocked: sleep 45 followed by: tail -15 /tmp/build.log echo \"---running?---\" jobs -l ls -la /tmp/build.log. To wait for a condition, use Monitor with an until-loop (e.g. `until <check>; do sleep 2; done`). To wait for a command you started, use run_in_background: true. Do not chain shorter sleeps to work around this block.</tool_use_error>"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}
