@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-09T16:33:04.712549+00:00",
+  "generated_at": "2026-07-11T02:48:25.020671+00:00",
   "bomly_version": null,
   "fixtures": {
     "webapp": {
@@ -2417,6 +2417,874 @@
           "min_safe_version": "2.10.0",
           "unfixable_advisory_ids": [],
           "confirmation": "bomly-only (second scanner did not independently confirm by ID)"
+        }
+      }
+    },
+    "bigapp": {
+      "ecosystem": "maven",
+      "package_count": 21,
+      "fixable_count": 17,
+      "no_fix_count": 4,
+      "mixed_count": 2,
+      "needs_adjudication_count": 0,
+      "packages": {
+        "com.fasterxml.jackson.core:jackson-core": {
+          "advisories": [
+            {
+              "id": "GHSA-72HV-8253-57QQ",
+              "aliases": [],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "2.18.6"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "2.18.6",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+          "advisories": [
+            {
+              "id": "GHSA-5JMJ-H7XM-6Q6V",
+              "aliases": [
+                "CVE-2026-54515"
+              ],
+              "fix_state": "not-fixed",
+              "fixed_versions": [],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-HGJ6-7826-R7M5",
+              "aliases": [
+                "CVE-2026-54514"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "2.18.8"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-J3RV-43J4-C7QM",
+              "aliases": [
+                "CVE-2026-54512"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "2.18.8"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-RMJ7-2VXQ-3G9F",
+              "aliases": [
+                "CVE-2026-54513"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "2.18.8"
+              ],
+              "severity": "high"
+            }
+          ],
+          "expected": "mixed",
+          "min_safe_version": "2.18.8",
+          "unfixable_advisory_ids": [
+            "GHSA-5JMJ-H7XM-6Q6V"
+          ],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "com.google.guava:guava": {
+          "advisories": [
+            {
+              "id": "GHSA-5MG8-W23W-74H3",
+              "aliases": [
+                "CVE-2020-8908"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "32.0.0-android"
+              ],
+              "severity": "low"
+            },
+            {
+              "id": "GHSA-7G45-4RM6-3MM3",
+              "aliases": [
+                "CVE-2023-2976"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "32.0.0-android"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "32.0.0-android",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "com.google.oauth-client:google-oauth-client": {
+          "advisories": [
+            {
+              "id": "GHSA-HW42-3568-WJ87",
+              "aliases": [
+                "CVE-2021-22573"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.33.3"
+              ],
+              "severity": "high"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "1.33.3",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "com.google.protobuf:protobuf-java": {
+          "advisories": [
+            {
+              "id": "GHSA-735F-PC8J-V9W8",
+              "aliases": [
+                "CVE-2024-7254"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.27.5"
+              ],
+              "severity": "high"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "4.27.5",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "com.nimbusds:nimbus-jose-jwt": {
+          "advisories": [
+            {
+              "id": "GHSA-GVPG-VGMX-XG6W",
+              "aliases": [
+                "CVE-2023-52428"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "9.37.2"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-XWMG-2G98-W7V9",
+              "aliases": [
+                "CVE-2025-53864"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "9.37.4"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "9.37.4",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "commons-httpclient:commons-httpclient": {
+          "advisories": [
+            {
+              "id": "GHSA-3832-9276-X7GF",
+              "aliases": [
+                "CVE-2012-5783"
+              ],
+              "fix_state": "not-fixed",
+              "fixed_versions": [],
+              "severity": "medium"
+            }
+          ],
+          "expected": "no_fix",
+          "min_safe_version": null,
+          "unfixable_advisory_ids": [
+            "GHSA-3832-9276-X7GF"
+          ],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "commons-lang:commons-lang": {
+          "advisories": [
+            {
+              "id": "GHSA-J288-Q9X7-2F5V",
+              "aliases": [
+                "CVE-2025-48924"
+              ],
+              "fix_state": "not-fixed",
+              "fixed_versions": [],
+              "severity": "medium"
+            }
+          ],
+          "expected": "no_fix",
+          "min_safe_version": null,
+          "unfixable_advisory_ids": [
+            "GHSA-J288-Q9X7-2F5V"
+          ],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "io.netty:netty-codec": {
+          "advisories": [
+            {
+              "id": "GHSA-3P8M-J85Q-PGMJ",
+              "aliases": [
+                "CVE-2025-58057"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.125.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-MJ4R-2HFC-F8P6",
+              "aliases": [
+                "CVE-2026-42583"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.133.Final"
+              ],
+              "severity": "high"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "4.1.133.Final",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "io.netty:netty-codec-http": {
+          "advisories": [
+            {
+              "id": "GHSA-269Q-HMXG-M83Q",
+              "aliases": [
+                "CVE-2022-24823"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.77.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-38F8-5428-X5CV",
+              "aliases": [
+                "CVE-2026-42585"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.133.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-57RV-R2G8-2CJ3",
+              "aliases": [
+                "CVE-2026-42584"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.133.Final"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-5JPM-X58V-624V",
+              "aliases": [
+                "CVE-2024-29025"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.108.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-84H7-RJJ3-6JX4",
+              "aliases": [
+                "CVE-2025-67735"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.129.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-F6HV-JMP6-3VWV",
+              "aliases": [
+                "CVE-2026-42587"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.133.Final"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-FGHV-69VJ-QJ49",
+              "aliases": [
+                "CVE-2025-58056"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.125.Final"
+              ],
+              "severity": "low"
+            },
+            {
+              "id": "GHSA-HVCG-QMG6-JM4C",
+              "aliases": [
+                "CVE-2026-50020"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.135.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-M4CV-J2PX-7723",
+              "aliases": [
+                "CVE-2026-42580"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.133.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-PWQR-WMGM-9RR8",
+              "aliases": [
+                "CVE-2026-33870"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.132.Final"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-V8H7-RR48-VMMV",
+              "aliases": [
+                "CVE-2026-41417"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.133.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-XXQH-MFJM-7MV9",
+              "aliases": [
+                "CVE-2026-42581"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.133.Final"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "4.1.135.Final",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "io.netty:netty-common": {
+          "advisories": [
+            {
+              "id": "GHSA-389X-839F-4RHX",
+              "aliases": [
+                "CVE-2025-25193"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.118.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-XQ3W-V528-46RV",
+              "aliases": [
+                "CVE-2024-47535"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.115.Final"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "4.1.118.Final",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "io.netty:netty-handler": {
+          "advisories": [
+            {
+              "id": "GHSA-3QP7-7MW8-WX86",
+              "aliases": [
+                "CVE-2026-44249"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.135.Final"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-6MJQ-H674-J845",
+              "aliases": [
+                "CVE-2023-34462"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.94.Final"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-C653-97M9-RCG9",
+              "aliases": [
+                "CVE-2026-50010"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.135.Final"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-X4GW-5CX5-PGMH",
+              "aliases": [
+                "CVE-2026-45416"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "4.1.135.Final"
+              ],
+              "severity": "high"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "4.1.135.Final",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "org.apache.axis2:axis2-transport-http": {
+          "advisories": [
+            {
+              "id": "GHSA-WWQ7-PXWC-P4RC",
+              "aliases": [
+                "CVE-2012-5785"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.8.0"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "1.8.0",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "org.apache.commons:commons-compress": {
+          "advisories": [
+            {
+              "id": "GHSA-4265-CCF5-PHJ5",
+              "aliases": [
+                "CVE-2024-26308"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.26.0"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-4G9R-VXHX-9PGX",
+              "aliases": [
+                "CVE-2024-25710"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.26.0"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "1.26.0",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "org.apache.james:apache-mime4j-core": {
+          "advisories": [
+            {
+              "id": "GHSA-JW7R-RXFF-GV24",
+              "aliases": [
+                "CVE-2024-21742"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "0.8.10"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "0.8.10",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "org.apache.neethi:neethi": {
+          "advisories": [
+            {
+              "id": "GHSA-287C-FXR7-3W6C",
+              "aliases": [
+                "CVE-2026-42404"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "3.2.2"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-2HFH-9H53-QC24",
+              "aliases": [
+                "CVE-2026-42403"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "3.2.2"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-G36M-9G3M-2VMP",
+              "aliases": [
+                "CVE-2026-42402"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "3.2.2"
+              ],
+              "severity": "high"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "3.2.2",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "org.bitbucket.b_c:jose4j": {
+          "advisories": [
+            {
+              "id": "GHSA-3677-XXCR-WJQV",
+              "aliases": [
+                "CVE-2024-29371"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "0.9.6"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-6QVW-249J-H44C",
+              "aliases": [
+                "CVE-2023-51775"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "0.9.4"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "0.9.6",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "org.bouncycastle:bcpkix-jdk15on": {
+          "advisories": [
+            {
+              "id": "GHSA-4CX2-FC23-5WG6",
+              "aliases": [
+                "CVE-2025-8916"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.79"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-WG6Q-6289-32HP",
+              "aliases": [
+                "CVE-2026-5588"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.84"
+              ],
+              "severity": "medium"
+            }
+          ],
+          "expected": "fix",
+          "min_safe_version": "1.84",
+          "unfixable_advisory_ids": [],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "org.bouncycastle:bcprov-jdk15on": {
+          "advisories": [
+            {
+              "id": "GHSA-2J2X-HX4G-2GF4",
+              "aliases": [
+                "CVE-2016-1000344"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-4VHJ-98R6-424H",
+              "aliases": [
+                "CVE-2016-1000338"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-6XX3-RG99-GC3P",
+              "aliases": [
+                "CVE-2020-15522"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.66"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-72M5-FVVV-55M6",
+              "aliases": [
+                "CVE-2020-26939"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.61"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-8XFC-GM6G-VGPV",
+              "aliases": [
+                "CVE-2024-29857"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.78"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-9GP4-QRFF-C648",
+              "aliases": [
+                "CVE-2016-1000345"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-C8XF-M4FF-JCXJ",
+              "aliases": [
+                "CVE-2016-1000339"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-FJQM-246C-MWQG",
+              "aliases": [
+                "CVE-2016-1000346"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "low"
+            },
+            {
+              "id": "GHSA-HR8G-6V94-X4M9",
+              "aliases": [
+                "CVE-2023-33201"
+              ],
+              "fix_state": "not-fixed",
+              "fixed_versions": [],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-QCJ7-G2J5-G7R3",
+              "aliases": [
+                "CVE-2016-1000342"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-R97X-3G8F-GX3M",
+              "aliases": [
+                "CVE-2016-1000340"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-R9CH-M4FH-FC7Q",
+              "aliases": [
+                "CVE-2016-1000341"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-RRVX-PWF8-P59P",
+              "aliases": [
+                "CVE-2016-1000343"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-V435-XC8X-WVR9",
+              "aliases": [
+                "CVE-2024-30171"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.78"
+              ],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-W285-WF9Q-5W69",
+              "aliases": [
+                "CVE-2016-1000352"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.56"
+              ],
+              "severity": "high"
+            },
+            {
+              "id": "GHSA-WJXJ-5M7G-MG7Q",
+              "aliases": [
+                "CVE-2023-33202"
+              ],
+              "fix_state": "not-fixed",
+              "fixed_versions": [],
+              "severity": "medium"
+            },
+            {
+              "id": "GHSA-XQJ7-J8J5-F2XR",
+              "aliases": [
+                "CVE-2018-1000180"
+              ],
+              "fix_state": "fixed",
+              "fixed_versions": [
+                "1.60"
+              ],
+              "severity": "high"
+            }
+          ],
+          "expected": "mixed",
+          "min_safe_version": "1.78",
+          "unfixable_advisory_ids": [
+            "GHSA-HR8G-6V94-X4M9",
+            "GHSA-WJXJ-5M7G-MG7Q"
+          ],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "org.hibernate:hibernate-core": {
+          "advisories": [
+            {
+              "id": "GHSA-2P5W-CVG5-GC5C",
+              "aliases": [
+                "CVE-2026-0603"
+              ],
+              "fix_state": "not-fixed",
+              "fixed_versions": [],
+              "severity": "high"
+            }
+          ],
+          "expected": "no_fix",
+          "min_safe_version": null,
+          "unfixable_advisory_ids": [
+            "GHSA-2P5W-CVG5-GC5C"
+          ],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
+        },
+        "software.amazon.ion:ion-java": {
+          "advisories": [
+            {
+              "id": "GHSA-264P-99WQ-F4J6",
+              "aliases": [
+                "CVE-2024-21634"
+              ],
+              "fix_state": "not-fixed",
+              "fixed_versions": [],
+              "severity": "high"
+            }
+          ],
+          "expected": "no_fix",
+          "min_safe_version": null,
+          "unfixable_advisory_ids": [
+            "GHSA-264P-99WQ-F4J6"
+          ],
+          "confirmation": "bomly-trusted (no independent second scanner for transitive Maven)"
         }
       }
     }

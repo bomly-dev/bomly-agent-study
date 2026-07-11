@@ -188,12 +188,33 @@ def build_fixture_ground_truth(fixture: str) -> dict:
 
 
 def main() -> int:
-    out = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "bomly_version": None,
-        "fixtures": {},
-    }
-    for fixture in FIXTURE_ECOSYSTEM:
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--only", default="",
+        help="Comma-separated fixtures to (re)generate; the rest are preserved "
+             "from the existing ground-truth.json. Default: regenerate all. Use "
+             "this to add/refresh one fixture (e.g. --only bigapp) WITHOUT "
+             "touching the others' frozen ground truth.",
+    )
+    args = ap.parse_args()
+
+    dest = REPO_ROOT / "fixtures" / "ground-truth.json"
+    targets = [f.strip() for f in args.only.split(",") if f.strip()] or list(FIXTURE_ECOSYSTEM)
+
+    if args.only and dest.exists():
+        # Merge into the existing file so the frozen fixtures stay byte-stable.
+        out = json.loads(dest.read_text())
+        out["generated_at"] = datetime.now(timezone.utc).isoformat()
+    else:
+        out = {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "bomly_version": None,
+            "fixtures": {},
+        }
+
+    for fixture in targets:
         print(f"scanning {fixture}...", file=sys.stderr)
         fg = build_fixture_ground_truth(fixture)
         out["fixtures"][fixture] = fg
@@ -204,9 +225,8 @@ def main() -> int:
             file=sys.stderr,
         )
 
-    dest = REPO_ROOT / "fixtures" / "ground-truth.json"
     dest.write_text(json.dumps(out, indent=2, sort_keys=False) + "\n")
-    print(f"wrote {dest.relative_to(REPO_ROOT)}", file=sys.stderr)
+    print(f"wrote {dest.relative_to(REPO_ROOT)} (fixtures updated: {', '.join(targets)})", file=sys.stderr)
     return 0
 
 
