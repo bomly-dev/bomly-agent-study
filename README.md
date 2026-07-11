@@ -12,8 +12,10 @@ available to them.
 ## What this is
 
 We give two coding agents the same task — "find and fix the vulnerable
-dependencies, keep the tests passing" — across three small applications
-(npm, Python, and Java/Maven). We run each agent in two conditions:
+dependencies, keep the tests passing" — across four applications: a small
+npm app, CTFd 3.7.7 (Python), Dependency-Track 4.10.0 (Java/Maven), and
+Internet2 Grouper 4.x (a 13-module Maven reactor with ~300 resolved
+dependencies). We run each agent in two conditions:
 
 - **bare** — the agent works with whatever it already knows and the ecosystem's
   own tooling.
@@ -23,6 +25,13 @@ dependencies, keep the tests passing" — across three small applications
 Then we score every run mechanically and publish the raw transcripts, the
 scoring code, and the full results — including the runs where the graph did not
 help.
+
+**The results are in:** [REPORT.md](REPORT.md) is the long-form writeup,
+[METHODOLOGY.md](METHODOLOGY.md) the as-run protocol (including where it
+changed and why), and [LIMITATIONS.md](LIMITATIONS.md) the honest caveat
+list. Short version: on the three tractable fixtures both agents saturated
+the task without the server; on the large Maven fixture, no MCP-connected
+run finished below 98% completeness while bare runs ranged 14–100%.
 
 ## Reproduce a run
 
@@ -60,17 +69,17 @@ make reproduce-one AGENT=claude CONDITION=mcp SCOPE=webapp RUN_NUMBER=1
 
 First invocation builds the Docker image (a few minutes); later ones reuse
 it. `AGENT` is `claude` or `codex`; `CONDITION` is `bare` or `mcp`; `SCOPE` is
-`webapp`, `service`, `api-java`, or `all` (all three, slower). Output lands in
-`runs/<agent>/<condition>/<run-number>/` — raw transcript, normalized
-transcript, `diff.patch`, `FIXES.md`, `meta.json`, `timing.json`, and
-`result.json` (the per-slot verdicts). Both `model` and the reasoning-effort
-level actually used are recorded in `meta.json`.
+`webapp`, `service`, `api-java`, `bigapp`, or `all`. Output lands in
+`runs/<agent>/<condition>/<fixture>/<run-number>/` — raw transcript,
+normalized transcript, `diff.patch`, `FIXES.md`, `meta.json`, `timing.json`,
+and `result.json` (the per-package verdicts). Both `model` and the
+reasoning-effort level actually used are recorded in `meta.json`.
 
 #### Model and reasoning effort
 
 | | Model | Effort | Env var overrides |
 |---|---|---|---|
-| Claude Code | `claude-sonnet-5` | `high` | `BOMLY_STUDY_CLAUDE_MODEL`, `BOMLY_STUDY_CLAUDE_EFFORT` |
+| Claude Code | `claude-sonnet-5` (default) · `claude-opus-4-8` on `bigapp` | `high` | `BOMLY_STUDY_CLAUDE_MODEL`, `BOMLY_STUDY_CLAUDE_EFFORT` |
 | Codex | `gpt-5.5` | `medium` | `BOMLY_STUDY_CODEX_MODEL`, `BOMLY_STUDY_CODEX_EFFORT` |
 
 Both defaults were confirmed against the real CLIs, not guessed: Claude
@@ -86,11 +95,12 @@ BOMLY_STUDY_CLAUDE_MODEL=claude-opus-4-8 BOMLY_STUDY_CLAUDE_EFFORT=xhigh \
   make reproduce-one AGENT=claude CONDITION=mcp SCOPE=webapp
 ```
 
-The final run set (frozen before the `prereg-v1` tag, see
-[METHODOLOGY.md](METHODOLOGY.md) once published) pins one specific
-model+effort pair per agent for the whole study — these env vars are for
-picking that pair and for pilot/exploration, not for mixing models within a
-single published run set.
+The published run set pins one model+effort pair per agent per fixture — the
+pairs in the table above are what actually ran, and each run's `meta.json`
+records what it used. The `bigapp` fixture runs Claude on `claude-opus-4-8`
+(the reasoning is in [METHODOLOGY.md](METHODOLOGY.md), deviation #5). These
+env vars exist for reproduction and exploration, not for mixing models
+within a published cell.
 
 To exercise the isolation/scoring pipeline without invoking a real agent or
 touching any credentials (useful for checking your setup, costs nothing):
@@ -107,7 +117,7 @@ anything or holding any credential — it fresh-clones the frozen fixture ref,
 applies that run's `diff.patch`, and re-runs the same mechanical checks:
 
 ```bash
-make verify-only RUN=runs/claude/mcp/1
+make verify-only RUN=runs/claude/mcp/bigapp/1
 ```
 
 ### 4. Aggregate results
@@ -155,12 +165,14 @@ make aggregate   # rolls every runs/*/*/*/result.json into analysis/results.csv
 ## Layout
 
 ```
-fixtures/    the three intentionally-vulnerable apps + SLOTS.yaml (ground truth)
+fixtures/    the four intentionally-vulnerable apps + the frozen ground truth
+             (ground-truth.json / GROUND_TRUTH.md) + the SLOTS.yaml overlay
 prompts/     the exact task prompt and the two condition instruction files
 harness/     run + verify + aggregate scripts, per-agent adapters, Dockerfile
 runs/        raw transcripts, diffs, and per-run results
-analysis/    aggregated results and figures
+analysis/    aggregated results (results.csv) and generated figures
 scoring/     the scoring rubric and any manual adjudications
+scripts/     ground-truth + figure generators
 ```
 
 See [CREDENTIALS.md](CREDENTIALS.md) for the full credential setup guide (both
@@ -169,10 +181,13 @@ guarantees behind it).
 
 ## Method, in short
 
-Everything that could bias the result is pinned and published *before* the runs:
-methodology, the scoring rubric, the ground-truth `SLOTS.yaml`, and a
-limitations section — all committed under a `prereg-v1` tag before the first
-full run. Results land in later commits. Numbers are reported "in our setup, on
-this fixture, on these dates" — never as a general benchmark.
+Everything that could bias the result is pinned and published *before* the
+runs: the scoring rubric and the frozen ground truth were committed under the
+`prereg-v1` tag before the first full run, and results landed in later
+commits. Where the design changed after that tag (it did — most notably the
+fourth fixture), the change and its reasoning are published rather than
+papered over. Numbers are reported "in our setup, on this fixture, on these
+dates" — never as a general benchmark.
 
-See [METHODOLOGY.md](METHODOLOGY.md) and [LIMITATIONS.md](LIMITATIONS.md) once published.
+See [METHODOLOGY.md](METHODOLOGY.md), [LIMITATIONS.md](LIMITATIONS.md), and
+[REPORT.md](REPORT.md).
