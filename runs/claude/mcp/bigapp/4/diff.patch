@@ -1,0 +1,154 @@
+diff --git a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+index 4907509d..9a56a7f5 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+@@ -45,7 +45,8 @@
+         <dependency>
+             <groupId>org.bitbucket.b_c</groupId>
+             <artifactId>jose4j</artifactId>
+-            <version>0.9.3</version>
++            <!-- 0.9.6 fixes CVE-2023-51775 and CVE-2024-29371 -->
++            <version>0.9.6</version>
+         </dependency>
+         <dependency>
+             <groupId>com.box</groupId>
+@@ -56,8 +57,30 @@
+                     <groupId>org.bitbucket.b_c</groupId>
+                     <artifactId>jose4j</artifactId>
+                 </exclusion>
++                <!-- box-java-sdk pulls the legacy bcprov/bcpkix-jdk15on 1.52, which has
++                     many unpatched CVEs and no fixed release on the jdk15on line (it ended
++                     at 1.70). Exclude it and use the maintained jdk18on artifacts (1.84,
++                     managed in grouper-parent) instead. The org.bouncycastle.* classes are
++                     the same, so box-java-sdk resolves them at runtime. -->
++                <exclusion>
++                    <groupId>org.bouncycastle</groupId>
++                    <artifactId>bcprov-jdk15on</artifactId>
++                </exclusion>
++                <exclusion>
++                    <groupId>org.bouncycastle</groupId>
++                    <artifactId>bcpkix-jdk15on</artifactId>
++                </exclusion>
+             </exclusions>
+         </dependency>
++        <!-- Replacement for the excluded jdk15on bouncycastle artifacts above -->
++        <dependency>
++            <groupId>org.bouncycastle</groupId>
++            <artifactId>bcprov-jdk18on</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.bouncycastle</groupId>
++            <artifactId>bcpkix-jdk18on</artifactId>
++        </dependency>
+         <dependency>
+             <groupId>commons-logging</groupId>
+             <artifactId>commons-logging</artifactId>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+index 415e1cd5..2fb10bac 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+@@ -43,7 +43,8 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <!-- 1.26.0 fixes CVE-2024-25710 and CVE-2024-26308 -->
++            <version>1.26.0</version>
+         </dependency>
+         <dependency>
+             <groupId>commons-httpclient</groupId>
+diff --git a/fixtures/bigapp/grouper-parent/pom.xml b/fixtures/bigapp/grouper-parent/pom.xml
+index 4d50b531..bcd57e9d 100644
+--- a/fixtures/bigapp/grouper-parent/pom.xml
++++ b/fixtures/bigapp/grouper-parent/pom.xml
+@@ -185,7 +185,9 @@
+         <amqp-client.version>5.20.0</amqp-client.version>
+         
+         <!-- note, jackson version is also in grouper ws pom and should be adjusted accordingly -->
+-        <jackson.databind>2.18.2</jackson.databind>        
++        <!-- 2.18.9 fixes CVE-2026-54512/54513/54514/54515 (jackson-databind) and
++             GHSA-72hv-8253-57qq (jackson-core, pinned to the same version below) -->
++        <jackson.databind>2.18.9</jackson.databind>
+         <jsoup.version>1.15.3</jsoup.version>        
+         <java-ipv6.version>0.17</java-ipv6.version>
+         
+@@ -273,7 +275,64 @@
+               <artifactId>bcpkix-jdk18on</artifactId>
+               <version>${bouncyCastle.version}</version>
+             </dependency>
+-          
++
++            <!-- Security remediation: pin vulnerable transitive dependencies to
++                 patched versions. These are pulled in transitively (not declared
++                 directly by any module), so managing their versions here forces
++                 the fixed release across the whole reactor. -->
++            <!-- jackson-core: match the patched jackson.databind (fixes GHSA-72hv-8253-57qq) -->
++            <dependency>
++                <groupId>com.fasterxml.jackson.core</groupId>
++                <artifactId>jackson-core</artifactId>
++                <version>${jackson.databind}</version>
++            </dependency>
++            <!-- guava 32.0.0-jre fixes CVE-2020-8908 and CVE-2023-2976 -->
++            <dependency>
++                <groupId>com.google.guava</groupId>
++                <artifactId>guava</artifactId>
++                <version>32.0.0-jre</version>
++            </dependency>
++            <!-- google-oauth-client 1.33.3 fixes CVE-2021-22573 -->
++            <dependency>
++                <groupId>com.google.oauth-client</groupId>
++                <artifactId>google-oauth-client</artifactId>
++                <version>1.33.3</version>
++            </dependency>
++            <!-- protobuf-java 4.27.5 fixes CVE-2024-7254 -->
++            <dependency>
++                <groupId>com.google.protobuf</groupId>
++                <artifactId>protobuf-java</artifactId>
++                <version>4.27.5</version>
++            </dependency>
++            <!-- nimbus-jose-jwt 9.37.4 fixes CVE-2023-52428 and CVE-2025-53864 -->
++            <dependency>
++                <groupId>com.nimbusds</groupId>
++                <artifactId>nimbus-jose-jwt</artifactId>
++                <version>9.37.4</version>
++            </dependency>
++            <!-- netty-bom 4.1.135.Final fixes the netty-codec-http / -codec / -handler /
++                 -common CVEs (CVE-2022-24823 through CVE-2026-50020) consistently across
++                 every netty artifact -->
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-bom</artifactId>
++                <version>4.1.135.Final</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <!-- apache-mime4j-core 0.8.10 fixes CVE-2024-21742 -->
++            <dependency>
++                <groupId>org.apache.james</groupId>
++                <artifactId>apache-mime4j-core</artifactId>
++                <version>0.8.10</version>
++            </dependency>
++            <!-- neethi 3.2.2 fixes CVE-2026-42402/42403/42404 -->
++            <dependency>
++                <groupId>org.apache.neethi</groupId>
++                <artifactId>neethi</artifactId>
++                <version>3.2.2</version>
++            </dependency>
++
+             <dependency>
+                 <groupId>oro</groupId>
+                 <artifactId>oro</artifactId>
+diff --git a/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml b/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
+index 5c0aadf1..62839168 100644
+--- a/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
++++ b/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
+@@ -105,7 +105,8 @@
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-transport-http</artifactId>
+-            <version>1.6.4</version>
++            <!-- 1.8.0 fixes CVE-2012-5785 (improper SSL hostname verification) -->
++            <version>1.8.0</version>
+             <exclusions>
+                 <exclusion>
+                     <groupId>org.apache.httpcomponents</groupId>
