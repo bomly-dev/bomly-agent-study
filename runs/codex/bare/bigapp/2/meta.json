@@ -1,0 +1,23 @@
+{
+  "agent": "codex",
+  "condition": "bare",
+  "run_number": 2,
+  "pilot": false,
+  "scope": "bigapp",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "d8122295",
+  "harness_sha": "d8122295",
+  "bomly_version": "bomly 0.17.1",
+  "bomly_sha256": "a0e4fdd6aeeba409548c9d642ea42271fba172f4742d840bb76014b59aa18651",
+  "agent_version": "codex-cli 0.142.5",
+  "model": "gpt-5.5",
+  "effort": "medium",
+  "started_at": "2026-07-11T06:19:40.616222+00:00",
+  "ended_at": "2026-07-11T06:35:57.216521+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 0,
+  "mcp_tool_errors": [],
+  "stderr_tail": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/bomly-study-edixaibx/codex-bare-bigapp-2-1783750777/agent-config\"))\nReading additional input from stdin...\n2026-07-11T06:26:27.568559Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in /tmp/bomly-study-edixaibx/codex-bare-bigapp-2-1783750777/repo/fixtures/bigapp/grouper-parent/pom.xml:\n            <dependency>\n                <groupId>com.fasterxml.jackson.core</groupId>\n                <artifactId>jackson-databind</artifactId>\n                <version>${jackson.databind}</version>\n            </dependency>\n",
+  "credential_copy_mode": "known-files"
+}

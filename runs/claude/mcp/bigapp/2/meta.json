@@ -1,0 +1,36 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 2,
+  "pilot": false,
+  "scope": "bigapp",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "d8122295",
+  "harness_sha": "d8122295",
+  "bomly_version": "bomly 0.17.1",
+  "bomly_sha256": "a0e4fdd6aeeba409548c9d642ea42271fba172f4742d840bb76014b59aa18651",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-opus-4-8",
+  "effort": "high",
+  "started_at": "2026-07-11T06:04:46.785733+00:00",
+  "ended_at": "2026-07-11T06:19:26.735682+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 0,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_0138MFGYonYbQcqsZ7i2UkUd",
+      "error": "prepare scan: no subprojects discovered for execution target with the applied filters; discovery probe: found pom.xml at apacheds-ldappc-schema (maven); found pom.xml at grouper (maven); found pom.xml at grouper-container/grouper-api-container (maven); found pom.xml at grouper-container/grouper-uiDaemon-container (maven); found pom.xml at grouper-container/grouper-ws-container (maven); found pom.xml at grouper-misc/googleapps-grouper-provisioner (maven); found pom.xml at grouper-misc/grouper-azu"
+    },
+    {
+      "tool": "toolu_0113uC1LJCDZSbD2N273BAD1",
+      "error": "Exit code 127\n=== TOP KEYS ===\n/bin/bash: line 6: jq: command not found\n=== structure ===\n/bin/bash: line 7: jq: command not found"
+    },
+    {
+      "tool": "toolu_01KgZgyndftLjLe8mXuxBB9C",
+      "error": "Exit code 2\nEXIT=4\n\n\nError: unsupported output format \"/tmp/fullscan.json\"\nls: cannot access '/tmp/fullscan.json': No such file or directory"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

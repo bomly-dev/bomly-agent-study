@@ -1,0 +1,556 @@
+diff --git a/fixtures/bigapp/apacheds-ldappc-schema/pom.xml b/fixtures/bigapp/apacheds-ldappc-schema/pom.xml
+index 32137150..5695aa81 100644
+--- a/fixtures/bigapp/apacheds-ldappc-schema/pom.xml
++++ b/fixtures/bigapp/apacheds-ldappc-schema/pom.xml
+@@ -21,6 +21,11 @@
+   </distributionManagement>
+ 
+   <dependencies>
++    <dependency>
++      <groupId>commons-collections</groupId>
++      <artifactId>commons-collections</artifactId>
++      <version>3.2.2</version>
++    </dependency>
+     <dependency>
+       <groupId>org.apache.directory.server</groupId>
+       <artifactId>apacheds-core</artifactId>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+index 4907509d..8bf8d734 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+@@ -45,7 +45,7 @@
+         <dependency>
+             <groupId>org.bitbucket.b_c</groupId>
+             <artifactId>jose4j</artifactId>
+-            <version>0.9.3</version>
++            <version>${jose4j.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>com.box</groupId>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml b/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
+index 498f59aa..b5533ad6 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-ext-auth/pom.xml
+@@ -41,7 +41,7 @@
+         <maven.compiler.source>17</maven.compiler.source>
+         <maven.compiler.target>17</maven.compiler.target>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-        <pac4j.version>5.7.2</pac4j.version>
++        <pac4j.version>5.7.10</pac4j.version>
+         <javaee-pac4j.version>7.1.0</javaee-pac4j.version>
+         <slf4j.version>2.0.13</slf4j.version>
+     </properties>
+@@ -117,7 +117,7 @@
+         <dependency>
+             <groupId>com.nimbusds</groupId>
+             <artifactId>oauth2-oidc-sdk</artifactId>
+-            <version>10.1</version>
++            <version>${nimbus.oauth2.oidc.sdk}</version>
+         </dependency>
+ 
+         <dependency>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+index 415e1cd5..7b3655d0 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+@@ -43,7 +43,7 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <version>1.26.0</version>
+         </dependency>
+         <dependency>
+             <groupId>commons-httpclient</groupId>
+diff --git a/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml b/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
+index 0479e792..d4e58052 100644
+--- a/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouperActivemq/pom.xml
+@@ -52,12 +52,12 @@
+     <dependency>
+         <groupId>org.apache.activemq</groupId>
+         <artifactId>activemq-broker</artifactId>
+-        <version>5.19.2</version>
++        <version>5.19.7</version>
+     </dependency>
+     <dependency>
+         <groupId>org.apache.activemq</groupId>
+         <artifactId>activemq-jaas</artifactId>
+-        <version>5.19.2</version>
++        <version>5.19.7</version>
+     </dependency>
+   </dependencies>
+     
+diff --git a/fixtures/bigapp/grouper-misc/test-plugin/pom.xml b/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
+index 291c8a4f..024a5936 100644
+--- a/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
++++ b/fixtures/bigapp/grouper-misc/test-plugin/pom.xml
+@@ -17,7 +17,37 @@
+     <dependency>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-lang3</artifactId>
+-        <version>3.12.0</version>
++        <version>3.18.0</version>
++    </dependency>
++    <dependency>
++      <groupId>com.fasterxml.jackson.core</groupId>
++      <artifactId>jackson-databind</artifactId>
++      <version>2.18.9</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.protobuf</groupId>
++      <artifactId>protobuf-java</artifactId>
++      <version>4.28.2</version>
++    </dependency>
++    <dependency>
++      <groupId>com.nimbusds</groupId>
++      <artifactId>nimbus-jose-jwt</artifactId>
++      <version>9.37.4</version>
++    </dependency>
++    <dependency>
++      <groupId>io.netty</groupId>
++      <artifactId>netty-codec-http</artifactId>
++      <version>4.1.135.Final</version>
++    </dependency>
++    <dependency>
++      <groupId>io.netty</groupId>
++      <artifactId>netty-transport-native-epoll</artifactId>
++      <version>4.1.135.Final</version>
++    </dependency>
++    <dependency>
++      <groupId>io.netty</groupId>
++      <artifactId>netty-transport-native-kqueue</artifactId>
++      <version>4.1.135.Final</version>
+     </dependency>
+   </dependencies>
+   <build>
+@@ -40,4 +70,4 @@
+       </plugin>
+     </plugins>
+   </build>
+-</project>
+\ No newline at end of file
++</project>
+diff --git a/fixtures/bigapp/grouper-parent/pom.xml b/fixtures/bigapp/grouper-parent/pom.xml
+index 4d50b531..b13d9c5d 100644
+--- a/fixtures/bigapp/grouper-parent/pom.xml
++++ b/fixtures/bigapp/grouper-parent/pom.xml
+@@ -121,6 +121,9 @@
+         <commons.io.version>2.20.0</commons.io.version>
+         <commons.lang.version>2.6</commons.lang.version>
+         <commons.lang3.version>3.20.0</commons.lang3.version>
++        <guava.version>33.4.8-jre</guava.version>
++        <google.oauth.client.version>1.33.3</google.oauth.client.version>
++        <protobuf.java.version>4.28.2</protobuf.java.version>
+         <commons.logging.version>1.2</commons.logging.version>
+         <commons.math.version>1.2</commons.math.version>
+         <commons.pool.version>1.6</commons.pool.version>
+@@ -132,6 +135,7 @@
+         <shibboleth.common.version>1.3.3</shibboleth.common.version>
+         <javassist.version>3.22.0-GA</javassist.version>
+         <smack.version>3.1.0</smack.version>
++        <velocity.version>1.7</velocity.version>
+         <joda.time.version>2.9.9</joda.time.version>
+         <jug.version>1.1.2</jug.version>
+         <ezmorph.version>1.0.6</ezmorph.version>
+@@ -154,7 +158,13 @@
+         <jboss.logging.version>3.3.1.Final</jboss.logging.version>
+         <jetty.version>6.1.26</jetty.version>
+         <jetty.util.version>6.1.26</jetty.util.version>
+-        <opensaml.version>2.6.4</opensaml.version>
++        <opensaml.version>2.6.5</opensaml.version>
++        <axis2.version>1.8.0</axis2.version>
++        <apache.mime4j.core.version>0.8.10</apache.mime4j.core.version>
++        <neethi.version>3.2.2</neethi.version>
++        <xmlsec.version>3.0.3</xmlsec.version>
++        <woodstox.core.version>6.4.0</woodstox.core.version>
++        <xalan.version>2.7.3</xalan.version>
+         <openspml2.version>192-20100413</openspml2.version>
+         <quartz.version>2.3.2</quartz.version>
+         <slf4j.version>1.7.32</slf4j.version>
+@@ -173,19 +183,21 @@
+         <ldaptive.version>1.2.4</ldaptive.version>
+         <!-- if you change this version make sure container substitution still works -->
+         <playwright.version>1.46.0</playwright.version>
+-        <aws.java.sdk.core>1.12.267</aws.java.sdk.core>
+-        <aws.java.sdk.s3>1.12.267</aws.java.sdk.s3>
+-        <aws.java.sdk.sqs>1.12.267</aws.java.sdk.sqs>
+-        <aws.java.sdk.sns>1.12.267</aws.java.sdk.sns>
++        <aws.java.sdk.core>1.12.793</aws.java.sdk.core>
++        <aws.java.sdk.s3>1.12.793</aws.java.sdk.s3>
++        <aws.java.sdk.sqs>1.12.793</aws.java.sdk.sqs>
++        <aws.java.sdk.sns>1.12.793</aws.java.sdk.sns>
+         <httpclient>4.5.13</httpclient>
+         <httpcore>4.4.14</httpcore>
+         <httpmime>4.5.13</httpmime>
+         <geronimo-jms.version>1.1</geronimo-jms.version>
+         <qpid-jms-client.version>0.61.0</qpid-jms-client.version>
+         <amqp-client.version>5.20.0</amqp-client.version>
++        <netty.version>4.1.135.Final</netty.version>
+         
+         <!-- note, jackson version is also in grouper ws pom and should be adjusted accordingly -->
+-        <jackson.databind>2.18.2</jackson.databind>        
++        <jackson.databind>2.18.9</jackson.databind>
++        <jackson.core.version>2.18.9</jackson.core.version>
+         <jsoup.version>1.15.3</jsoup.version>        
+         <java-ipv6.version>0.17</java-ipv6.version>
+         
+@@ -198,6 +210,11 @@
+         <xercesimpl.version>2.12.2</xercesimpl.version>
+         <okhttp.version>4.12.0</okhttp.version>
+         <nimbus.oauth2.oidc.sdk>11.6</nimbus.oauth2.oidc.sdk>
++        <nimbus.jose.jwt.version>9.37.4</nimbus.jose.jwt.version>
++        <jose4j.version>0.9.6</jose4j.version>
++        <bouncyCastle.jdk15on.version>1.70</bouncyCastle.jdk15on.version>
++        <spring.version>6.2.11</spring.version>
++        <esapi.version>2.6.0.0</esapi.version>
+         
+         <!-- ddl utils -->
+         <oro.version>2.0.8</oro.version>
+@@ -273,6 +290,16 @@
+               <artifactId>bcpkix-jdk18on</artifactId>
+               <version>${bouncyCastle.version}</version>
+             </dependency>
++            <dependency>
++              <groupId>org.bouncycastle</groupId>
++              <artifactId>bcprov-jdk15on</artifactId>
++              <version>${bouncyCastle.jdk15on.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.bouncycastle</groupId>
++              <artifactId>bcpkix-jdk15on</artifactId>
++              <version>${bouncyCastle.jdk15on.version}</version>
++            </dependency>
+           
+             <dependency>
+                 <groupId>oro</groupId>
+@@ -319,6 +346,21 @@
+               <artifactId>aws-java-sdk-sns</artifactId>
+               <version>${aws.java.sdk.sns}</version>
+             </dependency>
++            <dependency>
++              <groupId>com.google.guava</groupId>
++              <artifactId>guava</artifactId>
++              <version>${guava.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>com.google.oauth-client</groupId>
++              <artifactId>google-oauth-client</artifactId>
++              <version>${google.oauth.client.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>com.google.protobuf</groupId>
++              <artifactId>protobuf-java</artifactId>
++              <version>${protobuf.java.version}</version>
++            </dependency>
+             <dependency>
+                 <groupId>com.github.mwiede</groupId>
+                 <artifactId>jsch</artifactId>
+@@ -449,6 +491,11 @@
+                 <artifactId>jackson-databind</artifactId>
+                 <version>${jackson.databind}</version>
+             </dependency>
++            <dependency>
++                <groupId>com.fasterxml.jackson.core</groupId>
++                <artifactId>jackson-core</artifactId>
++                <version>${jackson.core.version}</version>
++            </dependency>
+             <dependency>
+               <groupId>net.redhogs.cronparser</groupId>
+               <artifactId>cron-parser-core</artifactId>
+@@ -469,6 +516,11 @@
+                 <artifactId>csrfguard-jsp-tags</artifactId>
+                 <version>${csrfguard.version}</version>
+             </dependency>
++            <dependency>
++                <groupId>org.owasp.esapi</groupId>
++                <artifactId>esapi</artifactId>
++                <version>${esapi.version}</version>
++            </dependency>
+             <dependency>
+                 <groupId>javax.servlet.jsp.jstl</groupId>
+                 <artifactId>javax.servlet.jsp.jstl-api</artifactId>
+@@ -608,6 +660,11 @@
+                 <artifactId>shared-ldap</artifactId>
+                 <version>${shared.ldap.version}</version>
+             </dependency>
++            <dependency>
++                <groupId>edu.vt.middleware</groupId>
++                <artifactId>vt-ldap</artifactId>
++                <version>3.3.8</version>
++            </dependency>
+             <dependency>
+                 <groupId>org.beanshell</groupId>
+                 <artifactId>bsh</artifactId>
+@@ -729,6 +786,11 @@
+                 <artifactId>jettison</artifactId>
+                 <version>${jettison.version}</version>
+             </dependency>
++            <dependency>
++                <groupId>org.apache.velocity</groupId>
++                <artifactId>velocity</artifactId>
++                <version>${velocity.version}</version>
++            </dependency>
+             <dependency>
+                 <groupId>org.hibernate</groupId>
+                 <artifactId>hibernate-core</artifactId>
+@@ -789,6 +851,16 @@
+                 <artifactId>opensaml</artifactId>
+                 <version>${opensaml.version}</version>
+             </dependency>
++            <dependency>
++                <groupId>org.apache.santuario</groupId>
++                <artifactId>xmlsec</artifactId>
++                <version>${xmlsec.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>xalan</groupId>
++                <artifactId>xalan</artifactId>
++                <version>${xalan.version}</version>
++            </dependency>
+             <dependency>
+                 <groupId>org.openspml</groupId>
+                 <artifactId>openspml2</artifactId>
+@@ -857,6 +929,11 @@
+                 <artifactId>oauth2-oidc-sdk</artifactId>
+                 <version>${nimbus.oauth2.oidc.sdk}</version>
+             </dependency>
++            <dependency>
++                <groupId>com.nimbusds</groupId>
++                <artifactId>nimbus-jose-jwt</artifactId>
++                <version>${nimbus.jose.jwt.version}</version>
++            </dependency>
+             <!-- Provided Dependencies -->
+             <dependency>
+                 <groupId>javax.activation</groupId>
+@@ -889,6 +966,66 @@
+               <artifactId>wink-client</artifactId>
+               <version>${wink.client.version}</version>
+             </dependency>
++            <dependency>
++              <groupId>org.apache.axis2</groupId>
++              <artifactId>axis2-kernel</artifactId>
++              <version>${axis2.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.apache.axis2</groupId>
++              <artifactId>axis2-adb</artifactId>
++              <version>${axis2.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.apache.axis2</groupId>
++              <artifactId>axis2-transport-http</artifactId>
++              <version>${axis2.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.apache.axis2</groupId>
++              <artifactId>axis2-transport-local</artifactId>
++              <version>${axis2.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.apache.james</groupId>
++              <artifactId>apache-mime4j-core</artifactId>
++              <version>${apache.mime4j.core.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>com.fasterxml.woodstox</groupId>
++              <artifactId>woodstox-core</artifactId>
++              <version>${woodstox.core.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.apache.neethi</groupId>
++              <artifactId>neethi</artifactId>
++              <version>${neethi.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.bitbucket.b_c</groupId>
++              <artifactId>jose4j</artifactId>
++              <version>${jose4j.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.springframework</groupId>
++              <artifactId>spring-beans</artifactId>
++              <version>${spring.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.springframework</groupId>
++              <artifactId>spring-context</artifactId>
++              <version>${spring.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.springframework</groupId>
++              <artifactId>spring-core</artifactId>
++              <version>${spring.version}</version>
++            </dependency>
++            <dependency>
++              <groupId>org.springframework</groupId>
++              <artifactId>spring-web</artifactId>
++              <version>${spring.version}</version>
++            </dependency>
+             <dependency>
+               <groupId>org.wso2.charon</groupId>
+               <artifactId>org.wso2.charon.samples</artifactId>
+@@ -990,6 +1127,36 @@
+                 <artifactId>amqp-client</artifactId>
+                 <version>${amqp-client.version}</version>
+             </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-codec</artifactId>
++                <version>${netty.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-codec-http</artifactId>
++                <version>${netty.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-common</artifactId>
++                <version>${netty.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-handler</artifactId>
++                <version>${netty.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-transport-native-epoll</artifactId>
++                <version>${netty.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-transport-native-kqueue</artifactId>
++                <version>${netty.version}</version>
++            </dependency>
+ 
+ 
+         </dependencies>
+diff --git a/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml b/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
+index fe1179d2..9f121fa7 100644
+--- a/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
++++ b/fixtures/bigapp/grouper-ws/grouper-ws-java-generated-client/pom.xml
+@@ -38,12 +38,12 @@
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-adb</artifactId>
+-            <version>1.6.4</version>
++            <version>${axis2.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-transport-http</artifactId>
+-            <version>1.6.4</version>
++            <version>${axis2.version}</version>
+             <exclusions>
+                 <exclusion>
+                     <groupId>org.apache.httpcomponents</groupId>
+@@ -60,7 +60,7 @@
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-transport-local</artifactId>
+-            <version>1.6.4</version>
++            <version>${axis2.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.ws.security</groupId>
+@@ -99,7 +99,7 @@
+         <dependency>
+             <groupId>org.bouncycastle</groupId>
+             <artifactId>bcprov-jdk15on</artifactId>
+-            <version>1.70</version>
++            <version>${bouncyCastle.jdk15on.version}</version>
+         </dependency>
+ 
+ 
+diff --git a/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml b/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
+index 5c0aadf1..381a913b 100644
+--- a/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
++++ b/fixtures/bigapp/grouper-ws/grouper-ws/pom.xml
+@@ -60,7 +60,7 @@
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-kernel</artifactId>
+-            <version>1.6.4</version>
++            <version>${axis2.version}</version>
+             <exclusions>
+                 <exclusion>
+                     <groupId>org.apache.geronimo.specs</groupId>
+@@ -105,7 +105,7 @@
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-transport-http</artifactId>
+-            <version>1.6.4</version>
++            <version>${axis2.version}</version>
+             <exclusions>
+                 <exclusion>
+                     <groupId>org.apache.httpcomponents</groupId>
+@@ -122,7 +122,7 @@
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-transport-local</artifactId>
+-            <version>1.6.1</version>
++            <version>${axis2.version}</version>
+             <scope>runtime</scope>
+         </dependency>
+         <!-- dependency>
+@@ -144,7 +144,7 @@
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-adb</artifactId>
+-            <version>1.6.1</version>
++            <version>${axis2.version}</version>
+             <scope>runtime</scope>
+             <exclusions>
+                 <exclusion>
+diff --git a/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml b/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
+index 87a9faaa..39be83cc 100644
+--- a/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
++++ b/fixtures/bigapp/grouper/src/test/edu/internet2/middleware/grouper/plugins/testImplementation/pom.xml
+@@ -17,7 +17,37 @@
+     <dependency>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-lang3</artifactId>
+-        <version>3.12.0</version>
++        <version>3.18.0</version>
++    </dependency>
++    <dependency>
++      <groupId>com.fasterxml.jackson.core</groupId>
++      <artifactId>jackson-databind</artifactId>
++      <version>2.18.9</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.protobuf</groupId>
++      <artifactId>protobuf-java</artifactId>
++      <version>4.28.2</version>
++    </dependency>
++    <dependency>
++      <groupId>com.nimbusds</groupId>
++      <artifactId>nimbus-jose-jwt</artifactId>
++      <version>9.37.4</version>
++    </dependency>
++    <dependency>
++      <groupId>io.netty</groupId>
++      <artifactId>netty-codec-http</artifactId>
++      <version>4.1.135.Final</version>
++    </dependency>
++    <dependency>
++      <groupId>io.netty</groupId>
++      <artifactId>netty-transport-native-epoll</artifactId>
++      <version>4.1.135.Final</version>
++    </dependency>
++    <dependency>
++      <groupId>io.netty</groupId>
++      <artifactId>netty-transport-native-kqueue</artifactId>
++      <version>4.1.135.Final</version>
+     </dependency>
+   </dependencies>
+   <build>
+@@ -40,4 +70,4 @@
+       </plugin>
+     </plugins>
+   </build>
+-</project>
+\ No newline at end of file
++</project>
