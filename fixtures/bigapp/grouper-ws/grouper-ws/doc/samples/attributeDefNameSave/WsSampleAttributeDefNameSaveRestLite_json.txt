@@ -1,0 +1,243 @@
+Grouper web service sample of service: attributeDefNameSave, WsSampleAttributeDefNameSaveRestLite, manually written lite/rest, format: json, for version: 5.0.0
+
+
+#########################################
+##
+## HTTP request sample (could be formatted for view by
+## indenting or changing dates or other data)
+##
+#########################################
+
+
+POST /grouper-ws/servicesRest/v2_5_000/attributeDefNames HTTP/1.1
+Authorization: Basic xxxxxxxxxxxxxxxxx==
+Content-Type: application/json
+Content-Length: 309
+Host: localhost:8092
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.6)
+Cookie: JSESSIONID=FB7955149A67CD7AD6A18A4AA03ED322
+Accept-Encoding: gzip,deflate
+
+{
+  "WsRestAttributeDefNameSaveLiteRequest":{
+    "attributeDefLookupName":"test:testAttributeAssignDefNameDef",
+    "attributeDefNameName":"test:testAttributeAssignDefNameToSave1RestLite_json",
+    "displayExtension":"My new attribute def name to save 1 rest lite json",
+    "description":"This is a description 1 rest lite json"
+  }
+}
+
+
+#########################################
+##
+## HTTP response sample (could be formatted for view by
+## indenting or changing dates or other data)
+##
+#########################################
+
+
+HTTP/1.1 201
+Set-Cookie: JSESSIONID=xxxxxxxxxxxxxxxxxxxxxxxx; Path=/grouper-ws; HttpOnly
+X-Grouper-resultCode: SUCCESS_INSERTED
+X-Grouper-success: T
+X-Grouper-resultCode2: NONE
+Content-Type: application/json;charset=UTF-8
+Content-Length: 1025
+Date: Fri, 23 May 2025 17:20:22 GMT
+Keep-Alive: timeout=20
+Connection: keep-alive
+
+{
+  "WsAttributeDefNameSaveLiteResult":{
+    "resultMetadata":{
+      "resultCode":"SUCCESS_INSERTED",
+      "resultMessage":"Success for: clientVersion: 2.5.0, wsAttributeDefNameToSaves: Array size: 1: [0]: WsAttributeDefNameToSave[\n  wsAttributeDefNameLookup=WsAttributeDefNameLookup[pitAttributeDefNames=[]],\n  wsAttributeDefName=WsAttributeDefName[displayExtension=My new attribute...\n, actAsSubject: null, txType: NONE, paramNames: \n, params: null",
+      "success":"T"
+    },
+    "responseMetadata":{
+      "millis":"83",
+      "serverVersion":"5.0.0"
+    },
+    "wsAttributeDefName":{
+      "idIndex":"1000362",
+      "extension":"testAttributeAssignDefNameToSave1RestLite_json",
+      "displayExtension":"My new attribute def name to save 1 rest lite json",
+      "description":"This is a description 1 rest lite json",
+      "displayName":"test:My new attribute def name to save 1 rest lite json",
+      "name":"test:testAttributeAssignDefNameToSave1RestLite_json",
+      "uuid":"19c97a52891e4137b8b75929df959745",
+      "attributeDefId":"c2bf345acadf4e90b6c66b98a7252c33",
+      "attributeDefName":"test:testAttributeAssignDefNameDef"
+    }
+  }
+}
+
+
+#########################################
+##
+## Java source code (note, any programming language / objects
+## can use used to generate the above request/response.  Nothing
+## is Java specific.  Also, if you are using Java, the client libraries
+## are available
+##
+#########################################
+
+
+/*******************************************************************************
+ * Copyright 2012 Internet2
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+package edu.internet2.middleware.grouper.ws.samples.rest.attribute;
+
+import org.apache.commons.lang.StringUtils;
+
+import edu.internet2.middleware.grouper.util.GrouperHttpClient;
+import edu.internet2.middleware.grouper.util.GrouperHttpMethod;
+import edu.internet2.middleware.grouper.ws.coresoap.WsAttributeDefNameSaveLiteResult;
+import edu.internet2.middleware.grouper.ws.rest.WsRestResultProblem;
+import edu.internet2.middleware.grouper.ws.rest.attribute.WsRestAttributeDefNameSaveLiteRequest;
+import edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest;
+import edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType;
+import edu.internet2.middleware.grouper.ws.util.RestClientSettings;
+
+/**
+ * @author mchyzer
+ */
+public class WsSampleAttributeDefNameSaveRestLite implements WsSampleRest {
+
+  /**
+   * attribute def name save lite web service with REST
+   * @param wsSampleRestType is the type of rest (xml, xhtml, etc)
+   */
+  public static void attributeDefNameSaveLite(WsSampleRestType wsSampleRestType) {
+
+    try {
+      // grouper http client
+      GrouperHttpClient grouperHttpClient = new GrouperHttpClient();
+
+      //URL e.g. http://localhost:8093/grouper-ws/servicesRest/v1_3_000/...
+      //NOTE: aStem:aAttributeDefName urlencoded substitutes %3A for a colon
+      String url = RestClientSettings.URL + "/" + RestClientSettings.VERSION  
+            + "/attributeDefNames";
+      
+      // assign the URL and method
+      grouperHttpClient.assignUrl(url).assignGrouperHttpMethod(GrouperHttpMethod.post);
+      // assign user and pass
+      grouperHttpClient.assignUser(RestClientSettings.USER)
+          .assignPassword(RestClientSettings.PASS);
+
+      //Make the body of the request, in this case with beans and marshaling, but you can make
+      //your request document in whatever language or way you want
+      WsRestAttributeDefNameSaveLiteRequest attributeDefNameSaveLite = new WsRestAttributeDefNameSaveLiteRequest();
+
+      attributeDefNameSaveLite.setAttributeDefLookupName("test:testAttributeAssignDefNameDef");
+      
+      attributeDefNameSaveLite.setAttributeDefNameName("test:testAttributeAssignDefNameToSave1RestLite_" + wsSampleRestType);
+      attributeDefNameSaveLite.setDisplayExtension("My new attribute def name to save 1 rest lite " + wsSampleRestType);
+      attributeDefNameSaveLite.setDescription("This is a description 1 rest lite " + wsSampleRestType);
+      
+      //get the xml / json / xhtml / paramString
+      String requestDocument = wsSampleRestType.getWsLiteRequestContentType().writeString(attributeDefNameSaveLite);
+      
+      //make sure right content type is in request (e.g. application/xhtml+xml
+      String contentType = wsSampleRestType.getWsLiteRequestContentType().getContentType();
+      
+      // assign body
+      grouperHttpClient.assignBody(requestDocument);
+
+      // content type
+      grouperHttpClient.addHeader("Content-Type", contentType);
+      
+      // execute
+      grouperHttpClient.executeRequest();
+      
+
+      //check if success
+      String successString = grouperHttpClient.getResponseHeadersLower().get("x-grouper-success");
+      
+      if (StringUtils.isBlank(successString)) {
+        throw new RuntimeException("Web service did not even respond!");
+      }
+      boolean success = "T".equals(successString);
+
+      // check result code
+      String resultCode = grouperHttpClient.getResponseHeadersLower().get("x-grouper-resultcode");
+      
+      String response = grouperHttpClient.getResponseBody();
+
+      Object resultObject = wsSampleRestType.getWsLiteResponseContentType().parseString(response);
+    
+      //see if problem
+      if (resultObject instanceof WsRestResultProblem) {
+        throw new RuntimeException(((WsRestResultProblem)resultObject).getResultMetadata().getResultMessage());
+      }
+
+      //convert to object (from xhtml, xml, json, etc)
+      WsAttributeDefNameSaveLiteResult wsAttributeDefNameSaveLiteResult = (WsAttributeDefNameSaveLiteResult)resultObject;
+      
+      String resultMessage = wsAttributeDefNameSaveLiteResult.getResultMetadata().getResultMessage();
+
+      // see if request worked or not
+      if (!success) {
+        throw new RuntimeException("Bad response from web service: resultCode: " + resultCode
+            + ", " + resultMessage);
+      }
+      
+      System.out.println("Server version: " + wsAttributeDefNameSaveLiteResult.getResponseMetadata().getServerVersion()
+          + ", result code: " + resultCode
+          + ", result message: " + resultMessage );
+
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    attributeDefNameSaveLite(WsSampleRestType.json);
+  }
+
+  /**
+   * @see edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest#executeSample(edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType)
+   */
+  public void executeSample(WsSampleRestType wsSampleRestType) {
+    attributeDefNameSaveLite(wsSampleRestType);
+  }
+
+  /**
+   * @see edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest#validType(edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType)
+   */
+  public boolean validType(WsSampleRestType wsSampleRestType) {
+    //allow all
+    return true;
+  }
+}
+
+
+#########################################
+##
+## Stdout
+##
+#########################################
+
+
+Server version: 5.0.0, result code: SUCCESS_INSERTED, result message: Success for: clientVersion: 2.5.0, wsAttributeDefNameToSaves: Array size: 1: [0]: WsAttributeDefNameToSave[
+  wsAttributeDefNameLookup=WsAttributeDefNameLookup[pitAttributeDefNames=[]],
+  wsAttributeDefName=WsAttributeDefName[displayExtension=My new attribute...
+, actAsSubject: null, txType: NONE, paramNames: 
+, params: null

@@ -74,7 +74,13 @@ RUN case "$TARGETARCH" in \
 # harness/verify.py's parsing still holds against the new schema before
 # trusting any scored run under this version; see prompts/condition-mcp/ for
 # the corresponding tool-list disclosure update.
-ARG BOMLY_VERSION=0.17.0
+# 0.17.1: fixes the maven-detector's multi-module TGF parser (bomly-cli#252) —
+# `mvn dependency:tree -DoutputType=tgf` emits one TGF block per reactor module,
+# and the parser dropped every block after the first, failing every native
+# scan of a multi-module reactor ("maven tgf references unknown package"). This
+# is what makes the `bigapp` fixture (the 13-module Internet2 Grouper reactor)
+# scannable at all — see harness/verify.py's maven-detector invocation.
+ARG BOMLY_VERSION=0.17.1
 RUN curl -fsSL -o /tmp/bomly.tar.gz \
       "https://github.com/bomly-dev/bomly-cli/releases/download/v${BOMLY_VERSION}/bomly_${BOMLY_VERSION}_linux_${TARGETARCH}.tar.gz" \
     && tar -xzf /tmp/bomly.tar.gz -C /usr/local/bin bomly \
@@ -146,6 +152,38 @@ COPY --chown=ubuntu:ubuntu fixtures/api-java /tmp/warm-pom
 RUN cd /tmp/warm-pom \
     && mvn -B -P enhance test -Dtest="org.dependencytrack.model.**,org.dependencytrack.util.**,org.dependencytrack.parser.**" -DfailIfNoTests=false \
     && rm -rf /tmp/warm-pom
+
+# --- Maven Central mirror (Google's GCS mirror, a faithful copy) for the
+#     ubuntu user. The bigapp reactor (Grouper, 13 modules) resolves hundreds
+#     of transitive artifacts on a cold cache; a direct repo.maven.apache.org
+#     resolve reliably drew HTTP 429 with a 30-minute cooldown during fixture
+#     selection. This changes only WHERE artifacts download from, not WHICH
+#     resolve, so it does not affect any ground truth. Placed AFTER the
+#     api-java warm-up so that fixture's frozen build is untouched; it applies
+#     to bigapp's warm-up below and to every runtime `mvn` (both Maven
+#     fixtures) — the latter is a pure robustness win.
+RUN mkdir -p /home/ubuntu/.m2 && printf '%s\n' \
+    '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">' \
+    '  <mirrors><mirror>' \
+    '    <id>gcs-central</id>' \
+    '    <url>https://maven-central.storage-download.googleapis.com/maven2/</url>' \
+    '    <mirrorOf>central</mirrorOf>' \
+    '  </mirror></mirrors>' \
+    '</settings>' > /home/ubuntu/.m2/settings.xml
+
+# --- Pre-warm Maven for the bigapp fixture (Internet2 Grouper 4.x, a
+#     13-module reactor). Plain multi-module install, but with one gotcha: the
+#     `grouper` module depends on grouperClient's TEST jar, so `-DskipTests`
+#     (which still COMPILES tests and builds test-jars) is required and
+#     `-Dmaven.test.skip=true` must NOT be used (it skips test-jar creation and
+#     the reactor then fails to resolve the internal test-jar). Runs the same
+#     `mvn install` from grouper-parent that the fixture's warm/scan path uses,
+#     proving at build time that the offline reactor build works and priming
+#     ~/.m2 with every external dependency + the internal module jars.
+COPY --chown=ubuntu:ubuntu fixtures/bigapp /tmp/warm-bigapp
+RUN cd /tmp/warm-bigapp/grouper-parent \
+    && mvn -B -DskipTests install \
+    && rm -rf /tmp/warm-bigapp
 
 # --- Pre-warm trivy's vulnerability DB (used as the Maven fixture's
 #     independent second scanner, harness/verify.py) into $HOME/.cache/trivy,

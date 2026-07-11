@@ -1,0 +1,7 @@
+/target/
+/.swo
+/.swp
+.DS_Store
+/ddlScripts/
+.classpath
+.project

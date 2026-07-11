@@ -1,0 +1,1302 @@
+/**
+ * Copyright 2014 Internet2
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package edu.internet2.middleware.grouperClient.util;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.nio.charset.UnsupportedCharsetException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.JexlException;
+import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.Jdk14Logger;
+import org.apache.http.HeaderElement;
+import org.apache.http.HeaderElementIterator;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeaderElementIterator;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
+import org.apache.http.util.Args;
+import org.apache.http.util.EntityUtils;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.internet2.middleware.grouperClient.ws.WsRestClassLookup;
+import edu.internet2.middleware.grouperClient.ws.beans.WsGroupLookup;
+import edu.internet2.middleware.grouperClient.ws.beans.WsRestAddMemberRequest;
+import edu.internet2.middleware.grouperClient.ws.beans.WsSubject;
+import edu.internet2.middleware.grouperClient.ws.beans.WsSubjectLookup;
+import edu.internet2.middleware.morphString.Crypto;
+import edu.internet2.middleware.morphString.MorphStringConfig;
+
+/**
+ * utility methods specific to grouper client
+ */
+public class GrouperClientUtils extends GrouperClientCommonUtils {
+
+  private static CloseableHttpClient httpTrustAllClient = null;
+  
+  public static CloseableHttpClient httpTrustAllClient(boolean reuseIfConfigured) {
+    CloseableHttpClient closeableHttpClient = httpTrustAllClient;
+    
+    if (closeableHttpClient == null || !reuseIfConfigured) {
+      
+      synchronized (GrouperClientUtils.class) {
+        closeableHttpClient = httpTrustAllClient;
+        
+        if (closeableHttpClient == null || !reuseIfConfigured) {
+          TrustStrategy trustStrategy = new TrustStrategy() {
+            @Override
+            public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+              return true;
+            }
+          };
+      
+          // Trust all, ONLY use for connections you are sure of.
+          SSLContextBuilder builder = new SSLContextBuilder();
+          try {
+            builder.loadTrustMaterial(null, trustStrategy);
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            closeableHttpClient = httpClientBuilderDecorate(HttpClients.custom(), sslsf).setRetryHandler(new DefaultHttpRequestRetryHandler(0, false)).setSSLSocketFactory(sslsf).useSystemProperties().build();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+          boolean httpClientReuse = GrouperClientConfig.retrieveConfig().propertyValueBoolean("grouperClientHttpClientReuse", true);
+          if (httpClientReuse && reuseIfConfigured) {
+            httpTrustAllClient = closeableHttpClient;
+          }
+        }
+      }
+    }
+    return closeableHttpClient;
+  }
+
+  private static CloseableHttpClient httpClient = null;
+
+  public static CloseableHttpClient httpClient(boolean reuseIfConfigured) {
+    
+    CloseableHttpClient closeableHttpClient = httpClient;
+    
+    if (closeableHttpClient == null || !reuseIfConfigured) {
+      synchronized (GrouperClientUtils.class) {
+        closeableHttpClient = httpClient;
+        if (closeableHttpClient == null || !reuseIfConfigured) {
+          closeableHttpClient = httpClientBuilderDecorate(HttpClientBuilder.create(), null).setRetryHandler(new DefaultHttpRequestRetryHandler(0, false)).useSystemProperties().build();
+          boolean httpClientReuse = GrouperClientConfig.retrieveConfig().propertyValueBoolean("grouperClientHttpClientReuse", true);
+          if (httpClientReuse && reuseIfConfigured) {
+            httpClient = closeableHttpClient;
+          }
+        }        
+      }
+    }
+    
+    return closeableHttpClient;
+  }
+
+  /**
+   * Create a basic authentication string.
+   * @param login is the login.
+   * @param password is the password.
+   * @return "Basic login:password" where login:password is Base64 encoded.
+   */
+  public static String httpBasicAuthenticationString(String login, String password){
+    String basicBase64 = new String(Base64.encodeBase64((login + ":" + password).getBytes()));
+    return "Basic " + basicBase64;
+  }
+
+  public static void httpCloseQuietly(CloseableHttpClient closeableHttpClient, HttpRequestBase httpRequestBase, CloseableHttpResponse closeableHttpResponse, boolean reuseIfConfigured) {
+    if (closeableHttpResponse != null) {
+      EntityUtils.consumeQuietly(closeableHttpResponse.getEntity());
+    }
+    
+    if (httpRequestBase != null) {
+      httpRequestBase.releaseConnection();
+    }
+    
+    if (closeableHttpResponse != null) {
+      try {
+        closeableHttpResponse.close();
+      } catch (IOException e) {
+        // ignore
+      }
+    }
+    
+    // dont close this, just close the methods.  the client is reused
+    boolean httpClientReuse = GrouperClientConfig.retrieveConfig().propertyValueBoolean("grouperClientHttpClientReuse", true);
+    if (!httpClientReuse && reuseIfConfigured) {
+      try{
+        closeableHttpClient.close();
+      } catch (Throwable e){
+      }
+    }
+
+  }
+  
+  private static HttpClientBuilder httpClientBuilderDecorate(HttpClientBuilder httpClientBuilder, SSLConnectionSocketFactory sslSocketFactory) {
+    
+    // https://www.baeldung.com/httpclient-connection-management
+    PoolingHttpClientConnectionManager connManager;
+    if (sslSocketFactory == null) {
+      connManager = new PoolingHttpClientConnectionManager();
+    } else {
+      Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+        .register("https", sslSocketFactory)
+        .build();
+      
+      connManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+    }
+    
+    int httpClientMaxTotalPoolSize = GrouperClientConfig.retrieveConfig().propertyValueInt("grouperClientHttpClientMaxTotalPoolSize", 100);
+    int httpClientDefaultMaxPerRoute = GrouperClientConfig.retrieveConfig().propertyValueInt("grouperClientHttpClientDefaultMaxPerRoute", 30);
+    
+    connManager.setMaxTotal(httpClientMaxTotalPoolSize);
+    connManager.setDefaultMaxPerRoute(httpClientDefaultMaxPerRoute);
+    httpClientBuilder.setConnectionManager(connManager);
+    
+    // use the timeout of server, or if not found, use 5 seconds
+    final ConnectionKeepAliveStrategy myStrategy = new ConnectionKeepAliveStrategy() {
+
+      @Override
+      public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
+        Args.notNull(response, "HTTP response");  
+        
+        HeaderElementIterator it = new BasicHeaderElementIterator(response.headerIterator(HTTP.CONN_KEEP_ALIVE));
+        while (it.hasNext()) {
+          HeaderElement he = it.nextElement();
+          String param = he.getName();
+          String value = he.getValue();
+          if (value != null && param.equalsIgnoreCase("timeout")) {
+            try {
+                return Long.parseLong(value) * 1000;
+            } catch(NumberFormatException ignore) {
+            }
+          }
+        }        
+        return 5000;
+
+      }  
+    };
+    
+    httpClientBuilder.setKeepAliveStrategy(myStrategy);
+    return httpClientBuilder;
+  }
+
+  public static void main(String[] args) throws Exception {
+    //  {
+    //    "WsRestAddMemberRequest":{
+    //      "subjectLookups":[
+    //        {
+    //          "subjectSourceId":"jdbc",
+    //          "subjectId":"test.subject.0"
+    //        }
+    //      ]
+    //      ,
+    //      "wsGroupLookup":{
+    //        "groupName":"test:testGroup"
+    //      }
+    //    }
+    //  }
+
+    
+    WsRestAddMemberRequest wsRestAddMemberRequest = new WsRestAddMemberRequest();
+    WsSubjectLookup wsSubjectLookup = new WsSubjectLookup("test.subject.0", "jdbc", null);
+    wsRestAddMemberRequest.setSubjectLookups(new WsSubjectLookup[] {wsSubjectLookup});
+    wsRestAddMemberRequest.setWsGroupLookup(new WsGroupLookup("test:group", null));
+    
+    String result = jsonConvertTo(wsRestAddMemberRequest, true);
+    
+    result = new JsonIndenter(result).result();
+
+    System.out.println(result);
+
+    wsRestAddMemberRequest = (WsRestAddMemberRequest)jsonConvertFrom(WsRestClassLookup.getAliasClassMap(), result);
+
+    System.out.println(wsRestAddMemberRequest.getWsGroupLookup().getGroupName()); 
+    System.out.println(wsRestAddMemberRequest.getSubjectLookups()[0].getSubjectId());
+  }
+  
+  private static final ObjectMapper mapper = new ObjectMapper();
+  
+  static {
+    mapper.setSerializationInclusion(Include.NON_NULL);
+    //TODO when jackson is upgraded in the grouper client, put these lines back
+//    mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+//    mapper.configure(Feature.ALLOW_SINGLE_QUOTES, true);
+//    mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, true);
+  }
+
+  /**
+   * get the extension from name.  if name is a:b:c, name is c
+   * @param name
+   * @return the name
+   */
+  public static String extensionFromName(String name) {
+    if (isBlank(name)) {
+      return name;
+    }
+    int lastColonIndex = name.lastIndexOf(':');
+    if (lastColonIndex == -1) {
+      return name;
+    }
+    String extension = name.substring(lastColonIndex+1);
+    return extension;
+  }
+
+  /**
+   * convert object to json, optionally include object name wrapper
+   * @param object
+   * @param includeObjectNameWrapper
+   * @return the json
+   */
+  public static String jsonConvertTo(Object object, boolean includeObjectNameWrapper) {
+    
+    try {
+      String result = mapper.writeValueAsString(object);
+      
+      if (includeObjectNameWrapper) {
+        result = "{\"" + object.getClass().getSimpleName() + "\":" + result + "}";
+      }
+      return result;
+    } catch (Exception e) {
+      
+      throw new RuntimeException("Error with " + (object == null ? "null" : object.getClass().getName()), e);
+    }
+  }
+  
+  /**
+   * <pre>
+   * detects the front of a json string, pops off the first field, and gives the body as the matcher
+   * ^\s*\{\s*\"([^"]+)\"\s*:\s*\{(.*)}$
+   * Example matching text:
+   * {
+   *  "XstreamPocGroup":{
+   *    "somethingNotMarshaled":"whatever",
+   *    "name":"myGroup",
+   *    "someInt":5,
+   *    "someBool":true,
+   *    "members":[
+   *      {
+   *        "name":"John",
+   *        "description":"John Smith - Employee"
+   *      },
+   *      {
+   *        "name":"Mary",
+   *        "description":"Mary Johnson - Student"
+   *      }
+   *    ]
+   *  }
+   * }
+   *
+   * ^\s*          front of string and optional space
+   * \{\s*         open bracket and optional space
+   * \"([^"]+)\"   quote, simple name of class, quote
+   * \s*:\s*       optional space, colon, optional space
+   * \{(.*)}\s*$      open bracket, the class info, close bracket, optional space, end of string
+   *
+   *
+   * </pre>
+   */
+  private static Pattern jsonPattern = Pattern.compile("^\\s*\\{\\s*\\\"([^\"]+)\\\"\\s*:\\s*(.*)}\\s*$", Pattern.DOTALL);
+
+  /**
+   * convert an object from json.  note this works well if there are no collections, just real types, arrays, etc.
+   * @param conversionMap is the class simple name to class of objects which are allowed to be brought back.
+   * Note: only the top level object needs to be registered
+   * @param json
+   * @return the object
+   */
+  public static Object jsonConvertFrom(Map<String, Class<?>> conversionMap, String json) {
+
+    //gson does not put the type of the object in the json, but we need that.  so when we convert,
+    //put the type in there.  So we need to extract the type out when unmarshaling
+    Matcher matcher = jsonPattern.matcher(json);
+
+    if (!matcher.matches()) {
+      throw new RuntimeException("Cant match this json, should start with simple class name: " + json);
+    }
+
+    String simpleClassName = matcher.group(1);
+    String jsonBody = matcher.group(2);
+
+    Class<?> theClass = conversionMap.get(simpleClassName);
+    if (theClass == null) {
+      throw new RuntimeException("Not allowed to unmarshal json: " + simpleClassName + ", " + json);
+    }
+
+    try {
+      return mapper.readValue(jsonBody, theClass);
+    } catch(Exception e) {
+      throw new RuntimeException(abbreviate(json, 2000), e);
+    }
+  }
+
+  /**
+   * 
+   * @param key
+   * @param durationNanos
+   */
+  public static void performanceTimingAllDuration(String key, long durationNanos) {
+    
+    String className = "edu.internet2.middleware.grouper.util.PerformanceLogger";
+    Class<?> theClass = null;
+    try {
+    
+      theClass = forName(className);
+    } catch (Exception e) {
+      //ignore
+      return;
+    }
+    
+    callMethod(theClass, "performanceTimingAllDuration", new Class[] {String.class, long.class}, new Object[] {key, durationNanos});
+    
+  }
+  
+  /**
+   * use this for performance log label for sql queries
+   */
+  public static final String PERFORMANCE_LOG_LABEL_SQL = "sqlQueries";
+
+  /**
+   * to string reflection
+   * @param object
+   * @return the string representation
+   */
+  public static String toStringReflection(Object object, Set<String> fieldsToIgnore) {
+    return toStringReflection(object, fieldsToIgnore, null);
+  }
+  
+  /**
+   * to string reflection
+   * @param object
+   * @return the string representation
+   */
+  public static String toStringReflection(Object object, Set<String> fieldsToIgnore, String extraInfo) {
+    
+    StringBuilder result = new StringBuilder();
+    
+    result.append(object.getClass().getSimpleName()).append("(");
+    if (!isBlank(extraInfo)) {
+      result.append(extraInfo);
+      if (!trim(extraInfo).endsWith(",")) {
+        result.append(", ");
+      } else if (!extraInfo.endsWith(" ")) {
+        result.append(" ");
+      }
+    }
+    Set<String> fieldNames = GrouperClientUtils.fieldNames(object.getClass(), 
+        Object.class, null, false, false, false);
+    
+    // assume configurations cache stuff in fields.  We can make this more flexible / customizable at some point
+    if (fieldsToIgnore != null) {
+      fieldNames.removeAll(fieldsToIgnore);
+    }
+    
+    fieldNames = new TreeSet<String>(fieldNames);
+    boolean firstField = true;
+    for (String fieldName : fieldNames) {
+      
+      Object value = GrouperClientUtils.propertyValue(object, fieldName);
+      if (!GrouperClientUtils.isBlank(value)) {
+        
+        if ((value instanceof Collection) && ((Collection)value).size() == 0) {
+          continue;
+        }
+        if ((value instanceof Map) && ((Map)value).size() == 0) {
+          continue;
+        }
+        if ((value.getClass().isArray()) && Array.getLength(value) == 0) {
+          continue;
+        }
+        if (!firstField) {
+          result.append(", ");
+        }
+        firstField = false;
+        result.append(fieldName).append("='").append(GrouperClientUtils.toStringForLog(value, false)).append("'");
+      }
+    }
+    if (result.toString().endsWith(", ")) {
+      result.setLength(result.length()-2);
+    }
+    result.append(")");
+    return result.toString();
+  }
+
+
+  /**
+   * to string reflection
+   * @param object
+   * @return the string representation
+   */
+  public static String toStringReflection(Object object) {
+    return ToStringBuilder.reflectionToString(object, GrouperClientUtils.NotNullToStringStyle.NOT_NULL_STYLE);
+  }
+  
+  /**
+   * dont print null fields in reflection
+   * @author mchyzer
+   *
+   */
+  public static final class NotNullToStringStyle extends ToStringStyle {
+    
+    private static final long serialVersionUID = 1L;
+    
+    public static final ToStringStyle NOT_NULL_STYLE = new NotNullToStringStyle();
+
+    public NotNullToStringStyle() {
+      super();
+      this.setUseShortClassName(true);
+    }
+    
+    private Object readResolve() {
+      return NOT_NULL_STYLE;
+    }
+
+    private static Set<String> fieldsToIgnore = GrouperClientUtils.toSet("dbVersion");
+    
+    @Override
+    public void append(StringBuffer buffer, String fieldName, Object value,
+        Boolean fullDetail) {
+      if (value != null && !fieldsToIgnore.contains(fieldName) && !fieldName.startsWith("internal")
+          && !fieldName.endsWith("Dao")) {
+        super.append(buffer, fieldName, value, fullDetail);
+      }
+    }
+  }
+  
+
+  /**
+   * configure jdk14 logs once
+   */
+  private static boolean configuredLogs = false;
+
+  /**
+   * append a certain number of question marks to a query
+   * @param query
+   * @param numberOfMarks
+   */
+  public static String appendQuestions(int numberOfMarks) {
+    StringBuilder result = new StringBuilder();
+    appendQuestions(result, numberOfMarks);
+    return result.toString();
+  }
+
+  /**
+   * append a certain number of question marks to a query
+   * @param query
+   * @param numberOfMarks
+   */
+  public static void appendQuestions(StringBuilder query, int numberOfMarks) {
+    //loop through the columns, do the prepared statement part
+    for (int i = 0; i < numberOfMarks; i++) {
+      query.append("?");
+  
+      //if not the last one give a comma
+      if (i < numberOfMarks - 1) {
+        query.append(", ");
+      }
+    }
+  }
+
+  /**
+   * @param theClass
+   * @return the log
+   */
+  public static Log retrieveLog(Class<?> theClass) {
+
+    Log theLog = LogFactory.getLog(theClass);
+    
+    //if this isnt here, dont configure yet
+    if (isBlank(GrouperClientConfig.retrieveConfig().propertyValueString("encrypt.disableExternalFileLookup"))
+        || theClass.equals(GrouperClientCommonUtils.class)) {
+      return new GrouperClientLog(theLog);
+    }
+    
+    if (!configuredLogs) {
+      String logLevel = GrouperClientConfig.retrieveConfig().propertyValueString("grouperClient.logging.logLevel");
+      String logFile = GrouperClientConfig.retrieveConfig().propertyValueString("grouperClient.logging.logFile");
+      String grouperClientLogLevel = GrouperClientConfig.retrieveConfig().propertyValueString(
+          "grouperClient.logging.grouperClientOnly.logLevel");
+      
+      boolean hasLogLevel = !isBlank(logLevel);
+      boolean hasLogFile = !isBlank(logFile);
+      boolean hasGrouperClientLogLevel = !isBlank(grouperClientLogLevel);
+      
+      if (hasLogLevel || hasLogFile) {
+        if (theLog instanceof Jdk14Logger) {
+          Jdk14Logger jdkLogger = (Jdk14Logger) theLog;
+          Logger logger = jdkLogger.getLogger();
+          long timeToLive = 60;
+          while (logger.getParent() != null && timeToLive-- > 0) {
+            //this should be root logger
+            logger = logger.getParent();
+          }
+  
+          if (length(logger.getHandlers()) == 1) {
+  
+            //remove console appender if only one
+            if (logger.getHandlers()[0].getClass() == ConsoleHandler.class) {
+              logger.removeHandler(logger.getHandlers()[0]);
+            }
+          }
+  
+          if (length(logger.getHandlers()) == 0) {
+            Handler handler = null;
+            if (hasLogFile) {
+              try {
+                handler = new FileHandler(logFile, true);
+              } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
+              }
+            } else {
+              handler = new ConsoleHandler();
+            }
+            handler.setFormatter(new SimpleFormatter());
+            handler.setLevel(Level.ALL);
+            logger.addHandler(handler);
+
+            logger.setUseParentHandlers(false);
+          }
+          
+          if (hasLogLevel) {
+            Level level = Level.parse(logLevel);
+            
+            logger.setLevel(level);
+
+          }
+        }
+      }
+      
+      if (hasGrouperClientLogLevel) {
+        Level level = Level.parse(grouperClientLogLevel);
+        Log grouperClientLog = LogFactory.getLog("edu.internet2.middleware.grouperClient");
+        if (grouperClientLog instanceof Jdk14Logger) {
+          Jdk14Logger jdkLogger = (Jdk14Logger) grouperClientLog;
+          Logger logger = jdkLogger.getLogger();
+          logger.setLevel(level);
+        }
+      }
+      
+      configuredLogs = true;
+    }
+    
+    return new GrouperClientLog(theLog);
+    
+  }
+  
+  /**
+   * override map for properties for testing
+   * @return the override map
+   * @deprecated use GrouperClientConfig.retrieveConfig().propertiesOverrideMap() instead
+   */
+  @Deprecated
+  public static Map<String, String> grouperClientOverrideMap() {
+    return GrouperClientConfig.retrieveConfig().propertiesOverrideMap();
+  }
+  
+  /**
+   * grouper client properties
+   * @return the properties
+   * @deprecated use GrouperClientConfig.retrieveConfig().properties() instead
+   */
+  @Deprecated
+  public static Properties grouperClientProperties() {
+    return GrouperClientConfig.retrieveConfig().properties();
+  }
+
+  /**
+   * get a property and validate required from grouper.client.properties
+   * @param key 
+   * @param required 
+   * @return the value
+   * @deprecated use GrouperClientConfig.retrieveConfig().propertyValueString instead
+   */
+  @Deprecated
+  public static String propertiesValue(String key, boolean required) {
+    if (required) {
+      return GrouperClientConfig.retrieveConfig().propertyValueStringRequired(key);
+    }
+    return GrouperClientConfig.retrieveConfig().propertyValueString(key);
+  }
+
+
+  /**
+   * get a boolean and validate from grouper.client.properties
+   * @param key
+   * @param defaultValue
+   * @param required
+   * @return the string
+   * @deprecated use GrouperClientConfig.retrieveConfig().propertyValueBoolean instead
+   */
+  @Deprecated
+  public static boolean propertiesValueBoolean(String key, boolean defaultValue, boolean required ) {
+    if (required) {
+      return GrouperClientConfig.retrieveConfig().propertyValueBooleanRequired(key);
+    }
+    return GrouperClientConfig.retrieveConfig().propertyValueBoolean(key, defaultValue);
+  }
+
+  /**
+   * get a boolean and validate from grouper.client.properties
+   * @param key
+   * @param defaultValue
+   * @param required
+   * @return the string
+   * @deprecated GrouperClientConfig.retrieveConfig().propertyValueInt
+   */
+  @Deprecated
+  public static int propertiesValueInt(String key, int defaultValue, boolean required ) {
+    if (required) {
+      return GrouperClientConfig.retrieveConfig().propertyValueIntRequired(key);
+    }
+    return GrouperClientConfig.retrieveConfig().propertyValueInt(key, defaultValue);
+  }
+
+  /**
+   * logger
+   */
+  private static Log LOG = LogFactory.getLog(GrouperClientUtils.class);
+
+  /** class object for this string */
+  private static Map<String, Class<?>> jexlClass = new HashMap<String, Class<?>>();
+
+  /** pattern to see if class or not */
+  private static Pattern jexlClassPattern = Pattern.compile("^[a-zA-Z0-9_.]*\\.[A-Z][a-zA-Z0-9_]*$");
+
+  /** true or false for if we know if this is a class or not */
+  private static Map<String, Boolean> jexlKnowsIfClass = new HashMap<String, Boolean>();
+
+  /**
+   * 
+   */
+  private static class ElMapContext extends MapContext {
+  
+    /**
+     * retrieve class if class
+     * @param name
+     * @return class
+     */
+    private static Object retrieveClass(String name) {
+      if (isBlank(name)) {
+        return null;
+      }
+      
+      //see if fully qualified class
+      
+      Boolean knowsIfClass = jexlKnowsIfClass.get(name);
+      
+      //see if knows answer
+      if (knowsIfClass != null) {
+        //return class or null
+        return jexlClass.get(name);
+      }
+      
+      //see if valid class
+      if (jexlClassPattern.matcher(name).matches()) {
+        
+        jexlKnowsIfClass.put(name, true);
+        //try to load
+        try {
+          Class<?> theClass = Class.forName(name);
+          jexlClass.put(name, theClass);
+          return theClass;
+        } catch (Exception e) {
+          LOG.info("Cant load what looks like class: " + name, e);
+          //this is ok I guess, dont rethrow, not sure it is a class
+        }
+      }
+      return null;
+      
+    }
+    
+    /**
+     * @see org.apache.commons.jexl2.MapContext#get(java.lang.String)
+     */
+    @Override
+    public Object get(String name) {
+      
+      //see if registered      
+      Object object = super.get(name);
+      
+      if (object != null) {
+        return object;
+      }
+      return retrieveClass(name);
+    }
+  
+    /**
+     * @see org.apache.commons.jexl2.MapContext#has(java.lang.String)
+     */
+    @Override
+    public boolean has(String name) {
+      boolean superHas = super.has(name);
+      if (superHas) {
+        return true;
+      }
+      
+      return retrieveClass(name) != null;
+      
+    }
+    
+  }
+
+  /**
+   * substitute an EL for objects.  Dont worry if something returns null
+   * @param stringToParse
+   * @param variableMap
+   * @return the string
+   */
+  public static String substituteExpressionLanguage(String stringToParse, Map<String, Object> variableMap) {
+    
+    return substituteExpressionLanguage(stringToParse, variableMap, true, true, true, false);
+    
+  }
+  
+  /**
+   * wait for a thread to end
+   * @param thread
+   */
+  public static void join(Thread thread) {
+    if (thread != null) {
+      try {
+        thread.join();
+      } catch (InterruptedException ie) {
+        throw new RuntimeException("error", ie);
+      }
+    }
+  }
+
+  /**
+   * substitute an EL for objects
+   * @param stringToParse
+   * @param variableMap
+   * @param allowStaticClasses if true allow static classes not registered with context
+   * @param silent if silent mode, swallow exceptions (warn), and dont warn when variable not found
+   * @param lenient false if undefined variables should throw an exception.  if lenient is true (default)
+   * then undefined variables are null
+   * @param logOnNull if null output of substitution should be logged
+   * @return the string
+   */
+  public static String substituteExpressionLanguage(String stringToParse, 
+      Map<String, Object> variableMap, boolean allowStaticClasses, boolean silent, boolean lenient, boolean logOnNull) {
+    if (isBlank(stringToParse)) {
+      return stringToParse;
+    }
+    String overallResult = null;
+    Exception exception = null;
+    try {
+      JexlContext jc = allowStaticClasses ? new ElMapContext() : new MapContext();
+
+      int index = 0;
+      
+      variableMap = nonNull(variableMap);
+      
+      for (String key: variableMap.keySet()) {
+        jc.set(key, variableMap.get(key));
+      }
+      
+      //allow utility methods
+      jc.set("elUtils", new GcElUtilsSafe());
+      //if you add another one here, add it in the logs below
+      
+      // matching ${ exp }   (non-greedy)
+      Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}");
+      Matcher matcher = pattern.matcher(stringToParse);
+      
+      StringBuilder result = new StringBuilder();
+  
+      //loop through and find each script
+      while(matcher.find()) {
+        result.append(stringToParse.substring(index, matcher.start()));
+        
+        //here is the script inside the curlies
+        String script = matcher.group(1);
+        
+        index = matcher.end();
+  
+        if (script.contains("{")) {
+          //we need to match up some curlies here...
+          int scriptStart = matcher.start(1);
+          int openCurlyCount = 0;
+          for (int i=scriptStart; i<stringToParse.length();i++) {
+            char curChar = stringToParse.charAt(i);
+            if (curChar == '{') {
+              openCurlyCount++;
+            }
+            if (curChar == '}') {
+              openCurlyCount--;
+              //negative 1 since we need to get to the close of the parent one...
+              if (openCurlyCount <= -1) {
+                script = stringToParse.substring(scriptStart, i);
+                index = i+1;
+                break;
+              }
+            }
+          }
+        }
+        
+        JexlEngine jexlEngine = new JexlEngine();
+        jexlEngine.setSilent(silent);
+        jexlEngine.setLenient(lenient);
+  
+        Expression e = jexlEngine.createExpression(script);
+  
+        //this is the result of the evaluation
+        Object o = null;
+        
+        try {
+          o = e.evaluate(jc);
+        } catch (JexlException je) {
+          //exception-scrape to see if missing variable
+          if (!lenient && trimToEmpty(je.getMessage()).contains("undefined variable")) {
+            //clean up the message a little bit
+            // e.g. edu.internet2.middleware.grouper.util.GrouperUtil.substituteExpressionLanguage@8846![0,6]: 'amount < 50000 && amount2 < 23;' undefined variable amount
+            String message = je.getMessage();
+            //Pattern exceptionPattern = Pattern.compile("^" + GrouperUtil.class.getName() + "\\.substituteExpressionLanguage.*?]: '(.*)");
+            Pattern exceptionPattern = Pattern.compile("^.*undefined variable (.*)");
+            Matcher exceptionMatcher = exceptionPattern.matcher(message);
+            if (exceptionMatcher.matches()) {
+              //message = "'" + exceptionMatcher.group(1);
+              message = "variable '" + exceptionMatcher.group(1) + "' is not defined in script: '" + script + "'";
+            }
+            throw new GcExpressionLanguageMissingVariableException(message, je);
+          }
+          throw je;
+        }
+          
+        if (o == null) {
+          if (logOnNull) {
+            LOG.warn("expression returned null: " + script + ", in pattern: '" + stringToParse + "', available variables are: "
+                + toStringForLog(variableMap.keySet()));
+          } else {
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("expression returned null: " + script + ", in pattern: '" + stringToParse + "', available variables are: "
+                  + toStringForLog(variableMap.keySet()));
+            }            
+          }
+          o = "";
+        }
+        
+        if (o instanceof RuntimeException) {
+          throw (RuntimeException)o;
+        }
+        
+        result.append(o);
+        
+      }
+      
+      result.append(stringToParse.substring(index, stringToParse.length()));
+      overallResult = result.toString();
+      return overallResult;
+      
+    } catch (Exception e) {
+      exception = e;
+      if (e instanceof GcExpressionLanguageMissingVariableException) {
+        throw (GcExpressionLanguageMissingVariableException)e;
+      }
+      throw new RuntimeException("Error substituting string: '" + stringToParse + "'", e);
+    } finally {
+      if (LOG.isDebugEnabled()) {
+        Set<String> keysSet = new LinkedHashSet<String>(nonNull(variableMap).keySet());
+        keysSet.add("elUtils");
+        StringBuilder logMessage = new StringBuilder();
+        logMessage.append("Subsituting EL: '").append(stringToParse).append("', and with env vars: ");
+        String[] keys = keysSet.toArray(new String[]{});
+        for (int i=0;i<keys.length;i++) {
+          logMessage.append(keys[i]);
+          if (i != keys.length-1) {
+            logMessage.append(", ");
+          }
+        }
+        logMessage.append(" with result: '" + overallResult + "'");
+        if (exception != null) {
+          logMessage.append(", and exception: " + exception + ", " + getFullStackTrace(exception));
+        }
+        LOG.debug(logMessage.toString());
+      }
+    }
+  }
+
+  /**
+   * get the attribute value of an attribute name of a subject
+   * @param wsSubject subject
+   * @param attributeNames list of attribute names in the subject
+   * @param attributeName to query
+   * @return the value or null
+   */
+  public static String subjectAttributeValue(WsSubject wsSubject, String[] attributeNames, String attributeName) {
+    
+    if (GrouperClientUtils.equals("subject__id", attributeName)) {
+      return wsSubject.getId();
+    }
+    
+    if (GrouperClientUtils.equals("subject__name", attributeName)) {
+      return wsSubject.getName();
+    }
+    
+    for (int i=0;i<GrouperClientUtils.length(attributeNames);i++) {
+      
+      if (GrouperClientUtils.equalsIgnoreCase(attributeName, attributeNames[i])
+          && GrouperClientUtils.length(wsSubject.getAttributeValues()) > i) {
+        //got it
+        return wsSubject.getAttributeValue(i);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 
+   * @return the encrypt key
+   */
+  public static String encryptKey() {
+    String encryptKey = null;
+    boolean disableExternalFileLookup = false;
+    
+    try {
+      encryptKey = MorphStringConfig.retrieveConfig().propertyValueString("encrypt.key");
+      disableExternalFileLookup = MorphStringConfig.retrieveConfig().propertyValueBoolean(
+          "encrypt.disableExternalFileLookup", false);
+    } catch (Exception e) {
+      encryptKey = GrouperClientConfig.retrieveConfig().propertyValueStringRequired("encrypt.key");
+      disableExternalFileLookup = GrouperClientConfig.retrieveConfig().propertyValueBoolean(
+          "encrypt.disableExternalFileLookup", false);
+    }
+        
+    //lets lookup if file
+    encryptKey = GrouperClientUtils.readFromFileIfFile(encryptKey, disableExternalFileLookup);
+
+    //the server does this, so if the key is blank, it will still have something there, so be consistent
+    if (GrouperClientConfig.retrieveConfig().propertyValueBoolean("encrypt.encryptLikeServer", false)) {
+      encryptKey += "w";
+    }
+    
+    return encryptKey;
+  }
+
+  /**
+   * decrypt a pass from a file if the file exists (i.e. passes might have slashes in them)
+   * @param pass
+   * @param logInfo if not null, put log info in there
+   * @return the pass
+   */
+  public static String decryptFromFileIfFileExists(String pass, StringBuilder logInfo) {
+
+    boolean disableExternalFileLookup = GrouperClientUtils.propertiesValueBoolean(
+        "encrypt.disableExternalFileLookup", false, false);
+    
+    //lets lookup if file
+    String passFromFile = GrouperClientUtils.readFromFileIfFileExists(pass, disableExternalFileLookup);
+
+    if (!GrouperClientUtils.equals(pass, passFromFile)) {
+
+      if (logInfo != null) {
+        logInfo.append("reading encrypted value from file: " + pass);
+      }
+      
+      String encryptKey = encryptKey();
+      pass = new Crypto(encryptKey).decrypt(passFromFile);
+      
+    } else {
+      if (logInfo != null) {
+        logInfo.append("pass is a scalar");
+      }
+    }
+    
+    return pass;
+  }
+  
+
+  /**
+   * name of the cache directory without trailing slash
+   * @return the name of the cache directory
+   */
+  public static String cacheDirectoryName() {
+    
+    if (cacheDirectoryName == null) {
+      String directoryName = GrouperClientConfig.retrieveConfig().propertyValueStringRequired("grouperClient.cacheDirectory");
+      if (GrouperClientCommonUtils.isBlank(directoryName)) {
+        throw new RuntimeException("grouperClient.cacheDirectory is required in grouper.client.properties");
+      }
+  
+      directoryName = GrouperClientCommonUtils.stripEnd(directoryName, "/");
+      directoryName = GrouperClientCommonUtils.stripEnd(directoryName, "\\");
+      
+      File discoveryDir = new File(directoryName);
+      directoryName = discoveryDir.getAbsolutePath();
+      if (directoryName.endsWith("/.")) {
+        directoryName = directoryName.substring(0, directoryName.length()-2);
+      }
+      if (directoryName.endsWith("\\.")) {
+        directoryName = directoryName.substring(0, directoryName.length()-2);
+      }
+      cacheDirectoryName = directoryName;
+    }    
+    return cacheDirectoryName;
+  }
+
+  /**
+   * encrypt a message to SHA with base 64
+   * @param plaintext
+   * @return the hash
+   */
+  public synchronized static String encryptSha(String plaintext) {
+    
+    try {
+    
+      byte[] sha1bytes = DigestUtils.sha(plaintext.getBytes("UTF-8"));
+      return new String(Base64.encodeBase64(sha1bytes));
+      
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /** cache directory name */
+  private static String cacheDirectoryName = null;
+  
+  /**
+   * call HTTP with a url, optional request body, get a response body.  this assumes json by default
+   * @param urlSuffix is after the configured URL, or if it starts with http:// or https:// just use that
+   * @param serviceAuthn is the config string that identifies the user/pass/url
+   * @param httpCallMethod HTTP
+   * @param body to send if applicable
+   * @return the response
+   */
+  public static HttpCallResponse httpCall(String urlSuffix, String serviceAuthn, HttpCallMethod httpCallMethod, String body) {
+    
+    // Get an http client.
+    CloseableHttpClient closeableHttpClient;
+        
+    String url = null;
+    
+    if (urlSuffix.toLowerCase().startsWith("http://") || urlSuffix.toLowerCase().startsWith("https://")) {
+      url = urlSuffix;
+    } else {
+      String urlBase = GrouperClientConfig.retrieveConfig().propertyValueStringRequired("grouperClient.webService." + serviceAuthn + ".url");
+      if (urlBase == null) {
+        throw new RuntimeException("urlBase is null");
+      }
+      urlBase = stripLastSlashIfExists(urlBase);
+      url = urlBase + urlSuffix;
+    }
+    
+
+    HttpRequestBase httpRequestBase = null;
+    
+    if (httpCallMethod == null) {
+      throw new RuntimeException("You need to pass in an httpCallMethod");
+    }
+    
+    //URL e.g. http://localhost:8093/grouper-ws/servicesRest/v1_3_000/...
+    //NOTE: aStem:aGroup urlencoded substitutes %3A for a colon
+    switch (httpCallMethod) {
+      case GET:
+        
+        httpRequestBase = new HttpGet(url);
+        if (!GrouperClientUtils.isBlank(body)) {
+          throw new RuntimeException("GET cannot have a body");
+        }
+        break;
+      case POST:
+        
+        httpRequestBase = new HttpPost(url);
+        break;
+        
+      case PUT:
+        
+        httpRequestBase = new HttpPut(url);
+        break;
+        
+      case DELETE:
+        
+        httpRequestBase = new HttpDelete(url);
+        break;
+        
+      default: 
+        throw new RuntimeException("Not expecting method: " + httpCallMethod);
+    }
+    
+    if (!GrouperClientUtils.isBlank(body)) {
+      try {
+        ((HttpPost)httpRequestBase).setEntity(new StringEntity(body, ContentType.APPLICATION_JSON));
+
+      } catch (UnsupportedCharsetException uee) {
+        throw new RuntimeException(uee);
+      }
+    }
+
+
+    //make sure right content type is in request (e.g. application/xhtml+xml
+
+    //see if invalid SSL
+    String httpsSocketFactoryName = GrouperClientConfig.retrieveConfig().propertyValueString("grouperClient.https.customSocketFactory");
+
+    if (StringUtils.equals(httpsSocketFactoryName, "edu.internet2.middleware.grouperClient.ssl.EasySslSocketFactory")) {
+      closeableHttpClient = GrouperClientUtils.httpTrustAllClient(false);
+    } else {
+      closeableHttpClient = GrouperClientUtils.httpClient(false);
+    }
+
+    int soTimeoutMillis = GrouperClientConfig.retrieveConfig().propertyValueIntRequired(
+        "grouperClient.webService.httpSocketTimeoutMillis");
+
+
+    int connectionManagerMillis = GrouperClientConfig.retrieveConfig().propertyValueIntRequired(
+        "grouperClient.webService.httpConnectionManagerTimeoutMillis");
+
+    RequestConfig.Builder config = RequestConfig.custom()
+        .setConnectionRequestTimeout(connectionManagerMillis)
+        .setConnectTimeout(connectionManagerMillis)
+        .setSocketTimeout(soTimeoutMillis);
+      
+    httpRequestBase.setConfig(config.build());
+
+    String user = GrouperClientConfig.retrieveConfig().propertyValueStringRequired("grouperClient.webService." + serviceAuthn + ".user");
+
+    boolean disableExternalFileLookup = GrouperClientConfig.retrieveConfig().propertyValueBooleanRequired(
+        "encrypt.disableExternalFileLookup");
+
+    //lets lookup if file
+    String wsPass = GrouperClientConfig.retrieveConfig().propertyValueStringRequired("grouperClient.webService." + serviceAuthn + ".pass");
+    String wsPassFromFile = GrouperClientUtils.readFromFileIfFile(wsPass, disableExternalFileLookup);
+
+    String passPrefix = null;
+
+    if (!GrouperClientUtils.equals(wsPass, wsPassFromFile)) {
+
+      passPrefix = "WebService pass: reading encrypted value from file: " + wsPass;
+
+      String encryptKey = GrouperClientUtils.encryptKey();
+      wsPass = new Crypto(encryptKey).decrypt(wsPassFromFile);
+      
+    } else {
+      passPrefix = "WebService pass: reading scalar value from grouper.client.properties";
+    }
+    
+    if (GrouperClientConfig.retrieveConfig().propertyValueBoolean("grouperClient.logging.logMaskedPassword", false)) {
+      LOG.debug(passPrefix + ": " + GrouperClientUtils.repeat("*", wsPass.length()));
+    }
+
+    String authenticationString = GrouperClientUtils.httpBasicAuthenticationString(user, wsPass); 
+    httpRequestBase.addHeader("Authorization", authenticationString);
+
+    String contentType = GrouperClientConfig.retrieveConfig().propertyValueString("grouperClient.webService." + serviceAuthn + ".defaultRequestContentType");
+    contentType = GrouperClientUtils.defaultIfEmpty(contentType, "application/json");
+    
+    HttpCallResponse httpCallResponse = new HttpCallResponse();
+    httpCallResponse.setHttpCallMethod(httpCallMethod);
+    httpCallResponse.setContentType(contentType);
+    httpCallResponse.setUrl(url);
+    
+    httpRequestBase.addHeader("Content-Type", contentType);
+    
+    //no keep alive so response is easier to indent for tests
+    httpRequestBase.addHeader("Connection", "close");
+    CloseableHttpResponse closeableHttpResponse = null;
+    
+    try {
+
+      closeableHttpResponse = closeableHttpClient.execute(httpRequestBase);
+      int responseCodeInt = closeableHttpResponse.getStatusLine().getStatusCode();
+
+      httpCallResponse.setHttpResponseCode(responseCodeInt);
+
+      String theResponse = GrouperClientUtils.responseBodyAsString(closeableHttpResponse);
+      
+      httpCallResponse.setResponseBody(theResponse);
+      
+    } catch (IOException ioe) {
+      throw new RuntimeException("Error in url: " + url + ", method: " + httpCallMethod + ", body: " + GrouperClientUtils.abbreviate(body, 5000), ioe);
+    } finally {
+      GrouperClientUtils.httpCloseQuietly(closeableHttpClient, httpRequestBase, closeableHttpResponse, false);
+    }
+    
+    return httpCallResponse;
+  }
+
+  /**
+   * pop first url string, retrieve, and remove, or null if not there
+   * @param urlStrings
+   * @return the string or null if not there
+   */
+  public static String popUrlString(List<String> urlStrings) {
+    
+    int urlStringsLength = length(urlStrings);
+  
+    if (urlStringsLength > 0) {
+      String firstResource = urlStrings.get(0);
+      //pop off
+      urlStrings.remove(0);
+      //return
+      return firstResource;
+    }
+    return null;
+  }
+
+}

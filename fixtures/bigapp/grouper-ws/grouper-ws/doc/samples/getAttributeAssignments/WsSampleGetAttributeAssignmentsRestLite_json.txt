@@ -1,0 +1,1416 @@
+Grouper web service sample of service: getAttributeAssignments, WsSampleGetAttributeAssignmentsRestLite, manually written lite/rest, format: json, for version: 5.0.0
+
+
+#########################################
+##
+## HTTP request sample (could be formatted for view by
+## indenting or changing dates or other data)
+##
+#########################################
+
+
+POST /grouper-ws/servicesRest/json/v2_5_000/attributeAssignments HTTP/1.1
+Authorization: Basic xxxxxxxxxxxxxxxxx==
+Content-Type: application/json
+Content-Length: 206
+Host: localhost:8092
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.6)
+Cookie: JSESSIONID=E501F122BA39721B51B4EBBDDDE71ED2
+Accept-Encoding: gzip,deflate
+
+{
+  "WsRestGetAttributeAssignmentsLiteRequest":{
+    "attributeAssignType":"group",
+    "wsAttributeDefNameName":"test:testAttributeAssignDefName",
+    "includeAssignmentsOnAssignments":"T",
+    "actAsSubjectId":"GrouperSystem"
+  }
+}
+
+
+#########################################
+##
+## HTTP response sample (could be formatted for view by
+## indenting or changing dates or other data)
+##
+#########################################
+
+
+HTTP/1.1 200
+Set-Cookie: JSESSIONID=xxxxxxxxxxxxxxxxxxxxxxxx; Path=/grouper-ws; HttpOnly
+X-Grouper-resultCode: SUCCESS
+X-Grouper-success: T
+X-Grouper-resultCode2: NONE
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Fri, 23 May 2025 17:35:56 GMT
+Keep-Alive: timeout=20
+Connection: keep-alive
+
+2000
+{
+  "WsGetAttributeAssignmentsResults":{
+    "wsAttributeDefs":[
+      {
+        "idIndex":"1000099",
+        "extension":"testAttributeAssignAssignNameDef",
+        "name":"test:testAttributeAssignAssignNameDef",
+        "uuid":"eeb2eaf13a6a4d95b9ae7aee514c7e8a",
+        "attributeDefType":"attr",
+        "multiAssignable":"F",
+        "multiValued":"F",
+        "valueType":"string",
+        "assignToAttributeDef":"F",
+        "assignToAttributeDefAssignment":"F",
+        "assignToEffectiveMembership":"F",
+        "assignToEffectiveMembershipAssignment":"F",
+        "assignToGroup":"F",
+        "assignToGroupAssignment":"F",
+        "assignToImmediateMembership":"F",
+        "assignToImmediateMembershipAssignment":"F",
+        "assignToMember":"F",
+        "assignToMemberAssignment":"F",
+        "assignToStem":"F",
+        "assignToStemAssignment":"F"
+      },
+      {
+        "idIndex":"1000098",
+        "extension":"testAttributeAssignDefNameDef",
+        "name":"test:testAttributeAssignDefNameDef",
+        "uuid":"c2bf345acadf4e90b6c66b98a7252c33",
+        "attributeDefType":"attr",
+        "multiAssignable":"F",
+        "multiValued":"T",
+        "valueType":"integer",
+        "assignToAttributeDef":"F",
+        "assignToAttributeDefAssignment":"F",
+        "assignToEffectiveMembership":"F",
+        "assignToEffectiveMembershipAssignment":"F",
+        "assignToGroup":"F",
+        "assignToGroupAssignment":"F",
+        "assignToImmediateMembership":"F",
+        "assignToImmediateMembershipAssignment":"F",
+        "assignToMember":"F",
+        "assignToMemberAssignment":"F",
+        "assignToStem":"F",
+        "assignToStemAssignment":"F"
+      }
+    ]
+    ,
+    "wsAttributeDefNames":[
+      {
+        "idIndex":"1000340",
+        "extension":"testAttributeAssignAssignName",
+        "displayExtension":"testAttributeAssignAssignName",
+        "displayName":"test:testAttributeAssignAssignName",
+        "name":"test:testAttributeAssignAssignName",
+        "uuid":"9451090f499b4fa08844f156650369dc",
+        "attributeDefId":"eeb2eaf13a6a4d95b9ae7aee514c7e8a",
+        "attributeDefName":"test:testAttributeAssignAssignNameDef"
+      },
+      {
+        "idIndex":"1000339",
+        "extension":"testAttributeAssignDefName",
+        "displayExtension":"testAttributeAssignDefName",
+        "displayName":"test:testAttributeAssignDefName",
+        "name":"test:testAttributeAssignDefName",
+        "uuid":"9f5dbd01041b444ebe9abd696ae91143",
+        "attributeDefId":"c2bf345acadf4e90b6c66b98a7252c33",
+        "attributeDefName":"test:testAttributeAssignDefNameDef"
+      }
+    ]
+    ,
+    "wsAttributeAssigns":[
+      {
+        "disallowed":"F",
+        "attributeAssignActionType":"immediate",
+        "attributeAssignDelegatable":"FALSE",
+        "attributeAssignActionId":"0d86cf02b8c8467b9d778660a8c7b57b",
+        "attributeAssignActionName":"assign",
+        "attributeAssignType":"group",
+        "attributeDefNameId":"9f5dbd01041b444ebe9abd696ae91143",
+        "attributeDefNameName":"test:testAttributeAssignDefName",
+        "attributeDefId":"c2bf345acadf4e90b6c66b98a7252c33",
+        "attributeDefName":"test:testAttributeAssignDefNameDef",
+        "wsAttributeAssignValues":[
+          {
+            "id":"04750905c38e40b39f19ddd72616f269",
+            "valueSystem":"15"
+          },
+          {
+            "id":"0754cd61ee714ad3838bb77b1c1c328e",
+            "valueSystem":"15"
+          },
+          {
+            "id":"0836a6bd110b45f5b77833aa58426c99",
+            "valueSystem":"15"
+          },
+          {
+            "id":"130cb98db1ea4ef89ab1e9c67036ae0c",
+            "valueSystem":"15"
+          },
+          {
+            "id":"178a468a4d7446f0af7642fd74794276",
+            "valueSystem":"15"
+          },
+          {
+            "id":"18f1c412a54a4585b9b4ea91fd1a7eb3",
+            "valueSystem":"15"
+          },
+          {
+            "id":"1cbec5ca25e34ec3943bc1e911a1f6c9",
+            "valueSystem":"15"
+          },
+          {
+            "id":"1f560d1e3dda48a78c0dcb9465bd336c",
+            "valueSystem":"15"
+          },
+          {
+            "id":"22ea5ddd99ba4206a0fa80d65bc8c84e",
+            "valueSystem":"15"
+          },
+          {
+            "id":"260d72d7d9954af8a7e421bd6d96acfa",
+            "valueSystem":"15"
+          },
+          {
+            "id":"2cc9e51b21234ed2aa1ed1deecf8f8aa",
+            "valueSystem":"15"
+          },
+          {
+            "id":"2d9fe32bbde14a5e89d1f5e7955ed105",
+            "valueSystem":"15"
+          },
+          {
+            "id":"2dd7cd2cea0240108e466dd856f351b1",
+            "valueSystem":"15"
+          },
+          {
+            "id":"2e97c64c179147a38685275e4dc29ef7",
+            "valueSystem":"15"
+          },
+          {
+            "id":"30053412e50e49b684ffb830cf307009",
+            "valueSystem":"15"
+          },
+          {
+            "id":"30dae1899da44c608602ebdc3c49f1d5",
+            "valueSystem":"15"
+          },
+          {
+            "id":"334275bf8488481b8e27362d742f714b",
+            "valueSystem":"15"
+          },
+          {
+            "id":"35f1a90fc71a404db7e24470104b2cbf",
+            "valueSystem":"15"
+          },
+          {
+            "id":"3d18096945674f9f907eb397af9e5d08",
+            "valueSystem":"15"
+          },
+          {
+            "id":"3fa80d3f38a149d1b95383d545e5cadb",
+            "valueSystem":"15"
+          },
+          {
+            "id":"447f85f16d93453f9cd1b04fdac29369",
+            "valueSystem":"15"
+          },
+          {
+            "id":"48049de7dc97461c9f630a9e46808d3f",
+            "valueSystem":"15"
+          },
+          {
+            "id":"49539f592e1e471f813032966f8f72d1",
+            "valueSystem":"15"
+          },
+          {
+            "id":"49be03080e054b16a6bcec24e4dd9947",
+            "valueSystem":"15"
+          },
+          {
+            "id":"49e4dc9750da447daa5d32834bd7693d",
+            "valueSystem":"15"
+          },
+          {
+            "id":"4bb630e1599d4ad28e7a002b5ce07905",
+            "valueSystem":"15"
+          },
+          {
+            "id":"4ccc2b7f5fb94dcc8d5f9b35c2340a54",
+            "valueSystem":"15"
+          },
+          {
+            "id":"4f59869235454e74a7772819a4c6748b",
+            "valueSystem":"15"
+          },
+          {
+            "id":"505ba2a4de0247038e42f38cf6b0dd56",
+            "valueSystem":"15"
+          },
+          {
+            "id":"53071148151b4f5984ea6a8e8ffd7dc2",
+            "valueSystem":"15"
+          },
+          {
+            "id":"557fa698b50a4a41b7e3541a8614e1d7",
+            "valueSystem":"15"
+          },
+          {
+            "id":"5a643550f8af41008ba83a19aad34776",
+            "valueSystem":"15"
+          },
+          {
+            "id":"639418452e16428587d3af63d18960e4",
+            "valueSystem":"15"
+          },
+          {
+            "id":"643b1d25ded94ebab2fef09f805293d1",
+            "valueSystem":"15"
+          },
+          {
+            "id":"690c82f12d8a478b960aa976ed0c890c",
+            "valueSystem":"15"
+          },
+          {
+            "id":"69d32d41007441ecb269bab1c3c89b52",
+            "valueSystem":"15"
+          },
+          {
+            "id":"6a1b5b829f9949f9ad83a0678e48fd23",
+            "valueSystem":"15"
+          },
+          {
+            "id":"6b346f592bb349c3980535fcb728c53d",
+            "valueSystem":"15"
+          },
+          {
+            "id":"6b8b9df8e9a64a1dad3c800a53f6b340",
+            "valueSystem":"15"
+          },
+          {
+            "id":"745af10eb9154459a24a1547c105af52",
+            "valueSystem":"15"
+          },
+          {
+            "id":"76c87498ac6340a4b0f5f5bb3af70559",
+            "valueSystem":"15"
+          },
+          {
+            "id":"79611c4ec5004521adb2f23007c94697",
+            "valueSystem":"15"
+          },
+          {
+            "id":"79b6234bce354bd680c1a9c0222b9052",
+            "valueSystem":"15"
+          },
+          {
+            "id":"7f695e768c4146249e4b07585a9b567e",
+            "valueSystem":"15"
+          },
+          {
+            "id":"85184c9d02d149ca83d96516927a4f59",
+            "valueSystem":"15"
+          },
+          {
+            "id":"886ba899bc474bf49e3bfa523367b0b8",
+            "valueSystem":"15"
+          },
+          {
+            "id":"8b457027cbcd4a069cb7b5f0bbf304c7",
+            "valueSystem":"15"
+          },
+          {
+            "id":"8bc087a4a52540daa62303f2676ec494",
+            "valueSystem":"15"
+          },
+          {
+            "id":"8fd44fbbf98645078f1e753ccaf910c9",
+            "valueSystem":"15"
+          },
+          {
+            "id":"8fdbc6eb7cbc4d8ba2f17174b531de0e",
+            "valueSystem":"15"
+          },
+          {
+            "id":"960bea837efe4969867c170081afa871",
+            "valueSystem":"15"
+          },
+          {
+            "id":"9bd026f4620748c3a4dbd37ff5c207bf",
+            "valueSystem":"15"
+          },
+          {
+            "id":"9ea8f22db05240d99bec8e23c61bfb4e",
+            "valueSystem":"15"
+          },
+          {
+            "id":"9f2a1a33314f470396beaf3fc5d96eaf",
+            "valueSystem":"15"
+          },
+          {
+            "id":"a437827d73164ebbbe20c8ab4f99c3e6",
+            "valueSystem":"15"
+          },
+          {
+            "id":"a48e6e14d5c74b469a7e485604f40835",
+            "valueSystem":"15"
+          },
+          {
+            "id":"a49ead677923469c84f39e993876dae4",
+            "valueSystem":"15"
+          },
+          {
+            "id":"aa4e591b99054807af786f73041b2fbc",
+            "valueSystem":"15"
+          },
+          {
+            "id":"aa646e95667a46f6acfc3176e14313ac",
+            "valueSystem":"15"
+          },
+          {
+            "id":"b5e2afd60a01427e97a26dbb088d31ed",
+            "valueSystem":"15"
+          },
+          {
+            "id":"bc9f529c4dcd4792bb76a4089e3fcdd2",
+            "valueSystem":"15"
+          },
+          {
+            "id":"bf57de3a580e465d92424157a112771b",
+            "valueSystem":"15"
+          },
+          {
+            "id":"c10b2b8056af421bb172218bbb7de745",
+            "valueSystem":"15"
+          },
+          {
+            "id":"c11b0374447e4372a68e95530a53b04b",
+            "valueSystem":"15"
+          },
+          {
+            "id":"c5eeae23e6ad4111b0e4724399302eb4",
+            "valueSystem":"15"
+          },
+          {
+            "id":"cad39e74457b4c7b9f132a6d08d64845",
+            "valueSystem":"15"
+          },
+          {
+            "id":"cebb2a0c59f04559a81d06a5b3722eee",
+            "valueSystem":"15"
+          },
+          {
+            "id":"cf83aaaadb8548c683c42fd7b0cb284f",
+            "valueSystem":"15"
+          },
+          {
+            "id":"d116c93af63b42a298735547d8a8ea6a",
+            "valueSystem":"15"
+          },
+          {
+            "id":"d3d3754bc5d54cd295f258a146515cd6",
+            "valueSystem":"15"
+          },
+          {
+            "id":"d77a1ca6143a46e2b0820d94f636bfa8",
+            "valueSystem":"15"
+          },
+          {
+            "id":"d85e8e51e8e7412684f09dfc5785cc60",
+            "valueSystem":"15"
+          },
+          {
+            "id":"db628cadcf8c4c46894253aee739216f",
+            "valueSystem":"15"
+          },
+          {
+            "id":"dc66636c4efe47ec8e138a4a596b2df4",
+            "valueSystem":"15"
+          },
+          {
+            "id":"e03c17f39cca460db066552adad30fb7",
+            "valueSystem":"15"
+          },
+          {
+            "id":"e3629745f0994027b911565cfd47e8f8",
+            "valueSystem":"15"
+          },
+          {
+            "id":"e6d0db4229b64ef0a9259642d6d42aa5",
+            "valueSystem":"15"
+          },
+          {
+            "id":"e6e8939fdf4e4b5e9b9dee6bc76bdd38",
+            "valueSystem":"15"
+          },
+          {
+            "id":"e784d81d201f487fbcff17a04cd62f4b",
+            "valueSystem":"15"
+          },
+          {
+            "id":"eb9642814d524bacbf0c0bbb44c6e418",
+            "valueSystem":"15"
+          },
+          {
+            "id":"f0436341c5b34d49952ac7498221709d",
+            "valueSystem":"15"
+          },
+          {
+            "id":"f1719697b273426c9b2bf43f79bbab0d",
+            "valueSystem":"15"
+          },
+          {
+            "id":"f18baa9dc3504b0aaf079990fe726a18",
+            "valueSystem":"15"
+          },
+          {
+            "id":"f97ea8a2a0bc42f0b93c16b5e527d61b",
+            "valueSystem":"15"
+          },
+          {
+            "id":"fa5ed8bf33084d1eab33d86aaba446c4",
+            "valueSystem":"15"
+          },
+          {
+            "id":"ff4ba390ab894b7a93b2c2ec829de8e7",
+            "valueSystem":"15"
+          },
+          {
+            "id":"0011b7ded6a7441293f2d626c30a429f",
+            "valueSystem":"5"
+          },
+          {
+            "id":"005294c6818c427786318d7fcfb390d9",
+            "valueSystem":"5"
+          },
+          {
+            "id":"00929e5b83ad41769e817b788f6e9544",
+            "valueSystem":"5"
+          },
+          {
+            "id":"016c70d70a9744d69f7af0478bc72207",
+            "valueSystem":"5"
+          },
+          {
+            "id":"02a196d12af24a7b85f05a125810c891",
+            "valueSystem":"5"
+          },
+          {
+            "id":"036c380cbf224116b7fe87e4699ec6bd",
+            "valueSystem":"5"
+          },
+          {
+            "id":"03bbff24bb274cc6b1e4a696c3f389bd",
+            "valueSystem":"5"
+          },
+          {
+            "id":"04634
+2000
+3656be54bb3b8e69cf2562de69a",
+            "valueSystem":"5"
+          },
+          {
+            "id":"0573ed82c3ca4898a21fc855671b2adb",
+            "valueSystem":"5"
+          },
+          {
+            "id":"075c5e69deec4c8588aafa7dac93e72d",
+            "valueSystem":"5"
+          },
+          {
+            "id":"09437983fe6345bf861885512f948b4a",
+            "valueSystem":"5"
+          },
+          {
+            "id":"09f5196a7d2740239d0e1d11ea386a49",
+            "valueSystem":"5"
+          },
+          {
+            "id":"0a9d8de273ad47b7bc081a3310d7f019",
+            "valueSystem":"5"
+          },
+          {
+            "id":"0abeb2d955e64d9082c7f187707bab1a",
+            "valueSystem":"5"
+          },
+          {
+            "id":"0d1fb9df59424dff80a81b4a7d1c659c",
+            "valueSystem":"5"
+          },
+          {
+            "id":"0d9173b2c1fb47ad8da4aa1c8a3e37ee",
+            "valueSystem":"5"
+          },
+          {
+            "id":"11a41f0a5f8845cbbf726c9cf4afcdb2",
+            "valueSystem":"5"
+          },
+          {
+            "id":"121c45b445d94524a6e15232aaeca1aa",
+            "valueSystem":"5"
+          },
+          {
+            "id":"124e60bd2b874d23897586b371a855b3",
+            "valueSystem":"5"
+          },
+          {
+            "id":"13b7d72eab05462ca48ca14ec59b807c",
+            "valueSystem":"5"
+          },
+          {
+            "id":"1529a370f60d40788ec299016695ce60",
+            "valueSystem":"5"
+          },
+          {
+            "id":"15bc2208f4f04cf5a05d9f8f26a8a075",
+            "valueSystem":"5"
+          },
+          {
+            "id":"17760d1b792746a594516c5e900f286e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"17cbf338ae044c81a9759dfd6ce2bb2d",
+            "valueSystem":"5"
+          },
+          {
+            "id":"187fee4bce84496f910a2e6f1d70234f",
+            "valueSystem":"5"
+          },
+          {
+            "id":"1bd03ae7d3c547c3b4c148e0a83037cd",
+            "valueSystem":"5"
+          },
+          {
+            "id":"1dd22a4f7c714d738f9ae61e1aee5add",
+            "valueSystem":"5"
+          },
+          {
+            "id":"27d5b07147a64c30892bc785c517cc04",
+            "valueSystem":"5"
+          },
+          {
+            "id":"27f2db4a555340ab9c1b31e959add3b8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"2822caa123124f5fa107dbf8c5288d88",
+            "valueSystem":"5"
+          },
+          {
+            "id":"2a28286327e24491b6e321b34e1510d8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"2ad96d69809440c88ea4fc96f1e78d7e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"2cc0b61407094f8cabb1c32fcf146b1f",
+            "valueSystem":"5"
+          },
+          {
+            "id":"2e5601e869b34d38b5971fa7c5d4205c",
+            "valueSystem":"5"
+          },
+          {
+            "id":"2f87008fe18048ca90f46b814c222a56",
+            "valueSystem":"5"
+          },
+          {
+            "id":"2fd2ee9e213644d89efe0c07852f63d8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"317113b0c6504059bbd8b8389f848ceb",
+            "valueSystem":"5"
+          },
+          {
+            "id":"3300b7f666b04e8288cfa72f5ea530ee",
+            "valueSystem":"5"
+          },
+          {
+            "id":"33c6233eb59c40bea482fde1d199d4e4",
+            "valueSystem":"5"
+          },
+          {
+            "id":"342ca48ae20a4ad3919ed04be78eec7f",
+            "valueSystem":"5"
+          },
+          {
+            "id":"36512dd1e5d3489ab6c95b3c555ad9a1",
+            "valueSystem":"5"
+          },
+          {
+            "id":"368825b1c3df4cbdb86904af4b86ef5a",
+            "valueSystem":"5"
+          },
+          {
+            "id":"3705fcad40c04604a76d820f6d4e9f5f",
+            "valueSystem":"5"
+          },
+          {
+            "id":"3832e73c500745cab34e77fc6af476cc",
+            "valueSystem":"5"
+          },
+          {
+            "id":"3ac28905c7a84609917d98ed17ba9ca8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"3c640a7177a84b259fe78fbe4f3311de",
+            "valueSystem":"5"
+          },
+          {
+            "id":"3ce34fc24eb44be08b94fdc5c43434c8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"3d6fbfaa3ee54e79a952fdd22afdc71a",
+            "valueSystem":"5"
+          },
+          {
+            "id":"40daf06017504fd3a2a917ec50f63557",
+            "valueSystem":"5"
+          },
+          {
+            "id":"41143eaedf33461d95c8f160e3968056",
+            "valueSystem":"5"
+          },
+          {
+            "id":"41853b5cf3b64a0d80aa25276b21c986",
+            "valueSystem":"5"
+          },
+          {
+            "id":"42554ee06abb4d4fbadb0ff0f30ddc36",
+            "valueSystem":"5"
+          },
+          {
+            "id":"474ba396f9e2473b9248811f0d220785",
+            "valueSystem":"5"
+          },
+          {
+            "id":"4b078136f1314286b465f13fda9da37d",
+            "valueSystem":"5"
+          },
+          {
+            "id":"4c0d18001f65482da709414562585e4b",
+            "valueSystem":"5"
+          },
+          {
+            "id":"4c23bb28fda54656be4ae89a6f985486",
+            "valueSystem":"5"
+          },
+          {
+            "id":"4f1e4ff63ea846998fed7eb617f5711c",
+            "valueSystem":"5"
+          },
+          {
+            "id":"4f6589a0cc034aa6a0ded09a1c869516",
+            "valueSystem":"5"
+          },
+          {
+            "id":"50d72b3e2b614896a3c6fd7e17d328b5",
+            "valueSystem":"5"
+          },
+          {
+            "id":"51d002a24cff4d98976cf8a1a5ad191e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"5357a5d0a687428eaa87e34f552eee63",
+            "valueSystem":"5"
+          },
+          {
+            "id":"560e2ed2b3f34d918151f77f84282482",
+            "valueSystem":"5"
+          },
+          {
+            "id":"5708e7187f494cd780377e6eac6cb5e9",
+            "valueSystem":"5"
+          },
+          {
+            "id":"57a97a7f89644820b9d614eedb6f749a",
+            "valueSystem":"5"
+          },
+          {
+            "id":"57fb2f23906f4c378ccbbf12d37aff3e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"588dc0f8c8da47e2a016d760fc4ac782",
+            "valueSystem":"5"
+          },
+          {
+            "id":"58ba75e285ba46cc86b09b6b6cf89826",
+            "valueSystem":"5"
+          },
+          {
+            "id":"591c1111ad8b4f08bb2f5a4b4433de28",
+            "valueSystem":"5"
+          },
+          {
+            "id":"5a36b1e00de2476fa69d484b1a7539cf",
+            "valueSystem":"5"
+          },
+          {
+            "id":"5a9b7b3346a04194a1843eec42feaa6c",
+            "valueSystem":"5"
+          },
+          {
+            "id":"5d811454d4e94b598edf577e9fa4249b",
+            "valueSystem":"5"
+          },
+          {
+            "id":"5dc3a6ce3f764960946526fd8e7e7bdf",
+            "valueSystem":"5"
+          },
+          {
+            "id":"600499943ee04d23a81c1f4bc89d6636",
+            "valueSystem":"5"
+          },
+          {
+            "id":"604b8d1ffac24d3393185270594f8644",
+            "valueSystem":"5"
+          },
+          {
+            "id":"60874269ff9f4f94a7b322a100764928",
+            "valueSystem":"5"
+          },
+          {
+            "id":"6159e52aa6b84463b0d851f234b616de",
+            "valueSystem":"5"
+          },
+          {
+            "id":"618625dd4a1341e88a95dbf420d75ccf",
+            "valueSystem":"5"
+          },
+          {
+            "id":"661df548797745b8814c551bb5c21cf9",
+            "valueSystem":"5"
+          },
+          {
+            "id":"670ece2d82c24084aab1e1db8d54ad40",
+            "valueSystem":"5"
+          },
+          {
+            "id":"673487af20304604ba1e550ffc5bbabb",
+            "valueSystem":"5"
+          },
+          {
+            "id":"674e833558fd41aaa2d95707dce3be26",
+            "valueSystem":"5"
+          },
+          {
+            "id":"67b440d5e99f4a8588669b068720b152",
+            "valueSystem":"5"
+          },
+          {
+            "id":"6cd17bea956546f3b3f2f272c0c0472f",
+            "valueSystem":"5"
+          },
+          {
+            "id":"6dd53a85a75a47af81dbc98e966a17a8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"6f1b4cd7af9d448081535a004840f9e0",
+            "valueSystem":"5"
+          },
+          {
+            "id":"704db026927c4b13b0a86247a95eb940",
+            "valueSystem":"5"
+          },
+          {
+            "id":"73d3afdc023647a99ea71d0a1b02ee79",
+            "valueSystem":"5"
+          },
+          {
+            "id":"78aa3c9ae35d4551912a8445ac16350b",
+            "valueSystem":"5"
+          },
+          {
+            "id":"7a0b41b447a045fb8b57b260c0296bd4",
+            "valueSystem":"5"
+          },
+          {
+            "id":"7b0e4869456f467ba99b167aea90462e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"7e81ddb0358d4b9b93a035532b43c1cf",
+            "valueSystem":"5"
+          },
+          {
+            "id":"81c5f2109b7646c4b920427c503eec50",
+            "valueSystem":"5"
+          },
+          {
+            "id":"850e0d9f74f74dacb3a15b8ea68cdb0e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"862a6b0bc82e4c4eba9c9000fd418cf9",
+            "valueSystem":"5"
+          },
+          {
+            "id":"8c96d4b0529d48aeae1785ee07e95ebe",
+            "valueSystem":"5"
+          },
+          {
+            "id":"8cf32b40e29643a8952158ac7783d5f6",
+            "valueSystem":"5"
+          },
+          {
+            "id":"8edf6d25bfce4dcdb2d46ec401f19a91",
+            "valueSystem":"5"
+          },
+          {
+            "id":"8fd15df2b47e41d6a8a7c1070c061090",
+            "valueSystem":"5"
+          },
+          {
+            "id":"9244efbd0e5d401fb2f6cc32721db2d8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"9609a1a0852a44a0ab238ee5223189db",
+            "valueSystem":"5"
+          },
+          {
+            "id":"960c68de468342d691250f653f5b0270",
+            "valueSystem":"5"
+          },
+          {
+            "id":"96ca1021e0a44a73a197f6d1a6c6fc02",
+            "valueSystem":"5"
+          },
+          {
+            "id":"a04e914401fc454ebacfc02e11396426",
+            "valueSystem":"5"
+          },
+          {
+            "id":"a51255e952fa4401ad0d742fabacf4c4",
+            "valueSystem":"5"
+          },
+          {
+            "id":"a74c950518634474b3fe98090d4455a7",
+            "valueSystem":"5"
+          },
+          {
+            "id":"a99c981202044148ad39e2d1a3ff96a1",
+            "valueSystem":"5"
+          },
+          {
+            "id":"a9ca01edf1e44e1184584c332de07be3",
+            "valueSystem":"5"
+          },
+          {
+            "id":"abd9d8ef4d72493682c7bb291b5955c8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ad302f7b639d4e9c90e20c73ce06c2cc",
+            "valueSystem":"5"
+          },
+          {
+            "id":"af3ff93d98314d6b86f7cd773e497ad5",
+            "valueSystem":"5"
+          },
+          {
+            "id":"b446020906f2467fa481f54c56a1d1c7",
+            "valueSystem":"5"
+          },
+          {
+            "id":"b5f0584d4aa74b35915c02e67f5afa68",
+            "valueSystem":"5"
+          },
+          {
+            "id":"b67f5b962d8640a39fad0e384cbeb88c",
+            "valueSystem":"5"
+          },
+          {
+            "id":"b86656f3c3a947b98058f36619749448",
+            "valueSystem":"5"
+          },
+          {
+            "id":"b8e51d8d30f846e59896ef266b166185",
+            "valueSystem":"5"
+          },
+          {
+            "id":"bd02fd661e404fc3a25469b3c932f3aa",
+            "valueSystem":"5"
+          },
+          {
+            "id":"bd56af4760b64288bfc663992202d6cd",
+            "valueSystem":"5"
+          },
+          {
+            "id":"be4cd75b34134716a020820d8e32c1e9",
+            "valueSystem":"5"
+          },
+          {
+            "id":"bfc98251eb3c45bfbf6ef7b41902c233",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c068efeb3e854453bb7001aa2e2a5747",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c1e2951a4950421e8f3702f2fbcee6e3",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c2eaf8887f4c4d408b66ff6ad7440683",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c547bb7adfb647d0ad6d624f638c2cf4",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c5c57fb5ab0645ae9ae698683ebde4f7",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c6641332ba3a40a79044cc47d6fb4d72",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c6eb9b95621a4488a516480a84eff5a5",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c71fcea808014897b524eb4b9c0b9966",
+            "valueSystem":"5"
+          },
+          {
+            "id":"c76c95011b4d42cd8b2efcc3f415725d",
+            "valueSystem":"5"
+          },
+          {
+            "id":"cbd974455a7e41d89f5c2072fc463837",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ce12857318b846e9a689e94c9ff04198",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ce211188e6db4bf68f1a839e47ffc79a",
+            "valueSystem":"5"
+          },
+          {
+            "id":"cea3f69a22894fbfabad2ca7e43ce0ae",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ceeac94af8ca4b3b80ade2f70d4e4342",
+            "valueSystem":"5"
+          },
+          {
+            "id":"cfbcf7ec5a2944a6a95317485546e669",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d0aab8f714354d88af074793571613a8",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d1fe5d4148ac48768fef20ff62508893",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d3f2710cc5b643a4a323a72ac733bf96",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d4e2fe5c886c4810ac4f5064f9bf893b",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d5d28ba6168045d9a8ef073963eb7fd7",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d6759cc51a1d41f8ab8d57dfbdbb8742",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d6ff7d09b1184e7ebde4c42de20ede9f",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d7dc3251a5df4f52a58e992ceaf199e7",
+            "valueSystem":"5"
+          },
+          {
+            "id":"d92487e664994a7b8550825403f7cd2d",
+            "valueSystem":"5"
+          },
+          {
+            "id":"db7d01b2d26541bd8cb39da47e3eaf96",
+            "va
+d2b
+lueSystem":"5"
+          },
+          {
+            "id":"de62d012b1984523b737023a0d0cf798",
+            "valueSystem":"5"
+          },
+          {
+            "id":"dffe170c39a14acfb564666d40861a2d",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e03654aa232b4056acd293c12fe9b81a",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e0998762be464fd39b77efd32fd61f06",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e142a8c8a2424b95977d24396b8f3ba0",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e1f9a3b5bc5a4793ab6e51a3cfb97e00",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e28b7d9da9244046b2d831f5fb186373",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e58f5bb184864f53abccbb103644f58d",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e599e5a023764748a4d970c2e1633a58",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e59a3017d6fd4c6cb6c1870d6525a672",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e60c043efa3f464693c7eefe629280d2",
+            "valueSystem":"5"
+          },
+          {
+            "id":"e62a56a2e56945ddb5a527c98302ee64",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ec06b740d0084858a6c682a7b09103e0",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ed57085e744a41f98e67e85a3b035171",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ee2a268975814797bcd69a63025d5553",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ee3e584b883b45d983ddb56d1a90d16c",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ee76dc3b6f1d404da03d8b8bebd7aece",
+            "valueSystem":"5"
+          },
+          {
+            "id":"eec036e1284c42558903a8ca1ea0b8ba",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ef0de4d054b34f889b6e9ebeb4a5e70e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ef2dd22aa91f4a6a861dff30f4d7da3e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"efb54956241f42d5bbb24c83c8b43d5e",
+            "valueSystem":"5"
+          },
+          {
+            "id":"f080a90f856846d8809dc2e80bf2365c",
+            "valueSystem":"5"
+          },
+          {
+            "id":"f0f8b3333959444a8aeb3c119dee2c94",
+            "valueSystem":"5"
+          },
+          {
+            "id":"fd8f3d996f9e48f1aa6db71761f9d84b",
+            "valueSystem":"5"
+          },
+          {
+            "id":"fdb38b1cc3484cc5ac5a9158aa9a95c0",
+            "valueSystem":"5"
+          },
+          {
+            "id":"fdc0ec71c7d14be1a4c73a0b7618668f",
+            "valueSystem":"5"
+          },
+          {
+            "id":"fe382f55f2134e79bb0f2d89d8858d47",
+            "valueSystem":"5"
+          },
+          {
+            "id":"ff9fcd1de61b4356bfcb02abea9f08b6",
+            "valueSystem":"5"
+          },
+          {
+            "id":"0ceff883a9864883af0e2506016dc807",
+            "valueSystem":"54"
+          },
+          {
+            "id":"694d44814e1b4b6395e886ab0de4e8e3",
+            "valueSystem":"54"
+          },
+          {
+            "id":"88a87d4adbfa4a199fa2f026a27a5752",
+            "valueSystem":"54"
+          },
+          {
+            "id":"1988eac6b3624db59a77958b1cada228",
+            "valueSystem":"63"
+          },
+          {
+            "id":"a8a7588f5dc24cada7354dfe2d21861b",
+            "valueSystem":"63"
+          }
+        ]
+        ,
+        "createdOn":"2025/05/23 13:05:21.624",
+        "enabled":"T",
+        "id":"deeb1e95e7884a889d45d72149dced56",
+        "lastUpdated":"2025/05/23 13:05:21.624",
+        "ownerGroupId":"05e479749781484684f732ad666e9cc9",
+        "ownerGroupName":"test:groupTestAttrAssign"
+      },
+      {
+        "disallowed":"F",
+        "attributeAssignActionType":"immediate",
+        "attributeAssignDelegatable":"FALSE",
+        "attributeAssignActionId":"17d8b00a92cd4d60a91ef7228ced261f",
+        "attributeAssignActionName":"assign",
+        "attributeAssignType":"group_asgn",
+        "attributeDefNameId":"9451090f499b4fa08844f156650369dc",
+        "attributeDefNameName":"test:testAttributeAssignAssignName",
+        "attributeDefId":"eeb2eaf13a6a4d95b9ae7aee514c7e8a",
+        "attributeDefName":"test:testAttributeAssignAssignNameDef",
+        "createdOn":"2025/05/23 13:05:21.654",
+        "enabled":"T",
+        "id":"388df658bb0043b18c39ae52aca40cdd",
+        "lastUpdated":"2025/05/23 13:05:21.654",
+        "ownerAttributeAssignId":"deeb1e95e7884a889d45d72149dced56"
+      }
+    ]
+    ,
+    "resultMetadata":{
+      "resultCode":"SUCCESS",
+      "resultMessage":", Found 2 results.",
+      "success":"T"
+    },
+    "responseMetadata":{
+      "millis":"105",
+      "serverVersion":"5.0.0"
+    },
+    "wsGroups":[
+      {
+        "extension":"groupTestAttrAssign",
+        "typeOfGroup":"group",
+        "displayExtension":"groupTestAttrAssign",
+        "description":"description",
+        "displayName":"test:groupTestAttrAssign",
+        "name":"test:groupTestAttrAssign",
+        "uuid":"05e479749781484684f732ad666e9cc9",
+        "idIndex":"1000049",
+        "enabled":"T"
+      }
+    ]
+    ,
+    "wsStems":[
+    ]
+    ,
+    "wsMemberships":[
+    ]
+    ,
+    "wsSubjects":[
+    ]
+  }
+}
+0
+
+
+#########################################
+##
+## Java source code (note, any programming language / objects
+## can use used to generate the above request/response.  Nothing
+## is Java specific.  Also, if you are using Java, the client libraries
+## are available
+##
+#########################################
+
+
+/*******************************************************************************
+ * Copyright 2012 Internet2
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+package edu.internet2.middleware.grouper.ws.samples.rest.attribute;
+
+import org.apache.commons.lang.StringUtils;
+
+import edu.internet2.middleware.grouper.util.GrouperHttpClient;
+import edu.internet2.middleware.grouper.util.GrouperHttpMethod;
+import edu.internet2.middleware.grouper.ws.coresoap.WsGetAttributeAssignmentsResults;
+import edu.internet2.middleware.grouper.ws.rest.attribute.WsRestGetAttributeAssignmentsLiteRequest;
+import edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest;
+import edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType;
+import edu.internet2.middleware.grouper.ws.util.RestClientSettings;
+
+/**
+ * @author mchyzer
+ */
+public class WsSampleGetAttributeAssignmentsRestLite implements WsSampleRest {
+
+  /**
+   * get attribute assignments lite web service with REST
+   * @param wsSampleRestType is the type of rest (xml, xhtml, etc)
+   */
+  @SuppressWarnings("deprecation")
+  public static void getAttributeAssignmentsLite(WsSampleRestType wsSampleRestType) {
+
+    try {
+      // grouper http client
+      GrouperHttpClient grouperHttpClient = new GrouperHttpClient();
+
+      //URL e.g. http://localhost:8093/grouper-ws/servicesRest/v1_3_000/...
+      //NOTE: aStem:aGroup urlencoded substitutes %3A for a colon
+      String url = RestClientSettings.URL + "/" + wsSampleRestType.getWsLiteResponseContentType().name()
+            + "/" + RestClientSettings.VERSION  
+            + "/attributeAssignments";
+
+      // assign the URL and method
+      grouperHttpClient.assignUrl(url).assignGrouperHttpMethod(GrouperHttpMethod.post);
+      // assign user and pass
+      grouperHttpClient.assignUser(RestClientSettings.USER)
+          .assignPassword(RestClientSettings.PASS);
+
+      //Make the body of the request, in this case with beans and marshaling, but you can make
+      //your request document in whatever language or way you want
+      WsRestGetAttributeAssignmentsLiteRequest wsRestGetAttributeAssignmentsLiteRequest 
+        = new WsRestGetAttributeAssignmentsLiteRequest();
+
+      // set the act as id
+      wsRestGetAttributeAssignmentsLiteRequest.setActAsSubjectId("GrouperSystem");
+      wsRestGetAttributeAssignmentsLiteRequest.setAttributeAssignType("group");
+      wsRestGetAttributeAssignmentsLiteRequest.setIncludeAssignmentsOnAssignments("T");
+      wsRestGetAttributeAssignmentsLiteRequest.setWsAttributeDefNameName("test:testAttributeAssignDefName");
+
+
+      //get the xml / json / xhtml / paramString
+      String requestDocument = wsSampleRestType.getWsLiteRequestContentType().writeString(wsRestGetAttributeAssignmentsLiteRequest);
+      
+      //make sure right content type is in request (e.g. application/xhtml+xml
+      String contentType = wsSampleRestType.getWsLiteRequestContentType().getContentType();
+      
+      // assign body
+      grouperHttpClient.assignBody(requestDocument);
+
+      // content type
+      grouperHttpClient.addHeader("Content-Type", contentType);
+      
+      // execute
+      grouperHttpClient.executeRequest();
+      
+
+      //check if success
+      String successString = grouperHttpClient.getResponseHeadersLower().get("x-grouper-success");
+      
+      if (StringUtils.isBlank(successString)) {
+        throw new RuntimeException("Web service did not even respond!");
+      }
+      boolean success = "T".equals(successString);
+
+      // check result code
+      String resultCode = grouperHttpClient.getResponseHeadersLower().get("x-grouper-resultcode");
+      
+      String response = grouperHttpClient.getResponseBody();
+
+      //convert to object (from xhtml, xml, json, etc)
+      WsGetAttributeAssignmentsResults wsGetAttributeAssignmentsResults = (WsGetAttributeAssignmentsResults)wsSampleRestType
+        .getWsLiteResponseContentType().parseString(response);
+      
+      String resultMessage = wsGetAttributeAssignmentsResults.getResultMetadata().getResultMessage();
+
+      // see if request worked or not
+      if (!success) {
+        throw new RuntimeException("Bad response from web service: resultCode: " + resultCode
+            + ", " + resultMessage);
+      }
+      
+      System.out.println("Server version: " + wsGetAttributeAssignmentsResults.getResponseMetadata().getServerVersion()
+          + ", result code: " + resultCode
+          + ", result message: " + resultMessage );
+
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  /**
+   * @param args
+   */
+  @SuppressWarnings("unchecked")
+  public static void main(String[] args) {
+    getAttributeAssignmentsLite(WsSampleRestType.xml);
+  }
+
+  /**
+   * @see edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest#executeSample(edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType)
+   */
+  public void executeSample(WsSampleRestType wsSampleRestType) {
+    getAttributeAssignmentsLite(wsSampleRestType);
+  }
+
+  /**
+   * @see edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest#validType(edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType)
+   */
+  public boolean validType(WsSampleRestType wsSampleRestType) {
+    return true;
+  }
+}
+
+
+#########################################
+##
+## Stdout
+##
+#########################################
+
+
+Server version: 5.0.0, result code: SUCCESS, result message: , Found 2 results.

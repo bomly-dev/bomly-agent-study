@@ -9,10 +9,10 @@
 
 PYTHON ?= python3.12
 
-.PHONY: test test-webapp test-service test-java clean \
+.PHONY: test test-webapp test-service test-java test-bigapp clean \
         reproduce-one verify-only aggregate study batch
 
-test: test-webapp test-service test-java ## Build + test all three fixtures from clean
+test: test-webapp test-service test-java test-bigapp ## Build + test/compile all fixtures from clean
 
 test-webapp: ## npm fixture: clean install, build, test
 	cd fixtures/webapp && npm ci && npm run build && npm test
@@ -33,10 +33,18 @@ test-java: ## Maven fixture (vendored Dependency-Track 4.10.0): bounded surefire
 	# test fails with NucleusUserException before ever reaching test logic.
 	cd fixtures/api-java && mvn -B -P enhance test -Dtest="org.dependencytrack.model.**,org.dependencytrack.util.**,org.dependencytrack.parser.**" -DfailIfNoTests=false
 
+test-bigapp: ## Large Maven fixture (vendored Grouper 4.x, 13-module reactor): compile + build only, no test run
+	# COMPILE + SCAN only (BOMLY_ONLY_FIXTURES): the reactor is large and its
+	# tests need external infra, so build_ok means "the reactor still compiles".
+	# -DskipTests (NOT -Dmaven.test.skip): the `grouper` module needs
+	# grouperClient's test-jar, which -Dmaven.test.skip would not build.
+	cd fixtures/bigapp/grouper-parent && mvn -B -DskipTests install
+
 clean: ## Remove build artifacts and virtualenvs
 	rm -rf fixtures/webapp/node_modules fixtures/webapp/dist
 	rm -rf fixtures/service/.venv
 	rm -rf fixtures/api-java/target
+	find fixtures/bigapp -type d -name target -prune -exec rm -rf {} +
 
 # --- Harness targets ---
 # AGENT/CONDITION/SCOPE select the run; RUN_NUMBER numbers repeats within a

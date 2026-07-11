@@ -1,0 +1,29 @@
+package edu.internet2.middleware.grouperClient.jdbc.tableSync;
+
+
+public enum GcGrouperSyncErrorCode {
+
+  /** error, exception while provisioning */
+  ERR,
+
+  /** invalid data, based on script */
+  INV,
+  
+  /** attribute value is more than maxlength */
+  LEN,
+
+  /** required field is missing */
+  REQ,
+
+  /** object is missing in the target and not able to be inserted */
+  DNE,
+  
+  /** grouper object matches multiple target objects */
+  MAT,
+  
+  /** group has no members, and configured to be not provisionable */
+  MEM,
+  
+  /** group skipped because it already exists in target on first encounter */
+  SKP;
+}

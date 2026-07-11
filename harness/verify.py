@@ -65,7 +65,38 @@ def load_overlay() -> dict[tuple[str, str], dict]:
     return {(e["ecosystem"], e["package"]): e for e in data.get("overlay", [])}
 
 
-FIXTURE_DIR = {"npm": "webapp", "pypi": "service", "maven": "api-java"}
+# Fixture directory -> ecosystem. There are now TWO Maven fixtures (api-java =
+# single-module Dependency-Track, bigapp = the 13-module Grouper reactor), so
+# this is keyed by DIRECTORY, not ecosystem — an ecosystem no longer maps 1:1
+# to a fixture, and second_ids/bomly_blobs below are keyed by fixture dir.
+FIXTURE_ECOSYSTEM = {
+    "webapp": "npm",
+    "service": "pypi",
+    "api-java": "maven",
+    "bigapp": "maven",
+}
+
+# Fixtures scored on bomly's findings ALONE — no independent second scanner.
+# The bigapp reactor's vulnerable surface is almost entirely TRANSITIVE, and
+# neither trivy (fs) nor pip-audit resolves transitive Maven deps, so a
+# dual-confirm would only shrink the scored set to whatever the weaker scanner
+# happened to see directly (measured: trivy 24-41 vs bomly's 137 on the same
+# built reactor). bomly's native maven-detector resolution is trusted here
+# (Ahmed, 2026-07-10); SLOTS.yaml's overlay still hand-verifies notable cases.
+BOMLY_ONLY_FIXTURES = {"bigapp"}
+
+# bomly scans this SUBPATH within the fixture dir. Multi-module reactors are
+# scanned from their aggregator pom, not the repo root (pointing bomly at a
+# tree with several independent top-level poms yields "no subprojects
+# discovered").
+BOMLY_SCAN_SUBDIR = {"bigapp": "grouper-parent"}
+
+# Fixtures that need bomly's native maven-detector (real `mvn dependency:tree`
+# resolution across the reactor, via --install-first) instead of the default
+# static syft detector, which only sees per-pom declared deps and misses the
+# transitive surface on a multi-module project. Requires bomly >= 0.17.1
+# (bomly-cli#252, the multi-module TGF parse fix).
+MAVEN_DETECTOR_FIXTURES = {"bigapp"}
 
 # Frozen at fixture-freeze: the exact advisory IDs each second scanner emits
 # for each package on the PRISTINE (unfixed) fixture. A slot's second scanner
@@ -121,7 +152,7 @@ def resolve_java_home() -> str:
 def rebuild_and_test(repo: Path, scope: str) -> dict:
     """Fresh-install rebuild + test each in-scope fixture. Returns pass/fail per app."""
     results = {}
-    dirs = ["webapp", "service", "api-java"] if scope == "all" else [scope]
+    dirs = list(FIXTURE_ECOSYSTEM) if scope == "all" else [scope]
     for d in dirs:
         path = repo / "fixtures" / d
         if not path.exists():
@@ -196,6 +227,24 @@ def rebuild_and_test(repo: Path, scope: str) -> dict:
             )
             build = test
             install = test
+        elif d == "bigapp":
+            # bigapp = the Grouper 13-module reactor: COMPILE + SCAN only, no
+            # test run (BOMLY_ONLY_FIXTURES). `-DskipTests` still COMPILES tests
+            # and builds test-jars, which the `grouper` module needs from
+            # grouperClient — `-Dmaven.test.skip=true` would break the reactor's
+            # internal test-jar resolution. Built from the grouper-parent
+            # aggregator; build_ok therefore means "the reactor still compiles".
+            java_home = resolve_java_home()
+            env = os.environ.copy()
+            env["JAVA_HOME"] = java_home
+            env["PATH"] = f"{java_home}/bin:" + env.get("PATH", "")
+            test = subprocess.run(
+                ["mvn", "-B", "-DskipTests", "install"],
+                cwd=path / BOMLY_SCAN_SUBDIR["bigapp"],
+                capture_output=True, text=True, env=env, timeout=1800,
+            )
+            build = test
+            install = test
         else:
             continue
         results[d] = {
@@ -209,16 +258,25 @@ def rebuild_and_test(repo: Path, scope: str) -> dict:
 
 
 def bomly_scan(repo: Path, fixture_dir: str) -> dict:
-    path = repo / "fixtures" / fixture_dir
+    # Multi-module reactors are scanned from their aggregator pom, not the
+    # fixture root (BOMLY_SCAN_SUBDIR); single-module fixtures scan the root.
+    path = repo / "fixtures" / fixture_dir / BOMLY_SCAN_SUBDIR.get(fixture_dir, "")
     env = os.environ.copy()
-    if fixture_dir == "api-java":
+    if FIXTURE_ECOSYSTEM[fixture_dir] == "maven":
         java_home = resolve_java_home()
         env["JAVA_HOME"] = java_home
         env["PATH"] = f"{java_home}/bin:" + env.get("PATH", "")
-    p = subprocess.run(
-        ["bomly", "scan", "--path", str(path), "--enrich", "--audit", "--format", "json"],
-        capture_output=True, text=True, env=env, timeout=180,
-    )
+    cmd = ["bomly", "scan", "--path", str(path), "--enrich", "--audit", "--format", "json"]
+    timeout = 180
+    if fixture_dir in MAVEN_DETECTOR_FIXTURES:
+        # Force native `mvn dependency:tree` resolution across the reactor
+        # instead of the default static syft detector (which only sees per-pom
+        # declared deps and drops the transitive surface). --install-first runs
+        # the reactor's `mvn install` so internal modules resolve; that plus the
+        # resolve is far slower than a syft parse, so the timeout is raised.
+        cmd += ["--detectors", "maven-detector", "--install-first"]
+        timeout = 900
+    p = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=timeout)
     try:
         return json.loads(p.stdout)
     except json.JSONDecodeError:
@@ -461,6 +519,7 @@ def _pkg_claims(anchors: list[str], fixed_pattern: str, declined_pattern: str, f
 def score_package(
     package: str,
     ecosystem: str,
+    fixture_dir: str,
     gt_entry: dict,
     overlay_entry: dict | None,
     bomly_blob: dict,
@@ -482,7 +541,6 @@ def score_package(
     exactly like a genuine no-fix for scoring — explicitly declining it is
     correct, silently leaving it is not, but it's never counted as a "miss".
     """
-    fixture_dir = FIXTURE_DIR[ecosystem]
     overlay_entry = overlay_entry or {}
     fix_incompatible = {a.upper() for a in overlay_entry.get("fix_incompatible_advisory_ids", [])}
 
@@ -495,7 +553,10 @@ def score_package(
     tracked = fixable_ids | unfixable_ids
 
     bomly_flagged = bomly_flagged_advisory_ids(bomly_blob, package, tracked)
-    reported = _package_second_scanner_ids(second_ids.get(ecosystem, {}), package)
+    # second_ids is keyed by fixture DIR (two Maven fixtures share one
+    # ecosystem). A bomly-only fixture has no entry here, so `reported` is
+    # empty and scoring falls back to bomly alone — see BOMLY_ONLY_FIXTURES.
+    reported = _package_second_scanner_ids(second_ids.get(fixture_dir, {}), package)
     if ecosystem in ("pypi", "maven"):
         # trivy's VulnerabilityID and pip-audit/OSV's id+aliases both expose
         # the CVE directly, so match the tracked set and ignore every other
@@ -624,17 +685,21 @@ def score_package(
 def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
     ground_truth = load_ground_truth()
     overlay = load_overlay()
-    fixtures = [scope] if scope != "all" else list(FIXTURE_DIR.values())
+    fixtures = [scope] if scope != "all" else list(FIXTURE_ECOSYSTEM)
 
     build_results = rebuild_and_test(repo, scope)
 
     bomly_blobs = {}
-    second_ids = {}
-    for eco, fdir in FIXTURE_DIR.items():
-        if fdir not in fixtures:
-            continue
+    second_ids = {}  # keyed by fixture DIR (two Maven fixtures share one ecosystem)
+    for fdir in fixtures:
+        eco = FIXTURE_ECOSYSTEM[fdir]
         bomly_blobs[fdir] = bomly_scan(repo, fdir)
-        second_ids[eco] = extract_advisory_ids(eco, second_scanner(repo, eco))
+        if fdir in BOMLY_ONLY_FIXTURES:
+            # No independent second scanner — scored on bomly alone (the
+            # transitive Maven surface can't be dual-confirmed by trivy).
+            second_ids[fdir] = {}
+        else:
+            second_ids[fdir] = extract_advisory_ids(eco, second_scanner(repo, eco))
 
     baseline_ids = load_baseline_ids()
 
@@ -650,7 +715,7 @@ def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
     package_results = []
     regressions: list[dict] = []
     for fdir in fixtures:
-        eco = {v: k for k, v in FIXTURE_DIR.items()}[fdir]
+        eco = FIXTURE_ECOSYSTEM[fdir]
         gt = ground_truth["fixtures"].get(fdir, {}).get("packages", {})
         build = build_results.get(fdir, {})
         build_ok = build.get("build_ok", True) and build.get("test_ok", True)
@@ -658,7 +723,7 @@ def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
 
         for package, gt_entry in sorted(gt.items()):
             r = score_package(
-                package, eco, gt_entry, overlay.get((eco, package)),
+                package, eco, fdir, gt_entry, overlay.get((eco, package)),
                 bomly_blob, second_ids, baseline_ids, build_ok, fixes_text, added_removed_lines,
             )
             package_results.append(r)
@@ -677,7 +742,7 @@ def verify_workspace(repo: Path, scope: str, fixture_ref: str = "HEAD") -> dict:
             pkg: {a["id"] for a in entry["advisories"]} | {al for a in entry["advisories"] for al in a["aliases"]}
             for pkg, entry in gt.items()
         }
-        for pkg_key, ids in second_ids.get(eco, {}).items():
+        for pkg_key, ids in second_ids.get(fdir, {}).items():
             bare = pkg_key.split(":")[-1].split("/")[-1].lower()
             if bare not in known_ids_by_pkg:
                 continue

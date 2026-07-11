@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -55,8 +56,16 @@ from adapters import signals  # noqa: E402 — see harness/adapters/signals.py:
 # Per-session timeout, seconds. The hard fixture (api-java: a real Maven app
 # with a 200-400 artifact tree) legitimately needs longer than the default 45
 # minutes; the easy/medium rungs don't.
-SCOPE_TIMEOUT_SECONDS = {"api-java": 75 * 60}
+SCOPE_TIMEOUT_SECONDS = {"api-java": 75 * 60, "bigapp": 120 * 60}
 DEFAULT_TIMEOUT_SECONDS = 45 * 60
+
+# Per-fixture Claude model override, threaded to run.sh via BOMLY_STUDY_CLAUDE_MODEL
+# (run.sh already forwards -e BOMLY_STUDY_CLAUDE_MODEL; adapters/claude.py reads
+# it, default claude-sonnet-5). The bigapp sub-study runs Claude on Opus 4.8 so
+# that sonnet's build-breaking (a model artifact, see fixtures 1-3) doesn't
+# confound the bare-vs-mcp comparison on the large-project regime (Ahmed,
+# 2026-07-10). Codex keeps its own default. Empty/absent = the study default.
+SCOPE_CLAUDE_MODEL = {"bigapp": "claude-opus-4-8"}
 
 
 def _cell_dir(runs_root: Path, agent: str, condition: str, scope: str, n: int) -> Path:
@@ -208,7 +217,13 @@ def main() -> int:
         ]
         if args.pilot:
             cmd.append("--pilot")
-        proc = subprocess.run(cmd)
+        env = os.environ.copy()
+        if agent == "claude" and scope in SCOPE_CLAUDE_MODEL:
+            # Per-fixture Claude model (e.g. bigapp -> Opus 4.8). run.sh forwards
+            # -e BOMLY_STUDY_CLAUDE_MODEL into the container; the meta.json for
+            # the run records the model actually used, for provenance.
+            env["BOMLY_STUDY_CLAUDE_MODEL"] = SCOPE_CLAUDE_MODEL[scope]
+        proc = subprocess.run(cmd, env=env)
         status, reason = _cell_status(_cell_dir(runs_root, agent, condition, scope, n))
         if status != "valid":
             print(

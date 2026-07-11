@@ -61,7 +61,10 @@ import verify  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-FIXTURE_ECOSYSTEM = {"webapp": "npm", "service": "pypi", "api-java": "maven"}
+# Authoritative dir->ecosystem map lives in harness/verify.py (which also knows
+# which fixtures are bomly-only, need the maven-detector, etc.) — reuse it so the
+# two never drift.
+FIXTURE_ECOSYSTEM = verify.FIXTURE_ECOSYSTEM
 
 
 def _bomly_package_advisories(bomly_scan_result: dict) -> dict[str, list[dict]]:
@@ -108,8 +111,16 @@ def build_fixture_ground_truth(fixture: str) -> dict:
     bomly_result = verify.bomly_scan(REPO_ROOT, fixture)
     bomly_advisories = _bomly_package_advisories(bomly_result)
 
-    second_raw = verify.second_scanner(REPO_ROOT, ecosystem)
-    second_ids = verify.extract_advisory_ids(ecosystem, second_raw)
+    bomly_only = fixture in verify.BOMLY_ONLY_FIXTURES
+    if bomly_only:
+        # No independent second scanner (the transitive Maven surface can't be
+        # dual-confirmed by trivy — see verify.BOMLY_ONLY_FIXTURES). bomly's
+        # native maven-detector resolution is the ground truth; every package
+        # is recorded as bomly-trusted rather than adjudication-flagged.
+        second_ids = {}
+    else:
+        second_raw = verify.second_scanner(REPO_ROOT, ecosystem)
+        second_ids = verify.extract_advisory_ids(ecosystem, second_raw)
     # Second-scanner package keys aren't always the bare name bomly uses
     # (trivy: "group:artifact"), so build a set of all-IDs-seen for a
     # simpler presence check: dual-confirmed means the package's OWN
@@ -131,7 +142,11 @@ def build_fixture_ground_truth(fixture: str) -> dict:
 
         bomly_id_set = {a["id"] for a in advisories} | {al for a in advisories for al in a["aliases"]}
         dual_confirmed = bool(reported & bomly_id_set) if reported else False
-        if not dual_confirmed:
+        if bomly_only:
+            # This fixture is scored on bomly alone by design (no second
+            # scanner run) — not a confirmation failure.
+            status_note = "bomly-trusted (no independent second scanner for transitive Maven)"
+        elif not dual_confirmed:
             # Not every real vuln is independently confirmable this way (npm
             # audit's GHSA-only IDs vs a CVE-only bomly alias, etc.) — record
             # it anyway but flag for adjudication rather than silently
@@ -178,7 +193,7 @@ def main() -> int:
         "bomly_version": None,
         "fixtures": {},
     }
-    for fixture in ("webapp", "service", "api-java"):
+    for fixture in FIXTURE_ECOSYSTEM:
         print(f"scanning {fixture}...", file=sys.stderr)
         fg = build_fixture_ground_truth(fixture)
         out["fixtures"][fixture] = fg

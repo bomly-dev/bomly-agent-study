@@ -1,0 +1,558 @@
+package edu.internet2.middleware.grouper.app.externalSystem;
+
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator.Builder;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.RSAKeyProvider;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import edu.internet2.middleware.grouper.app.config.GrouperConfigurationModuleAttribute;
+import edu.internet2.middleware.grouper.app.loader.GrouperLoaderConfig;
+import edu.internet2.middleware.grouper.cfg.dbConfig.ConfigFileName;
+import edu.internet2.middleware.grouper.cfg.text.GrouperTextContainer;
+import edu.internet2.middleware.grouper.j2ee.Authentication;
+import edu.internet2.middleware.grouper.util.GrouperHttpClient;
+import edu.internet2.middleware.grouper.util.GrouperHttpMethod;
+import edu.internet2.middleware.grouper.util.GrouperUtil;
+import edu.internet2.middleware.grouperClient.config.ConfigPropertiesCascadeBase;
+import edu.internet2.middleware.grouperClient.util.ExpirableCache;
+import edu.internet2.middleware.grouperClient.util.GrouperClientConfig;
+import edu.internet2.middleware.morphString.Morph;
+
+public class WsBearerTokenExternalSystem extends GrouperExternalSystem {
+
+  public static String authenticateMockUser(HttpServletRequest httpServletRequest) {
+
+    ConfigPropertiesCascadeBase.clearCache();
+
+    Pattern clientIdPattern = Pattern.compile("^grouper\\.wsBearerToken\\.([^.]+)\\.endpoint$");
+    for (String configId : GrouperLoaderConfig.retrieveConfig().propertyConfigIds(clientIdPattern)) {
+      
+      String httpAuthnType = GrouperLoaderConfig.retrieveConfig()
+          .propertyValueString(
+              "grouper.wsBearerToken." + configId + ".httpAuthnType", "bearerToken");
+
+      if (StringUtils.equals(httpAuthnType, "bearerToken")) {
+
+        String bearerTokenConfig = GrouperLoaderConfig.retrieveConfig()
+            .propertyValueStringRequired(
+                "grouper.wsBearerToken." + configId + ".accessTokenPassword");
+
+        boolean prependBearerTokenPrefix = GrouperLoaderConfig.retrieveConfig()
+            .propertyValueBoolean(
+                "grouper.wsBearerToken." + configId + ".prependBearerTokenPrefix", true);
+        
+        bearerTokenConfig = prependBearerTokenPrefix ? ("Bearer " + bearerTokenConfig) : bearerTokenConfig;
+
+        String httpHeader = GrouperLoaderConfig.retrieveConfig()
+            .propertyValueString(
+                "grouper.wsBearerToken." + configId + ".httpHeader", "Authorization");
+
+        String bearerTokenSent = httpServletRequest.getHeader(httpHeader);
+
+        if (StringUtils.equals(bearerTokenSent, bearerTokenConfig)) {
+          return configId;
+        }
+
+      } else if (StringUtils.equals(httpAuthnType, "basicAuth")) {
+        
+        String userFromConfig = GrouperLoaderConfig.retrieveConfig()
+            .propertyValueStringRequired("grouper.wsBearerToken." + configId + ".basicAuthUser");
+        
+        String passwordFromConfig = GrouperLoaderConfig.retrieveConfig()
+            .propertyValueString("grouper.wsBearerToken." + configId + ".basicAuthPassword");
+        
+        passwordFromConfig = StringUtils.defaultString(passwordFromConfig);
+
+        String authorizationHeader = httpServletRequest.getHeader("Authorization");
+        
+        String userSent = Authentication.retrieveUsername(authorizationHeader);
+        String passwordSent = Authentication.retrievePassword(authorizationHeader);
+        
+        if (StringUtils.equals(userSent, userFromConfig) && StringUtils.equals(passwordSent, passwordFromConfig)) {
+          return configId;
+        }
+        
+      } else {
+        throw new RuntimeException("Invalid authentication type: grouper-loader.properties: 'grouper.wsBearerToken." + configId + ".httpAuthnType' = '" + httpAuthnType + "'");
+      }
+
+    }
+    return null;
+  }
+  
+  private static ExpirableCache<String, String> configKeyToExpiresOnAndBearerToken = new ExpirableCache<String, String>();
+  
+  /**
+   * get bearer token for config id
+   * @param configId
+   * @return the bearer token
+   */
+  public static String retrieveBearerTokenForConfigId(Map<String, Object> debugMap, String configId) {
+    
+    String encryptedBearerToken = configKeyToExpiresOnAndBearerToken.get(configId);
+  
+    if (StringUtils.isNotBlank(encryptedBearerToken)) {
+      if (debugMap != null) {
+        debugMap.put("cachedAccessToken", true);
+      }
+      return Morph.decrypt(encryptedBearerToken);
+    }
+    
+    Object[] accessTokenAndExpiry = WsBearerTokenExternalSystem.generateAccessToken(debugMap, configId);
+
+    String accessToken = GrouperUtil.toStringSafe(accessTokenAndExpiry[0]);
+    int expiresInSeconds = Math.max(0, (Integer) accessTokenAndExpiry[1] - 5); // subtracting 5 just in case if there are network delays
+    int timeToLive = expiresInSeconds/60;
+    configKeyToExpiresOnAndBearerToken.put(configId, Morph.encrypt(accessToken), timeToLive);
+
+    return accessToken;
+  }
+  
+  static class RsaKeyProvider implements RSAKeyProvider {
+    
+    private RSAPrivateKey privateKey;
+    private String publicKeyId;
+    
+    RsaKeyProvider(PrivateKey privateKey, String publicKeyId) {
+     this.privateKey = (RSAPrivateKey)privateKey; 
+     this.publicKeyId = publicKeyId;
+    }
+    
+    @Override
+    public RSAPublicKey getPublicKeyById(String keyId) {
+      throw new RuntimeException("not implemented");
+    }
+    
+    @Override
+    public String getPrivateKeyId() {
+      return this.publicKeyId;
+    }
+    
+    @Override
+    public RSAPrivateKey getPrivateKey() {
+      return privateKey;
+    }
+      
+  }
+  
+
+
+  /**
+   * get access token
+   * @param debugMap can be null
+   * @param configId
+   * @param scope
+   * @return token in the first index and its int expiry in seconds in the second index
+   */
+  public static Object[] generateAccessToken(Map<String, Object> debugMap, String configId) {
+    
+    long startedNanos = System.nanoTime();
+    
+    try {
+      // we need to get another one
+      GrouperHttpClient grouperHttpClient = new GrouperHttpClient();
+      
+      final String url = GrouperLoaderConfig.retrieveConfig().propertyValueStringRequired("grouper.wsBearerToken." + configId + ".tokenUrl");
+      
+      final String grantType = GrouperLoaderConfig.retrieveConfig().propertyValueStringRequired("grouper.wsBearerToken." + configId + ".grantType");
+      final String scope = GrouperLoaderConfig.retrieveConfig().propertyValueString("grouper.wsBearerToken." + configId + ".scopes");
+      final String clientId = GrouperLoaderConfig.retrieveConfig().propertyValueStringRequired("grouper.wsBearerToken." + configId + ".clientId");
+      
+      String clientCredentialType = GrouperLoaderConfig.retrieveConfig().propertyValueString("grouper.wsBearerToken." + configId + ".clientCredentialType", "secret");
+
+      if (StringUtils.equals(clientCredentialType, "secret")) {
+        final String clientSecret = GrouperLoaderConfig.retrieveConfig().propertyValueStringRequired("grouper.wsBearerToken." + configId + ".clientSecret");
+        grouperHttpClient.addBodyParameter("client_secret", clientSecret);
+      } else if (StringUtils.equals(clientCredentialType, "publicPrivateKey")) {
+        String privateKeyString = GrouperLoaderConfig.retrieveConfig().propertyValueStringRequired("grouper.wsBearerToken." + configId + ".privateKey");
+        String publicKeyId = GrouperClientConfig.retrieveConfig().propertyValueString("grouperClient.wsBearerToken." + configId + ".publicKeyId");
+        PrivateKey privateKey;
+        try {
+          
+          privateKeyString = privateKeyString.replace("-----BEGIN PRIVATE KEY-----", "")
+              .replace("-----END PRIVATE KEY-----", "")
+              .replaceAll("\\s+", "");
+
+          // Decode the Base64 encoded key
+          byte[] keyBytes = java.util.Base64.getDecoder().decode(privateKeyString);
+          
+          PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+          KeyFactory kf = KeyFactory.getInstance("RSA");
+          privateKey = kf.generatePrivate(keySpec);
+          
+        } catch (NoSuchAlgorithmException e) {
+          throw new RuntimeException("Could not reconstruct the private key, the given algorithm could not be found.", e);
+        } catch (InvalidKeySpecException e) {
+          throw new RuntimeException("Could not reconstruct the private key", e);
+        } catch (Exception e) {
+          throw new RuntimeException("Could not construct private key from key contents", e);
+        }
+        
+        Algorithm algorithm = Algorithm.RSA256(new RsaKeyProvider(privateKey, publicKeyId));
+        
+        long now = System.currentTimeMillis();
+        
+        Builder jwtBuilder = JWT.create()
+            .withIssuer(clientId)
+            .withSubject(clientId)
+            .withAudience(url)
+            .withIssuedAt(new Date())
+            .withJWTId(UUID.randomUUID().toString())
+            .withExpiresAt(new Date(now + 3600 * 1000L));
+          
+
+        String signedJwt = jwtBuilder.sign(algorithm);
+
+        grouperHttpClient.addBodyParameter("client_assertion", signedJwt);
+        grouperHttpClient.addBodyParameter("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        grouperHttpClient.assignDoNotLogParameters("client_assertion");
+
+      } else {
+        throw new RuntimeException("Not expecting clientCredentialType of '" + clientCredentialType + "', expecting 'secret' or 'publicPrivateKey'!");
+      }
+      
+      
+      grouperHttpClient.assignGrouperHttpMethod(GrouperHttpMethod.post);
+      grouperHttpClient.assignUrl(url);
+      
+      // use the url parameters if configured 
+      if (GrouperLoaderConfig.retrieveConfig().propertyValueBoolean(
+          "grouper.wsBearerToken." + configId + ".sendParametersInBody", true)) {
+        
+        grouperHttpClient.addBodyParameter("grant_type", grantType);
+        grouperHttpClient.addBodyParameter("client_id", clientId);
+
+        // send only if scope is not empty
+        if (StringUtils.isNotBlank(scope)) {
+          grouperHttpClient.addBodyParameter("scope", scope);
+        }
+
+        if (GrouperLoaderConfig.retrieveConfig().propertyValueBoolean(
+                "grouper.wsBearerToken." + configId + ".sendClientAuthorizationBasicHttpHeader", false)) {
+          // client_secret_basic : Authorization: Basic <base64(client_id:client_secret)>
+          final String secret = GrouperLoaderConfig.retrieveConfig().propertyValueStringRequired("grouper.wsBearerToken." + configId + ".clientSecret");
+          grouperHttpClient.assignUser(clientId);
+          grouperHttpClient.assignPassword(secret);
+        }
+
+      } else {
+        grouperHttpClient.addUrlParameter("grant_type", grantType);
+        grouperHttpClient.addUrlParameter("client_id", clientId);
+        
+        // send only if scope is not empty
+        if (StringUtils.isNotBlank(scope)) {
+          grouperHttpClient.addUrlParameter("scope", scope);
+        }
+      }
+      
+      grouperHttpClient.assignDoNotLogResponseBody(true);
+      grouperHttpClient.assignDoNotLogRequestBody(true);
+      
+      String proxyUrl = GrouperLoaderConfig.retrieveConfig().propertyValueString("grouper.wsBearerToken." + configId + ".proxyUrl");
+      String proxyType = GrouperLoaderConfig.retrieveConfig().propertyValueString("grouper.wsBearerToken." + configId + ".proxyType");
+      
+      grouperHttpClient.assignProxyUrl(proxyUrl);
+      grouperHttpClient.assignProxyType(proxyType);
+      
+     //https://ims-na1.adobelogin.com/ims/token/v2?grant_type=client_credentials&client_id=sfd&client_secret=sdf&scope=openid,AdobeID,user_management_sdk
+      
+//      grouperHttpClient.addBodyParameter("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer");
+
+      int code = -1;
+      String json = null;
+  
+      try {
+        grouperHttpClient.executeRequest();
+        code = grouperHttpClient.getResponseCode();
+        // System.out.println(code + ", " + postMethod.getResponseBodyAsString());
+        
+        json = grouperHttpClient.getResponseBody();
+      } catch (Exception e) {
+        throw new RuntimeException("Error connecting to '" + url + "'", e);
+      }
+  
+      if (code != 200) {
+        throw new RuntimeException("Cant get access token from '" + url + "' " + code + ", " + json);
+      }
+      
+      JsonNode jsonObject = GrouperUtil.jsonJacksonNode(json);
+      int expiresInSeconds = GrouperUtil.jsonJacksonGetInteger(jsonObject, "expires_in");
+      String accessToken = GrouperUtil.jsonJacksonGetString(jsonObject, "access_token");
+      return new Object[] {accessToken, expiresInSeconds};
+      
+    } catch (RuntimeException re) {
+      
+      if (debugMap != null) {
+        debugMap.put("tokenError", GrouperUtil.getFullStackTrace(re));
+      }
+      throw re;
+  
+    } finally {
+      if (debugMap != null) {
+        debugMap.put("tokenTookMillis", (System.nanoTime()-startedNanos)/1000000);
+      }
+    }
+  }
+
+  public static void attachAuthenticationToHttpClient(GrouperHttpClient grouperHttpClient, String externalSystemConfigId) {
+    attachAuthenticationToHttpClient(grouperHttpClient, externalSystemConfigId, null, null);
+  }
+  
+  public static void attachAuthenticationToHttpClient(GrouperHttpClient grouperHttpClient, String externalSystemConfigId, GrouperLoaderConfig grouperLoaderConfig, Map<String, Object> debugMap) {
+    //  # Authentication type.
+    //  # {valueType: "string", defaultValue: "bearerToken", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.httpAuthnType$", formElement: "dropdown", optionValues: ["bearerToken", "basicAuth"]}
+    //  # grouper.wsBearerToken.myWsBearerToken.httpAuthnType = 
+    //
+    //  # Basic auth user
+    //  # {valueType: "string", required: true, regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.basicAuthUser$", formElement: "dropdown", optionValues: ["bearerToken", "basicAuth"], showEl: "${httpAuthnType == 'basicAuth'}}
+    //  # grouper.wsBearerToken.myWsBearerToken.basicAuthUser = 
+    //
+    //  # Basic auth password
+    //  # {valueType: "string", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.basicAuthPass$", showEl: "${httpAuthnType == 'basicAuth'}}
+    //  # grouper.wsBearerToken.myWsBearerToken.basicAuthPassword = 
+    //
+    //  # Bearer token secret, e.g. AWS access token
+    //  # {valueType: "password", sensitive: true, required: true, regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.accessTokenPassword$", showEl: "${httpAuthnType == null || httpAuthnType == 'bearerToken'}"}
+    //  # grouper.wsBearerToken.myWsBearerToken.accessTokenPassword =
+    //
+    //  # Include Bearer: prefix on access token.  If you want to change the prefix, just prefix the access token password and set this to false
+    //  # {valueType: "boolean", defaultValue: "true", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.accessTokenPassword$", showEl: "${httpAuthnType == null || httpAuthnType == 'bearerToken'}"}
+    //  # grouper.wsBearerToken.myWsBearerToken.prependBearerTokenPrefix =
+    //
+    //  # HTTP header to put the authentication in.  Default is the standard Authorization header
+    //  # {valueType: "string", defaultValue: "Authorization", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.httpHeader$", showEl: "${httpAuthnType == null || httpAuthnType == 'bearerToken'}"}
+    //  # grouper.wsBearerToken.myWsBearerToken.httpHeader =
+
+    grouperLoaderConfig = grouperLoaderConfig != null ? grouperLoaderConfig : GrouperLoaderConfig.retrieveConfig();
+    
+    String httpAuthnType = grouperLoaderConfig
+        .propertyValueString(
+            "grouper.wsBearerToken." + externalSystemConfigId + ".httpAuthnType", "bearerToken");
+
+    if (StringUtils.equals(httpAuthnType, "bearerToken")) {
+      String bearerToken = grouperLoaderConfig
+          .propertyValueStringRequired(
+              "grouper.wsBearerToken." + externalSystemConfigId + ".accessTokenPassword");
+
+      boolean prependBearerTokenPrefix = grouperLoaderConfig
+          .propertyValueBoolean(
+              "grouper.wsBearerToken." + externalSystemConfigId + ".prependBearerTokenPrefix", true);
+      
+      String headerValue = prependBearerTokenPrefix ? ("Bearer " + bearerToken) : bearerToken;
+
+      String httpHeader = grouperLoaderConfig
+          .propertyValueString(
+              "grouper.wsBearerToken." + externalSystemConfigId + ".httpHeader", "Authorization");
+
+      grouperHttpClient.addHeader(httpHeader, headerValue);
+    } else if (StringUtils.equals(httpAuthnType, "basicAuth")) {
+      
+      String user = grouperLoaderConfig
+          .propertyValueStringRequired("grouper.wsBearerToken." + externalSystemConfigId + ".basicAuthUser");
+      
+      String password = grouperLoaderConfig
+          .propertyValueString("grouper.wsBearerToken." + externalSystemConfigId + ".basicAuthPassword");
+      
+      password = StringUtils.defaultString(password);
+      if (grouperLoaderConfig.propertyValueBoolean("grouper.wsBearerToken." + externalSystemConfigId + ".basicAuthStandardUserOrder", true)) {
+        grouperHttpClient.assignUser(user);
+        grouperHttpClient.assignPassword(password);
+
+      } else {
+        grouperHttpClient.assignUser(password);
+        grouperHttpClient.assignPassword(user);
+      }
+
+    } else if (StringUtils.equals(httpAuthnType, "oauthClientCredentials")) {
+      
+      String bearerToken = retrieveBearerTokenForConfigId(debugMap, externalSystemConfigId);
+      
+      grouperHttpClient.addHeader("Authorization", "Bearer " + bearerToken);
+
+      String apiKeyHeader = grouperLoaderConfig.propertyValueString("grouper.wsBearerToken." + externalSystemConfigId + ".apiKeyHeaderName");
+      String apiKeyPassword = grouperLoaderConfig.propertyValueString("grouper.wsBearerToken." + externalSystemConfigId + ".apiKeyPassword");
+      
+      if (StringUtils.isNotBlank(apiKeyHeader) && StringUtils.isNotBlank(apiKeyPassword)) {      
+        grouperHttpClient.addHeader(apiKeyHeader, apiKeyPassword);
+      }
+      
+    } else {
+      throw new RuntimeException("Invalid authentication type: grouper-loader.properties: 'grouper.wsBearerToken." + externalSystemConfigId + ".httpAuthnType' = '" + httpAuthnType + "'");
+    }
+    
+    String proxyUrl = grouperLoaderConfig.propertyValueString("grouper.wsBearerToken." + externalSystemConfigId + ".proxyUrl");
+    String proxyType = grouperLoaderConfig.propertyValueString("grouper.wsBearerToken." + externalSystemConfigId + ".proxyType");
+    
+    grouperHttpClient.assignProxyUrl(proxyUrl);
+    grouperHttpClient.assignProxyType(proxyType);
+    grouperHttpClient.assignWebServiceExternalSystemConfigId(externalSystemConfigId);
+
+  }
+  
+  @Override
+  public ConfigFileName getConfigFileName() {
+    return ConfigFileName.GROUPER_LOADER_PROPERTIES;
+  }
+
+  @Override
+  public String getConfigItemPrefix() {
+    if (StringUtils.isBlank(this.getConfigId())) {
+      throw new RuntimeException("Must have configId!");
+    }
+    return "grouper.wsBearerToken." + this.getConfigId() + ".";
+  }
+
+  @Override
+  public String getConfigIdRegex() {
+    return "^(grouper\\.wsBearerToken)\\.([^.]+)\\.(.*)$";
+  }
+  
+  @Override
+  public String getConfigIdThatIdentifiesThisConfig() {
+    return "myWsBearerToken";
+  }
+
+  /**
+   * Validates the Scim provisioner by trying to log in and getting an auth token
+   * @return
+   * @throws UnsupportedOperationException
+   */
+  @Override
+  public List<String> test() throws UnsupportedOperationException {
+    List<String> ret = new ArrayList<>();
+
+    //  # Base website URL for WS with bearer token authn.  e.g. https://scim.us-east-1.amazonaws.com/abc123/scim/v2/
+    //  # {valueType: "string", required: true, regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.endpoint$"}
+    //  # grouper.wsBearerToken.myWsBearerToken.endpoint = 
+    //
+    //  # Bearer token secret
+    //  # {valueType: "password", sensitive: true, required: true, regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.accessTokenPassword$"}
+    //  # grouper.wsBearerToken.myWsBearerToken.accessTokenPassword =
+    //
+    //  # if this scim connector is enabled
+    //  # {valueType: "boolean", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.enabled$", defaultValue: "true"}
+    //  # grouper.wsBearerToken.myWsBearerToken.enabled =
+    //
+    //  # Test URL suffix that returns a 200
+    //  # {valueType: "string", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.testUrlSuffix$"}
+    //  # grouper.wsBearerToken.myWsBearerToken.testUrlSuffix = 
+    //
+    //  # Test URL method, defaults to GET.  Could be POST or whatever.
+    //  # {valueType: "string", defaultValue: "GET", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.testHttpMethod$"}
+    //  # grouper.wsBearerToken.myWsBearerToken.testHttpMethod = 
+    //
+    //  # Test URL response code.  Defaults to 200
+    //  # {valueType: "integer", defaultValue: "200", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.testHttpResponseCode$"}
+    //  # grouper.wsBearerToken.myWsBearerToken.testHttpResponseCode = 
+    //
+    //  # Test URL response regex to match to see if valid (optional)
+    //  # {valueType: "string", regex: "^grouper\\.myWsBearerToken\\.([^.]+)\\.testUrlResponseBodyRegex$"}
+    //  # grouper.wsBearerToken.myWsBearerToken.testUrlResponseBodyRegex = 
+    
+    GrouperLoaderConfig config = GrouperLoaderConfig.retrieveConfig();
+    String configPrefix = "grouper.wsBearerToken." + this.getConfigId() + ".";
+
+    String endpointProperty = configPrefix + "endpoint";
+    String endpoint = config.propertyValueString(endpointProperty);
+    if (GrouperUtil.isBlank(endpoint)) {
+      ret.add("Undefined or blank property: " + endpointProperty);
+    }
+
+    String testUrlSuffixProperty = configPrefix + "testUrlSuffix";
+    String testUrlSuffix = config.propertyValueString(testUrlSuffixProperty);
+    testUrlSuffix = GrouperUtil.defaultString(testUrlSuffix);
+      
+    final String testHttpMethod = GrouperUtil.defaultIfBlank(config.propertyValueString(configPrefix + "testHttpMethod"), "GET");
+
+    int testHttpResponseCode = GrouperUtil.intValue(config.propertyValueString(configPrefix + "testHttpResponseCode"), 200);
+
+    String testUrlResponseBodyRegex = config.propertyValueString(configPrefix + "testUrlResponseBodyRegex");
+    
+    // we need to get another one
+    GrouperHttpClient grouperHttpClient = new GrouperHttpClient();
+    String url = endpoint;
+    if (!StringUtils.isBlank(testUrlSuffix)) {
+      url = GrouperUtil.stripLastSlashIfExists(endpoint) + "/" + GrouperUtil.stripFirstSlashIfExists(testUrlSuffix);
+    }
+        
+    grouperHttpClient.assignUrl(url);
+    grouperHttpClient.assignGrouperHttpMethod(testHttpMethod);
+
+    attachAuthenticationToHttpClient(grouperHttpClient, this.getConfigId());
+
+    int code = -1;
+    String response = null;
+
+    try {
+      grouperHttpClient.executeRequest();
+      code = grouperHttpClient.getResponseCode();
+      response = grouperHttpClient.getResponseBody();
+    } catch (Exception e) {
+      ret.add("Error connecting to '" + url + "' <pre>" + GrouperUtil.getFullStackTrace(e) + "</pre>");
+      return ret;
+    }
+
+    if (code != testHttpResponseCode) {
+      ret.add("Response code to " + url + " expecting " + testHttpResponseCode + " but received " + code);
+      return ret;
+    }
+    
+    if (!StringUtils.isBlank(testUrlResponseBodyRegex)) {
+      if (response == null) {
+        ret.add("Response body from " + url + " expecting regex " + testUrlResponseBodyRegex + " but response was null");
+      } else {
+        Pattern pattern = Pattern.compile(testUrlResponseBodyRegex, Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(response);
+        if (!matcher.matches()) {
+          ret.add("Response body from " + url + " expecting regex " + testUrlResponseBodyRegex + " but no match " + GrouperUtil.escapeHtml(response, true));
+        }
+      }
+    }
+    
+    return ret;
+  }
+
+  @Override
+  public void validatePreSave(boolean isInsert, boolean fromUi,
+      List<String> errorsToDisplay, Map<String, String> validationErrorsToDisplay) {
+    
+    super.validatePreSave(isInsert, fromUi, errorsToDisplay, validationErrorsToDisplay);
+    
+    GrouperConfigurationModuleAttribute endpointAttribute = this.retrieveAttributes().get("endpoint");
+
+    if (endpointAttribute != null && StringUtils.startsWithIgnoreCase(endpointAttribute.getValueOrExpressionEvaluationValue(), "https://api.github.com/scim/")) {
+     
+      String endpoint = endpointAttribute.getValueOrExpressionEvaluationValue();
+      
+      // https://api.github.com/scim/v2/organizations/ORG
+      endpoint = GrouperUtil.stripLastSlashIfExists(endpoint);
+      if (!StringUtils.startsWithIgnoreCase(endpoint, "https://api.github.com/scim/v2/organizations/")) {
+        validationErrorsToDisplay.put(endpointAttribute.getHtmlForElementIdHandle(), GrouperTextContainer.textOrNull("grouperConfigurationValidationGithubEndpointMustContainOrganization"));
+      }
+      
+    }
+    
+  }
+  
+
+}

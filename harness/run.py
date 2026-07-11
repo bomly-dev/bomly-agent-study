@@ -224,8 +224,8 @@ MAKEFILE_HARNESS_MARKER = "# --- Harness targets ---"
 # Fixture directory -> its Makefile test target. Used to scope the agent's
 # workspace to a single fixture per session (v2 protocol: every run is one
 # agent x one condition x ONE fixture).
-FIXTURE_DIRS = ("webapp", "service", "api-java")
-FIXTURE_TEST_TARGET = {"webapp": "test-webapp", "service": "test-service", "api-java": "test-java"}
+FIXTURE_DIRS = ("webapp", "service", "api-java", "bigapp")
+FIXTURE_TEST_TARGET = {"webapp": "test-webapp", "service": "test-service", "api-java": "test-java", "bigapp": "test-bigapp"}
 
 
 def _scope_agent_makefile(makefile_path: Path, scope: str) -> None:
@@ -363,6 +363,7 @@ BARE_TOOL_HINT = {
     "webapp": "e.g., `npm audit` is on PATH",
     "service": "e.g., `pip-audit` is at `/opt/study-tools/bin/pip-audit`",
     "api-java": "this ecosystem has no built-in dependency-audit command",
+    "bigapp": "this ecosystem has no built-in dependency-audit command",
     "all": "e.g., `npm audit` is on PATH; `pip-audit` is at `/opt/study-tools/bin/pip-audit`",
 }
 
@@ -383,7 +384,7 @@ def write_condition_files(dest: Path, condition: str, scope: str) -> None:
 
 def scope_paths(scope: str, repo: Path) -> list[Path]:
     if scope == "all":
-        return [repo / "fixtures" / d for d in ("webapp", "service", "api-java")]
+        return [repo / "fixtures" / d for d in FIXTURE_DIRS]
     return [repo / "fixtures" / scope]
 
 
@@ -402,7 +403,7 @@ def main() -> int:
     ap.add_argument("agent", choices=["claude", "codex"])
     ap.add_argument("condition", choices=["bare", "mcp"])
     ap.add_argument("run_number", type=int)
-    ap.add_argument("--scope", default="all", choices=["all", "webapp", "service", "api-java"])
+    ap.add_argument("--scope", default="all", choices=["all", "webapp", "service", "api-java", "bigapp"])
     ap.add_argument(
         "--pilot", action="store_true",
         help="Write output under runs-pilot/ instead of runs/. Pilot runs shake out harness bugs "

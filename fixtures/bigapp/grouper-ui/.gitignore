@@ -1,0 +1,17 @@
+.lastbuild.properties
+build.properties
+dist
+logs
+spy.log
+temp
+tomcat-context.xml
+webapp/WEB-INF/classes
+webapp/WEB-INF/lib/*.jar
+/.settings/
+/.project
+/.classpath
+/bin/
+conf/penn*
+conf/grouperText/grouper.text.en.us.properties
+webapp/grouperExternal/public/penn
+java/src/Test*

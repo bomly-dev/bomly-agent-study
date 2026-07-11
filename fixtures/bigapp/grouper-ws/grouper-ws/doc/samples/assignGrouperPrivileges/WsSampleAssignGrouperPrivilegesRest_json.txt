@@ -1,0 +1,482 @@
+Grouper web service sample of service: assignGrouperPrivileges, WsSampleAssignGrouperPrivilegesRest, manually written lite/rest, format: json, for version: 5.0.0
+
+
+#########################################
+##
+## HTTP request sample (could be formatted for view by
+## indenting or changing dates or other data)
+##
+#########################################
+
+
+POST /grouper-ws/servicesRest/v2_5_000/grouperPrivileges HTTP/1.1
+Authorization: Basic xxxxxxxxxxxxxxxxx==
+Content-Type: application/json
+Content-Length: 442
+Host: localhost:8092
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.6)
+Cookie: JSESSIONID=9C2E1F50A6BAD750E4DFDEAC3A792FE8
+Accept-Encoding: gzip,deflate
+
+{
+  "WsRestAssignGrouperPrivilegesRequest":{
+    "replaceAllExisting":"F",
+    "allowed":"T",
+    "clientVersion":"v2_5_000",
+    "wsGroupLookup":{
+      "groupName":"aStem:aGroup"
+    },
+    "privilegeType":"access",
+    "privilegeNames":[
+      "update",
+      "read"
+    ]
+    ,
+    "wsSubjectLookups":[
+      {
+        "subjectId":"test.subject.0",
+        "subjectIdentifier":"",
+        "subjectSourceId":"jdbc"
+      },
+      {
+        "subjectId":"",
+        "subjectIdentifier":"id.test.subject.1",
+        "subjectSourceId":""
+      }
+    ]
+    ,
+    "actAsSubjectLookup":{
+      "subjectId":"GrouperSystem"
+    }
+  }
+}
+
+
+#########################################
+##
+## HTTP response sample (could be formatted for view by
+## indenting or changing dates or other data)
+##
+#########################################
+
+
+HTTP/1.1 200
+Set-Cookie: JSESSIONID=xxxxxxxxxxxxxxxxxxxxxxxx; Path=/grouper-ws; HttpOnly
+X-Grouper-resultCode: SUCCESS
+X-Grouper-success: T
+X-Grouper-resultCode2: NONE
+Content-Type: application/json;charset=UTF-8
+Content-Length: 1883
+Date: Fri, 23 May 2025 17:12:20 GMT
+Keep-Alive: timeout=20
+Connection: keep-alive
+
+{
+  "WsAssignGrouperPrivilegesResults":{
+    "resultMetadata":{
+      "resultCode":"SUCCESS",
+      "resultMessage":"Success for: clientVersion: 2.5.0, wsSubjects: Array size: 2: [0]: WsSubjectLookup[subjectId=test.subject.0,subjectIdentifier=,subjectSourceId=j..., group: WsGroupLookup[pitGroups=[],groupName=aStem:aGroup], stem: null, privilege: ACCESS-Array size: 2: [0]: update\n[1]: read\n, allowed? true, actAsSubject: WsSubjectLookup[subjectId=GrouperSystem], replaceAllExisting: false\n, params: null",
+      "success":"T"
+    },
+    "responseMetadata":{
+      "millis":"377",
+      "serverVersion":"5.0.0"
+    },
+    "wsGroup":{
+      "extension":"aGroup",
+      "typeOfGroup":"group",
+      "displayExtension":"a group",
+      "description":"a group description",
+      "displayName":"a stem:a group",
+      "name":"aStem:aGroup",
+      "uuid":"0bcb58edf06f4c4b8f3de4eba73a17a6",
+      "idIndex":"1000028",
+      "enabled":"T"
+    },
+    "results":[
+      {
+        "resultMetadata":{
+          "resultCode":"SUCCESS_ALLOWED",
+          "success":"T"
+        },
+        "privilegeName":"update",
+        "privilegeType":"access",
+        "wsSubject":{
+          "resultCode":"SUCCESS",
+          "success":"T",
+          "id":"test.subject.0",
+          "name":"my name is test.subject.0",
+          "sourceId":"jdbc"
+        }
+        
+      },
+      {
+        "resultMetadata":{
+          "resultCode":"SUCCESS_ALLOWED",
+          "success":"T"
+        },
+        "privilegeName":"update",
+        "privilegeType":"access",
+        "wsSubject":{
+          "identifierLookup":"id.test.subject.1",
+          "resultCode":"SUCCESS",
+          "success":"T",
+          "id":"test.subject.1",
+          "name":"my name is test.subject.1",
+          "sourceId":"jdbc"
+        }
+        
+      },
+      {
+        "resultMetadata":{
+          "resultCode":"SUCCESS_ALLOWED_ALREADY_EXISTED",
+          "success":"T"
+        },
+        "privilegeName":"read",
+        "privilegeType":"access",
+        "wsSubject":{
+          "resultCode":"SUCCESS",
+          "success":"T",
+          "id":"test.subject.0",
+          "name":"my name is test.subject.0",
+          "sourceId":"jdbc"
+        }
+        
+      },
+      {
+        "resultMetadata":{
+          "resultCode":"SUCCESS_ALLOWED",
+          "success":"T"
+        },
+        "privilegeName":"read",
+        "privilegeType":"access",
+        "wsSubject":{
+          "identifierLookup":"id.test.subject.1",
+          "resultCode":"SUCCESS",
+          "success":"T",
+          "id":"test.subject.1",
+          "name":"my name is test.subject.1",
+          "sourceId":"jdbc"
+        }
+      }
+    ]
+  }
+}
+
+
+#########################################
+##
+## Java source code (note, any programming language / objects
+## can use used to generate the above request/response.  Nothing
+## is Java specific.  Also, if you are using Java, the client libraries
+## are available
+##
+#########################################
+
+
+/*******************************************************************************
+ * Copyright 2012 Internet2
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+package edu.internet2.middleware.grouper.ws.samples.rest.grouperPrivileges;
+
+import java.lang.reflect.Array;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
+import edu.internet2.middleware.grouper.util.GrouperHttpClient;
+import edu.internet2.middleware.grouper.util.GrouperHttpMethod;
+import edu.internet2.middleware.grouper.ws.coresoap.WsAssignGrouperPrivilegesResult;
+import edu.internet2.middleware.grouper.ws.coresoap.WsAssignGrouperPrivilegesResults;
+import edu.internet2.middleware.grouper.ws.coresoap.WsGroupLookup;
+import edu.internet2.middleware.grouper.ws.coresoap.WsSubjectLookup;
+import edu.internet2.middleware.grouper.ws.rest.group.WsRestAssignGrouperPrivilegesRequest;
+import edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest;
+import edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType;
+import edu.internet2.middleware.grouper.ws.util.RestClientSettings;
+
+/**
+ * @author mchyzer
+ */
+public class WsSampleAssignGrouperPrivilegesRest implements WsSampleRest {
+
+  /**
+   * get grouper privileges web service with REST
+   * @param wsSampleRestType is the type of rest (xml, xhtml, etc)
+   */
+  @SuppressWarnings("deprecation")
+  public static void assignGrouperPrivileges(WsSampleRestType wsSampleRestType) {
+
+    try {
+      // grouper http client
+      GrouperHttpClient grouperHttpClient = new GrouperHttpClient();
+
+      //URL e.g. http://localhost:8093/grouper-ws/servicesRest/v1_3_000/...
+      //NOTE: aStem:aGroup urlencoded substitutes %3A for a colon
+      String url = RestClientSettings.URL + "/" + RestClientSettings.VERSION  
+            + "/grouperPrivileges";
+
+      // assign the URL and method
+      grouperHttpClient.assignUrl(url).assignGrouperHttpMethod(GrouperHttpMethod.post);
+      // assign user and pass
+      grouperHttpClient.assignUser(RestClientSettings.USER)
+          .assignPassword(RestClientSettings.PASS);
+
+      //Make the body of the request, in this case with beans and marshaling, but you can make
+      //your request document in whatever language or way you want
+      WsRestAssignGrouperPrivilegesRequest wsRestAssignGrouperPrivilegesRequest 
+        = new WsRestAssignGrouperPrivilegesRequest();
+      
+      wsRestAssignGrouperPrivilegesRequest.setPrivilegeType("access");
+      wsRestAssignGrouperPrivilegesRequest.setPrivilegeNames(new String[]{"update", "read"});
+      
+      // set the act as id
+      WsSubjectLookup actAsSubject = WsSubjectLookup.class.newInstance();
+      actAsSubject.setSubjectId("GrouperSystem");
+      wsRestAssignGrouperPrivilegesRequest.setActAsSubjectLookup(actAsSubject);
+
+      // just add, dont replace
+      wsRestAssignGrouperPrivilegesRequest.setReplaceAllExisting("F");
+
+      WsGroupLookup wsGroupLookup = WsGroupLookup.class.newInstance();
+      wsGroupLookup.setGroupName("aStem:aGroup");
+      wsRestAssignGrouperPrivilegesRequest.setWsGroupLookup(wsGroupLookup);
+      
+      //version, e.g. v1_3_000
+      wsRestAssignGrouperPrivilegesRequest.setClientVersion(RestClientSettings.VERSION);
+
+      // add two subjects to the group
+      WsSubjectLookup[] subjectLookups = (WsSubjectLookup[]) Array.newInstance(WsSubjectLookup.class,
+              2);
+      subjectLookups[0] = WsSubjectLookup.class.newInstance();
+      subjectLookups[0].setSubjectId("test.subject.0");
+      subjectLookups[0].setSubjectSourceId("jdbc");
+      subjectLookups[0].setSubjectIdentifier("");
+
+      subjectLookups[1] = WsSubjectLookup.class.newInstance();
+      subjectLookups[1].setSubjectId("");
+      subjectLookups[1].setSubjectSourceId("");
+      subjectLookups[1].setSubjectIdentifier("id.test.subject.1");
+
+      wsRestAssignGrouperPrivilegesRequest.setWsSubjectLookups(subjectLookups);
+
+      wsRestAssignGrouperPrivilegesRequest.setAllowed("T");
+
+      //get the xml / json / xhtml / paramString
+      String requestDocument = wsSampleRestType.getWsLiteRequestContentType().writeString(wsRestAssignGrouperPrivilegesRequest);
+      
+      //make sure right content type is in request (e.g. application/xhtml+xml
+      String contentType = wsSampleRestType.getWsLiteRequestContentType().getContentType();
+      
+      // assign body
+      grouperHttpClient.assignBody(requestDocument);
+
+      // content type
+      grouperHttpClient.addHeader("Content-Type", contentType);
+      
+      // execute
+      grouperHttpClient.executeRequest();
+      
+
+      //check if success
+      String successString = grouperHttpClient.getResponseHeadersLower().get("x-grouper-success");
+      
+      if (StringUtils.isBlank(successString)) {
+        throw new RuntimeException("Web service did not even respond!");
+      }
+      
+      boolean success = "T".equals(successString);
+
+      // check result code
+      String resultCode = grouperHttpClient.getResponseHeadersLower().get("x-grouper-resultcode");
+      
+      String response = grouperHttpClient.getResponseBody();
+
+      //convert to object (from xhtml, xml, json, etc)
+      WsAssignGrouperPrivilegesResults wsAssignGrouperPrivilegesResults = (WsAssignGrouperPrivilegesResults)wsSampleRestType
+        .getWsLiteResponseContentType().parseString(response);
+      
+      String resultMessage = wsAssignGrouperPrivilegesResults.getResultMetadata().getResultMessage();
+
+      // see if request worked or not
+      if (!success) {
+        throw new RuntimeException("Bad response from web service: resultCode: " + resultCode
+            + ", " + resultMessage);
+      }
+      
+      System.out.println(ToStringBuilder.reflectionToString(
+          wsAssignGrouperPrivilegesResults, ToStringStyle.MULTI_LINE_STYLE));
+      System.out.println(ToStringBuilder.reflectionToString(
+          wsAssignGrouperPrivilegesResults.getResultMetadata(),
+          ToStringStyle.MULTI_LINE_STYLE));
+
+      if (wsAssignGrouperPrivilegesResults != null) {
+        for (WsAssignGrouperPrivilegesResult wsAssignGrouperPrivilegesResult : wsAssignGrouperPrivilegesResults.getResults()) {
+            System.out.println(ToStringBuilder.reflectionToString(
+                wsAssignGrouperPrivilegesResult, ToStringStyle.MULTI_LINE_STYLE));
+            System.out.println(ToStringBuilder.reflectionToString(
+                wsAssignGrouperPrivilegesResult.getResultMetadata(),
+                    ToStringStyle.MULTI_LINE_STYLE));
+        }
+      }
+
+      if (!StringUtils.equals("T", 
+          wsAssignGrouperPrivilegesResults.getResultMetadata().getSuccess())) {
+        throw new RuntimeException("didnt get success! ");
+      }
+
+      System.out.println("Server version: " + wsAssignGrouperPrivilegesResults.getResponseMetadata().getServerVersion()
+          + ", result code: " + resultCode
+          + ", result message: " + resultMessage );
+        
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  /**
+   * @param args
+   */
+  @SuppressWarnings("unchecked")
+  public static void main(String[] args) {
+    RestClientSettings.resetData();
+    assignGrouperPrivileges(WsSampleRestType.json);
+  }
+
+  /**
+   * @see edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest#executeSample(edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType)
+   */
+  public void executeSample(WsSampleRestType wsSampleRestType) {
+    assignGrouperPrivileges(wsSampleRestType);
+  }
+
+  /**
+   * @see edu.internet2.middleware.grouper.ws.samples.types.WsSampleRest#validType(edu.internet2.middleware.grouper.ws.samples.types.WsSampleRestType)
+   */
+  public boolean validType(WsSampleRestType wsSampleRestType) {
+    //dont allow http params
+    return !WsSampleRestType.http_json.equals(wsSampleRestType);
+  }
+}
+
+
+#########################################
+##
+## Stdout
+##
+#########################################
+
+
+edu.internet2.middleware.grouper.ws.coresoap.WsAssignGrouperPrivilegesResults@639bf626[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS,resultMessage=Success for: clientVersion: 2.5.0, wsSubjects: Array size: 2: [0]: WsSubjectLookup[subjectId=test.subject.0,subjectIdentifier=,subjectSourceId=j..., group: WsGroupLookup[pitGroups=[],groupName=aStem:aGroup], stem: null, privilege: ACCESS-Array size: 2: [0]: update
+[1]: read
+, allowed? true, actAsSubject: WsSubjectLookup[subjectId=GrouperSystem], replaceAllExisting: false
+, params: null,success=T,httpStatusCode=500]
+  subjectAttributeNames=<null>
+  responseMetadata=WsResponseMeta[resultWarnings=,millis=377,millisStart=0,serverVersion=5.0.0]
+  wsGroup=WsGroup[extension=aGroup,typeOfGroup=group,displayExtension=a group,description=a group description,displayName=a stem:a group,name=aStem:aGroup,uuid=0bcb58edf06f4c4b8f3de4eba73a17a6,idIndex=1000028,enabled=T]
+  wsStem=<null>
+  results={WsAssignGrouperPrivilegesResult[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS_ALLOWED,success=T,httpStatusCode=500],privilegeName=update,privilegeType=access,
+  wsSubject=WsSubject[resultCode=SUCCESS,success=T,id=test.subject.0,name=my name is test.subject.0,sourceId=jdbc]],WsAssignGrouperPrivilegesResult[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS_ALLOWED,success=T,httpStatusCode=500],privilegeName=update,privilegeType=access,
+  wsSubject=WsSubject[identifierLookup=id.test.subject.1,resultCode=SUCCESS,success=T,id=test.subject.1,name=my name is test.subject.1,sourceId=jdbc]],WsAssignGrouperPrivilegesResult[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS_ALLOWED_ALREADY_EXISTED,success=T,httpStatusCode=500],privilegeName=read,privilegeType=access,
+  wsSubject=WsSubject[resultCode=SUCCESS,success=T,id=test.subject.0,name=my name is test.subject.0,sourceId=jdbc]],WsAssignGrouperPrivilegesResult[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS_ALLOWED,success=T,httpStatusCode=500],privilegeName=read,privilegeType=access,
+  wsSubject=WsSubject[identifierLookup=id.test.subject.1,resultCode=SUCCESS,success=T,id=test.subject.1,name=my name is test.subject.1,sourceId=jdbc]]}
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsResultMeta@31631758[
+  params=<null>
+  resultCode=SUCCESS
+  resultCode2=<null>
+  resultMessage=Success for: clientVersion: 2.5.0, wsSubjects: Array size: 2: [0]: WsSubjectLookup[subjectId=test.subject.0,subjectIdentifier=,subjectSourceId=j..., group: WsGroupLookup[pitGroups=[],groupName=aStem:aGroup], stem: null, privilege: ACCESS-Array size: 2: [0]: update
+[1]: read
+, allowed? true, actAsSubject: WsSubjectLookup[subjectId=GrouperSystem], replaceAllExisting: false
+, params: null
+  success=T
+  httpStatusCode=500
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsAssignGrouperPrivilegesResult@7c258588[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS_ALLOWED,success=T,httpStatusCode=500]
+  params=<null>
+  allowed=<null>
+  privilegeName=update
+  privilegeType=access
+  wsSubject=WsSubject[resultCode=SUCCESS,success=T,id=test.subject.0,name=my name is test.subject.0,sourceId=jdbc]
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsResultMeta@3a4a7fff[
+  params=<null>
+  resultCode=SUCCESS_ALLOWED
+  resultCode2=<null>
+  resultMessage=<null>
+  success=T
+  httpStatusCode=500
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsAssignGrouperPrivilegesResult@3f3797f5[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS_ALLOWED,success=T,httpStatusCode=500]
+  params=<null>
+  allowed=<null>
+  privilegeName=update
+  privilegeType=access
+  wsSubject=WsSubject[identifierLookup=id.test.subject.1,resultCode=SUCCESS,success=T,id=test.subject.1,name=my name is test.subject.1,sourceId=jdbc]
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsResultMeta@6f6e5c5e[
+  params=<null>
+  resultCode=SUCCESS_ALLOWED
+  resultCode2=<null>
+  resultMessage=<null>
+  success=T
+  httpStatusCode=500
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsAssignGrouperPrivilegesResult@2994a600[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS_ALLOWED_ALREADY_EXISTED,success=T,httpStatusCode=500]
+  params=<null>
+  allowed=<null>
+  privilegeName=read
+  privilegeType=access
+  wsSubject=WsSubject[resultCode=SUCCESS,success=T,id=test.subject.0,name=my name is test.subject.0,sourceId=jdbc]
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsResultMeta@2a9f14f8[
+  params=<null>
+  resultCode=SUCCESS_ALLOWED_ALREADY_EXISTED
+  resultCode2=<null>
+  resultMessage=<null>
+  success=T
+  httpStatusCode=500
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsAssignGrouperPrivilegesResult@22372048[
+  resultMetadata=WsResultMeta[resultCode=SUCCESS_ALLOWED,success=T,httpStatusCode=500]
+  params=<null>
+  allowed=<null>
+  privilegeName=read
+  privilegeType=access
+  wsSubject=WsSubject[identifierLookup=id.test.subject.1,resultCode=SUCCESS,success=T,id=test.subject.1,name=my name is test.subject.1,sourceId=jdbc]
+]
+edu.internet2.middleware.grouper.ws.coresoap.WsResultMeta@2e1f36a8[
+  params=<null>
+  resultCode=SUCCESS_ALLOWED
+  resultCode2=<null>
+  resultMessage=<null>
+  success=T
+  httpStatusCode=500
+]
+Server version: 5.0.0, result code: SUCCESS, result message: Success for: clientVersion: 2.5.0, wsSubjects: Array size: 2: [0]: WsSubjectLookup[subjectId=test.subject.0,subjectIdentifier=,subjectSourceId=j..., group: WsGroupLookup[pitGroups=[],groupName=aStem:aGroup], stem: null, privilege: ACCESS-Array size: 2: [0]: update
+[1]: read
+, allowed? true, actAsSubject: WsSubjectLookup[subjectId=GrouperSystem], replaceAllExisting: false
+, params: null

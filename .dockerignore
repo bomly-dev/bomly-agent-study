@@ -8,6 +8,7 @@ harness/__pycache__
 harness/adapters/__pycache__
 scripts/__pycache__
 fixtures/api-java/target
+fixtures/bigapp/**/target
 fixtures/webapp/node_modules
 fixtures/webapp/dist
 fixtures/service/.venv
