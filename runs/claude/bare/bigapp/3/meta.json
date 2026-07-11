@@ -1,0 +1,32 @@
+{
+  "agent": "claude",
+  "condition": "bare",
+  "run_number": 3,
+  "pilot": false,
+  "scope": "bigapp",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "d639e663",
+  "harness_sha": "d639e663",
+  "bomly_version": "bomly 0.17.1",
+  "bomly_sha256": "a0e4fdd6aeeba409548c9d642ea42271fba172f4742d840bb76014b59aa18651",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-opus-4-8",
+  "effort": "high",
+  "started_at": "2026-07-11T06:46:24.864421+00:00",
+  "ended_at": "2026-07-11T07:02:18.358532+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 1,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01Wdh9EBtJU1GHWoJQDfz4Hd",
+      "error": "Exit code 1\n/bin/bash: line 1: cd: fixtures/bigapp: No such file or directory"
+    },
+    {
+      "tool": "toolu_01D8yYGXTv2CLko9jqTRvjkb",
+      "error": "Exit code 1\n  File \"<stdin>\", line 11\n    print(f'{pom:55} {a.group(1):28} {v.group(1) if v else \\\"(managed)\\\"}')\n                                                            ^\nSyntaxError: unexpected character after line continuation character"
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

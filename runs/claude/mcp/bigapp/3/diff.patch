@@ -1,0 +1,188 @@
+diff --git a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+index 4907509d..4c805a79 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-box/pom.xml
+@@ -42,10 +42,11 @@
+             <scope>provided</scope>
+         </dependency>
+         <!-- https://mvnrepository.com/artifact/org.bitbucket.b_c/jose4j -->
++        <!-- Security: 0.9.3 -> 0.9.6 (GHSA-3677-xxcr-wjqv, GHSA-6qvw-249j-h44c). -->
+         <dependency>
+             <groupId>org.bitbucket.b_c</groupId>
+             <artifactId>jose4j</artifactId>
+-            <version>0.9.3</version>
++            <version>0.9.6</version>
+         </dependency>
+         <dependency>
+             <groupId>com.box</groupId>
+@@ -56,8 +57,34 @@
+                     <groupId>org.bitbucket.b_c</groupId>
+                     <artifactId>jose4j</artifactId>
+                 </exclusion>
++                <!-- Security: box-java-sdk 2.17.0 drags in the discontinued
++                     Bouncy Castle jdk15on 1.52 artifacts (17+ CVEs). The jdk15on
++                     line ended at 1.70 and cannot be pinned to a release that
++                     fixes them all (e.g. CVE-2023-33201/33202, CVE-2024-30171).
++                     Exclude them and use the maintained jdk18on 1.84 artifacts
++                     (already managed by grouper-parent), which share the same
++                     org.bouncycastle.* API and fix every advisory. -->
++                <exclusion>
++                    <groupId>org.bouncycastle</groupId>
++                    <artifactId>bcprov-jdk15on</artifactId>
++                </exclusion>
++                <exclusion>
++                    <groupId>org.bouncycastle</groupId>
++                    <artifactId>bcpkix-jdk15on</artifactId>
++                </exclusion>
+             </exclusions>
+         </dependency>
++        <!-- Security: replacement for the excluded Bouncy Castle jdk15on
++             artifacts above. Version managed as ${bouncyCastle.version} (1.84)
++             in grouper-parent. -->
++        <dependency>
++            <groupId>org.bouncycastle</groupId>
++            <artifactId>bcprov-jdk18on</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.bouncycastle</groupId>
++            <artifactId>bcpkix-jdk18on</artifactId>
++        </dependency>
+         <dependency>
+             <groupId>commons-logging</groupId>
+             <artifactId>commons-logging</artifactId>
+diff --git a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+index 415e1cd5..3be4fa61 100644
+--- a/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
++++ b/fixtures/bigapp/grouper-misc/grouper-installer/pom.xml
+@@ -43,7 +43,8 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+-            <version>1.25.0</version>
++            <!-- Security: 1.25.0 -> 1.26.0 (GHSA-4265-ccf5-phj5, GHSA-4g9r-vxhx-9pgx). -->
++            <version>1.26.0</version>
+         </dependency>
+         <dependency>
+             <groupId>commons-httpclient</groupId>
+diff --git a/fixtures/bigapp/grouper-parent/pom.xml b/fixtures/bigapp/grouper-parent/pom.xml
+index 4d50b531..e54d133b 100644
+--- a/fixtures/bigapp/grouper-parent/pom.xml
++++ b/fixtures/bigapp/grouper-parent/pom.xml
+@@ -173,10 +173,13 @@
+         <ldaptive.version>1.2.4</ldaptive.version>
+         <!-- if you change this version make sure container substitution still works -->
+         <playwright.version>1.46.0</playwright.version>
+-        <aws.java.sdk.core>1.12.267</aws.java.sdk.core>
+-        <aws.java.sdk.s3>1.12.267</aws.java.sdk.s3>
+-        <aws.java.sdk.sqs>1.12.267</aws.java.sdk.sqs>
+-        <aws.java.sdk.sns>1.12.267</aws.java.sdk.sns>
++        <!-- Security: bumped from 1.12.267 to 1.12.788. 1.12.267 pulled the
++             vulnerable software.amazon.ion:ion-java 1.0.2 (CVE-2024-21634);
++             aws-java-sdk-core 1.12.746+ no longer depends on ion-java. -->
++        <aws.java.sdk.core>1.12.788</aws.java.sdk.core>
++        <aws.java.sdk.s3>1.12.788</aws.java.sdk.s3>
++        <aws.java.sdk.sqs>1.12.788</aws.java.sdk.sqs>
++        <aws.java.sdk.sns>1.12.788</aws.java.sdk.sns>
+         <httpclient>4.5.13</httpclient>
+         <httpcore>4.4.14</httpcore>
+         <httpmime>4.5.13</httpmime>
+@@ -185,7 +188,9 @@
+         <amqp-client.version>5.20.0</amqp-client.version>
+         
+         <!-- note, jackson version is also in grouper ws pom and should be adjusted accordingly -->
+-        <jackson.databind>2.18.2</jackson.databind>        
++        <!-- Security: bumped from 2.18.2 to 2.18.9 (GHSA-rmj7-2vxq-3g9f,
++             GHSA-j3rv-43j4-c7qm, GHSA-hgj6-7826-r7m5, GHSA-5jmj-h7xm-6q6v). -->
++        <jackson.databind>2.18.9</jackson.databind>
+         <jsoup.version>1.15.3</jsoup.version>        
+         <java-ipv6.version>0.17</java-ipv6.version>
+         
+@@ -449,6 +454,88 @@
+                 <artifactId>jackson-databind</artifactId>
+                 <version>${jackson.databind}</version>
+             </dependency>
++
++            <!-- ============================================================
++                 Security remediation: pin vulnerable transitive dependencies
++                 to fixed versions. All are pulled transitively; these managed
++                 versions force the whole reactor onto patched releases.
++                 ============================================================ -->
++            <!-- jackson-core: GHSA-72hv-8253-57qq (fixed 2.18.6); kept in step
++                 with jackson-databind above. -->
++            <dependency>
++                <groupId>com.fasterxml.jackson.core</groupId>
++                <artifactId>jackson-core</artifactId>
++                <version>2.18.9</version>
++            </dependency>
++            <!-- Netty: many CVEs across netty-codec-http/handler/codec/common
++                 at 4.1.72.Final. Import the BOM so every netty module is pinned
++                 to 4.1.135.Final together (avoids inter-module version skew). -->
++            <dependency>
++                <groupId>io.netty</groupId>
++                <artifactId>netty-bom</artifactId>
++                <version>4.1.135.Final</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++            <!-- Guava: GHSA-7g45-4rm6-3mm3, GHSA-5mg8-w23w-74h3 (fixed 32.0.0). -->
++            <dependency>
++                <groupId>com.google.guava</groupId>
++                <artifactId>guava</artifactId>
++                <version>32.0.0-jre</version>
++            </dependency>
++            <!-- protobuf-java: GHSA-735f-pc8j-v9w8 (fixed 4.27.5). -->
++            <dependency>
++                <groupId>com.google.protobuf</groupId>
++                <artifactId>protobuf-java</artifactId>
++                <version>4.27.5</version>
++            </dependency>
++            <!-- google-oauth-client: GHSA-hw42-3568-wj87 (fixed 1.33.3). -->
++            <dependency>
++                <groupId>com.google.oauth-client</groupId>
++                <artifactId>google-oauth-client</artifactId>
++                <version>1.33.3</version>
++            </dependency>
++            <!-- nimbus-jose-jwt: GHSA-gvpg-vgmx-xg6w, GHSA-xwmg-2g98-w7v9
++                 (fixed 9.37.4). -->
++            <dependency>
++                <groupId>com.nimbusds</groupId>
++                <artifactId>nimbus-jose-jwt</artifactId>
++                <version>9.37.4</version>
++            </dependency>
++            <!-- neethi: GHSA-2hfh-9h53-qc24, GHSA-g36m-9g3m-2vmp,
++                 GHSA-287c-fxr7-3w6c (fixed 3.2.2). -->
++            <dependency>
++                <groupId>org.apache.neethi</groupId>
++                <artifactId>neethi</artifactId>
++                <version>3.2.2</version>
++            </dependency>
++            <!-- jose4j: GHSA-3677-xxcr-wjqv, GHSA-6qvw-249j-h44c (fixed 0.9.6).
++                 Also declared directly in grouper-box (bumped there too). -->
++            <dependency>
++                <groupId>org.bitbucket.b_c</groupId>
++                <artifactId>jose4j</artifactId>
++                <version>0.9.6</version>
++            </dependency>
++            <!-- apache-mime4j-core: GHSA-jw7r-rxff-gv24 (fixed 0.8.10). -->
++            <dependency>
++                <groupId>org.apache.james</groupId>
++                <artifactId>apache-mime4j-core</artifactId>
++                <version>0.8.10</version>
++            </dependency>
++            <!-- NOTE: axis2-transport-http GHSA-wwq7-pxwc-p4rc (fixed 1.8.0) is
++                 intentionally NOT pinned here. grouper-ws declares the whole
++                 Axis2 stack (axis2-kernel/adb/transport-http/transport-local)
++                 directly at 1.6.4; Axis2 modules are version-locked, and the
++                 1.6.4 -> 1.8.0 jump is an API-breaking major upgrade that would
++                 not compile. See FIXES.md. -->
++            <!-- commons-compress: GHSA-4265-ccf5-phj5, GHSA-4g9r-vxhx-9pgx
++                 (fixed 1.26.0). -->
++            <dependency>
++                <groupId>org.apache.commons</groupId>
++                <artifactId>commons-compress</artifactId>
++                <version>1.26.0</version>
++            </dependency>
++
+             <dependency>
+               <groupId>net.redhogs.cronparser</groupId>
+               <artifactId>cron-parser-core</artifactId>

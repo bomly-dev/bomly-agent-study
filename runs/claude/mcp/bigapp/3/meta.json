@@ -1,0 +1,44 @@
+{
+  "agent": "claude",
+  "condition": "mcp",
+  "run_number": 3,
+  "pilot": false,
+  "scope": "bigapp",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "d639e663",
+  "harness_sha": "d639e663",
+  "bomly_version": "bomly 0.17.1",
+  "bomly_sha256": "a0e4fdd6aeeba409548c9d642ea42271fba172f4742d840bb76014b59aa18651",
+  "agent_version": "2.1.201 (Claude Code)",
+  "model": "claude-opus-4-8",
+  "effort": "high",
+  "started_at": "2026-07-11T07:03:01.372733+00:00",
+  "ended_at": "2026-07-11T07:17:18.987699+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 1,
+  "mcp_tool_errors": [
+    {
+      "tool": "toolu_01QVsvBb2bJ9UuWqkgV1vkx8",
+      "error": "prepare scan: no subprojects discovered for execution target with the applied filters; discovery probe: found pom.xml at apacheds-ldappc-schema (maven); found pom.xml at grouper (maven); found pom.xml at grouper-container/grouper-api-container (maven); found pom.xml at grouper-container/grouper-uiDaemon-container (maven); found pom.xml at grouper-container/grouper-ws-container (maven); found pom.xml at grouper-misc/googleapps-grouper-provisioner (maven); found pom.xml at grouper-misc/grouper-azu"
+    },
+    {
+      "tool": "toolu_01TD4Wb4xqQXJpPLq2QJzfxk",
+      "error": "Exit code 127\n=== top-level keys ===\n/bin/bash: line 4: jq: command not found\n=== structure ===\n/bin/bash: line 5: jq: command not found"
+    },
+    {
+      "tool": "toolu_01MhdGKgoRWf9H3VxEwrFTH8",
+      "error": "Exit code 2\nexit=4\n\n\nError: unsupported output format \"/tmp/fullscan.json\"\nls: cannot access '/tmp/fullscan.json': No such file or directory"
+    },
+    {
+      "tool": "toolu_01Kb6qNas1ZRqQ65UmsjAQeh",
+      "error": "Exit code 1\n=== 1.12.267 ===\n      <groupId>software.amazon.ion</groupId>\n      <artifactId>ion-java</artifactId>\n      <version>${ion.java.version}</version>\n=== 1.12.797 ==="
+    },
+    {
+      "tool": "toolu_01PeyeVT85Mf5eJRShgdHdW8",
+      "error": "Exit code 1\n=== jackson-databind ===\n449:                <artifactId>jackson-databind</artifactId>\n=== jackson-core ===\n=== protobuf-java ===\n=== guava ===\n=== google-oauth-client ===\n=== nimbus-jose-jwt ===\n=== netty ===\n=== neethi ===\n=== jose4j ===\n=== mime4j ===\n=== axis2-transport-http ===\n=== commons-compress ===\n=== box-java-sdk ===\n=== ion-java ==="
+    }
+  ],
+  "stderr_tail": null,
+  "credential_copy_mode": "oauth-token-env-var"
+}

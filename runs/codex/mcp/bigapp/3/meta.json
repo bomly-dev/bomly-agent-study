@@ -1,0 +1,23 @@
+{
+  "agent": "codex",
+  "condition": "mcp",
+  "run_number": 3,
+  "pilot": false,
+  "scope": "bigapp",
+  "fixture_ref": "HEAD",
+  "fixture_sha": "d639e663",
+  "harness_sha": "d639e663",
+  "bomly_version": "bomly 0.17.1",
+  "bomly_sha256": "a0e4fdd6aeeba409548c9d642ea42271fba172f4742d840bb76014b59aa18651",
+  "agent_version": "codex-cli 0.142.5",
+  "model": "gpt-5.5",
+  "effort": "medium",
+  "started_at": "2026-07-11T07:30:32.755219+00:00",
+  "ended_at": "2026-07-11T07:38:05.706366+00:00",
+  "timeout": false,
+  "incomplete_reason": null,
+  "exit_code": 0,
+  "mcp_tool_errors": [],
+  "stderr_tail": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/bomly-study-0iza16wj/codex-mcp-bigapp-3-1783755029/agent-config\"))\nReading additional input from stdin...\n",
+  "credential_copy_mode": "known-files"
+}
