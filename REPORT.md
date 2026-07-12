@@ -132,6 +132,15 @@ advisories — not into fixing. Given the
 list up front, the same agent, same prompt, finished ≥98% five times out of
 five.
 
+![Scatter plot of tool calls versus completeness across all 20 bigapp runs; MCP runs sit at 98–100% at every call count, bare runs scatter down to 14%](analysis/figures/bigapp-effort.svg)
+
+Tool-call effort does not predict outcome in the bare condition (the 87-call
+run finished at 14%; a 44-call run did too); with the server, every level of
+effort landed ≥98%. We did not chart token usage: the two CLIs meter tokens
+differently (one excludes cache reads the other counts), so a cross-agent
+token chart would mislead — the raw per-run numbers are in
+`analysis/results.csv` and each run's `meta.json`.
+
 **Fix-claim honesty.** A `HALLUCINATED` label means the run's own `FIXES.md`
 claims a package was fixed but the advisory still applies to the rebuilt
 workspace; `INCORRECTLY_DECLINED` means a fixable package was declared
