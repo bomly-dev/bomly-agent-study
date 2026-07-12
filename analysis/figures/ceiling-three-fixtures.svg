@@ -1,0 +1,47 @@
+<svg viewBox="0 0 720 424" width="720" height="424" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Completeness on the three smaller fixtures">
+<rect x="0.5" y="0.5" width="719" height="423" rx="12" fill="#141414" stroke="#262626"/>
+<text x="24" y="34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="600" fill="#ededed" text-anchor="start">The three smaller fixtures — completeness, round 1</text>
+<text x="24" y="54" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" font-weight="normal" fill="#a3a3a3" text-anchor="start">Both agents finish at or near 100% with or without MCP: a ceiling, not a win.</text>
+<circle cx="200" cy="76" r="5" fill="#189fdb"/>
+<text x="211" y="80" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="start">bare</text>
+<circle cx="258" cy="76" r="5" fill="#e75c3a"/>
+<text x="269" y="80" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="start">with Bomly MCP</text>
+<line x1="200.0" y1="92" x2="200.0" y2="378" stroke="#242424" stroke-width="1"/>
+<text x="200.0" y="396" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">0%</text>
+<line x1="322.0" y1="92" x2="322.0" y2="378" stroke="#242424" stroke-width="1"/>
+<text x="322.0" y="396" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">25%</text>
+<line x1="444.0" y1="92" x2="444.0" y2="378" stroke="#242424" stroke-width="1"/>
+<text x="444.0" y="396" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">50%</text>
+<line x1="566.0" y1="92" x2="566.0" y2="378" stroke="#242424" stroke-width="1"/>
+<text x="566.0" y="396" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">75%</text>
+<line x1="688.0" y1="92" x2="688.0" y2="378" stroke="#242424" stroke-width="1"/>
+<text x="688.0" y="396" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">100%</text>
+<text x="24" y="114" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" font-weight="600" fill="#ededed" text-anchor="start">webapp (npm)</text>
+<text x="188" y="138" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" font-weight="normal" fill="#a3a3a3" text-anchor="end">Claude Code</text>
+<circle cx="688.0" cy="130.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="688.0" cy="138.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<text x="188" y="164" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" font-weight="normal" fill="#a3a3a3" text-anchor="end">Codex CLI</text>
+<circle cx="688.0" cy="156.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="688.0" cy="164.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<line x1="24" y1="188" x2="688" y2="188" stroke="#242424" stroke-width="1"/>
+<text x="24" y="210" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" font-weight="600" fill="#ededed" text-anchor="start">service (Python)</text>
+<text x="188" y="234" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" font-weight="normal" fill="#a3a3a3" text-anchor="end">Claude Code</text>
+<circle cx="475.3" cy="230.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<text x="475.28205128205127" y="220" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="middle">†</text>
+<circle cx="688.0" cy="230.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<text x="688.0" y="220" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="middle">†</text>
+<text x="188" y="260" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" font-weight="normal" fill="#a3a3a3" text-anchor="end">Codex CLI</text>
+<circle cx="688.0" cy="252.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="688.0" cy="260.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<line x1="24" y1="284" x2="688" y2="284" stroke="#242424" stroke-width="1"/>
+<text x="24" y="306" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" font-weight="600" fill="#ededed" text-anchor="start">api-java (Maven)</text>
+<text x="188" y="330" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" font-weight="normal" fill="#a3a3a3" text-anchor="end">Claude Code</text>
+<circle cx="682.0" cy="326.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<text x="681.9753086419753" y="316" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="middle">†</text>
+<circle cx="651.9" cy="326.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<text x="188" y="356" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" font-weight="normal" fill="#a3a3a3" text-anchor="end">Codex CLI</text>
+<circle cx="688.0" cy="348.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="688.0" cy="356.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<text x="461.28205128205127" y="234" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="end">56%</text>
+<text x="24" y="414" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="start">† run finished with the shared build broken</text>
+</svg>
