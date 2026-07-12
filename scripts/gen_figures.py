@@ -47,6 +47,7 @@ def load_runs(csv_path):
                 "comp": float(r["run_completeness"]),
                 "wall": float(r["wall_seconds"]),
                 "build": r["build_ok"] == "True",
+                "tools": int(r["tool_calls"]),
             }
     return runs
 
@@ -268,6 +269,68 @@ def fig_time(runs, out):
     write(out, parts)
 
 
+# --------------------------------------------------- fig 5: effort/outcome
+def fig_effort(runs, out):
+    W, H = 720, 380
+    x0, x1 = 90, 688
+    y0, y1 = 96, 306
+    tmax = 100
+    parts = svg_open(W, H, "Tool calls versus completeness per run on bigapp")
+    header(
+        parts, W,
+        "bigapp — tool calls vs. completeness per run",
+        "Both agents, all 20 runs. More effort did not mean a better outcome "
+        "without the list.",
+    )
+    legend(parts, x0, 76)
+
+    def X(v):
+        return x0 + (x1 - x0) * v / tmax
+
+    def Y(pct):
+        return y1 - (y1 - y0) * pct / 100.0
+
+    for pct in (0, 25, 50, 75, 100):
+        gy = Y(pct)
+        parts.append(
+            f'<line x1="{x0}" y1="{gy:.1f}" x2="{x1}" y2="{gy:.1f}" '
+            f'stroke="{GRID}" stroke-width="1"/>'
+        )
+        parts.append(text(x0 - 10, gy + 4, f"{pct}%", 11, TEXT3, anchor="end"))
+    for v in (0, 20, 40, 60, 80, 100):
+        gx = X(v)
+        parts.append(
+            f'<line x1="{gx:.1f}" y1="{y0}" x2="{gx:.1f}" y2="{y1}" '
+            f'stroke="{GRID}" stroke-width="1"/>'
+        )
+        parts.append(text(gx, y1 + 20, str(v), 11, TEXT3, anchor="middle"))
+    parts.append(
+        text((x0 + x1) / 2, y1 + 42, "tool calls in the run", 11, TEXT3,
+             anchor="middle")
+    )
+
+    marked = None
+    for agent in ("claude", "codex"):
+        for cond, color in (("bare", BARE), ("mcp", MCP)):
+            for n in range(1, 6):
+                r = runs[(agent, cond, "bigapp", n)]
+                dot(parts, X(r["tools"]), Y(r["comp"] * 100), color)
+                if cond == "bare" and r["tools"] > 80:
+                    marked = (X(r["tools"]), Y(r["comp"] * 100))
+    if marked:
+        mx, my = marked
+        parts.append(
+            f'<line x1="{mx:.1f}" y1="{my - 12}" x2="{mx:.1f}" '
+            f'y2="{my - 30}" stroke="{TEXT3}" stroke-width="1"/>'
+        )
+        parts.append(
+            text(mx, my - 38, "87 calls, 14% complete", 11, TEXT2,
+                 anchor="middle")
+        )
+    parts.append("</svg>")
+    write(out, parts)
+
+
 # --------------------------------------------------------- fig 4: ceiling
 def fig_ceiling(runs, out):
     W, H = 720, 424
@@ -352,6 +415,7 @@ def main():
     fig_hallucination(bad, os.path.join(figdir, "bigapp-hallucination.svg"))
     fig_time(runs, os.path.join(figdir, "bigapp-time.svg"))
     fig_ceiling(runs, os.path.join(figdir, "ceiling-three-fixtures.svg"))
+    fig_effort(runs, os.path.join(figdir, "bigapp-effort.svg"))
 
 
 if __name__ == "__main__":

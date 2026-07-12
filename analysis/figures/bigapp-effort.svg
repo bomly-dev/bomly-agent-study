@@ -1,0 +1,54 @@
+<svg viewBox="0 0 720 380" width="720" height="380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tool calls versus completeness per run on bigapp">
+<rect x="0.5" y="0.5" width="719" height="379" rx="12" fill="#141414" stroke="#262626"/>
+<text x="24" y="34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="600" fill="#ededed" text-anchor="start">bigapp — tool calls vs. completeness per run</text>
+<text x="24" y="54" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" font-weight="normal" fill="#a3a3a3" text-anchor="start">Both agents, all 20 runs. More effort did not mean a better outcome without the list.</text>
+<circle cx="90" cy="76" r="5" fill="#189fdb"/>
+<text x="101" y="80" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="start">bare</text>
+<circle cx="148" cy="76" r="5" fill="#e75c3a"/>
+<text x="159" y="80" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="start">with Bomly MCP</text>
+<line x1="90" y1="306.0" x2="688" y2="306.0" stroke="#242424" stroke-width="1"/>
+<text x="80" y="310.0" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="end">0%</text>
+<line x1="90" y1="253.5" x2="688" y2="253.5" stroke="#242424" stroke-width="1"/>
+<text x="80" y="257.5" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="end">25%</text>
+<line x1="90" y1="201.0" x2="688" y2="201.0" stroke="#242424" stroke-width="1"/>
+<text x="80" y="205.0" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="end">50%</text>
+<line x1="90" y1="148.5" x2="688" y2="148.5" stroke="#242424" stroke-width="1"/>
+<text x="80" y="152.5" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="end">75%</text>
+<line x1="90" y1="96.0" x2="688" y2="96.0" stroke="#242424" stroke-width="1"/>
+<text x="80" y="100.0" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="end">100%</text>
+<line x1="90.0" y1="96" x2="90.0" y2="306" stroke="#242424" stroke-width="1"/>
+<text x="90.0" y="326" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">0</text>
+<line x1="209.6" y1="96" x2="209.6" y2="306" stroke="#242424" stroke-width="1"/>
+<text x="209.6" y="326" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">20</text>
+<line x1="329.2" y1="96" x2="329.2" y2="306" stroke="#242424" stroke-width="1"/>
+<text x="329.2" y="326" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">40</text>
+<line x1="448.8" y1="96" x2="448.8" y2="306" stroke="#242424" stroke-width="1"/>
+<text x="448.8" y="326" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">60</text>
+<line x1="568.4" y1="96" x2="568.4" y2="306" stroke="#242424" stroke-width="1"/>
+<text x="568.4" y="326" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">80</text>
+<line x1="688.0" y1="96" x2="688.0" y2="306" stroke="#242424" stroke-width="1"/>
+<text x="688.0" y="326" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">100</text>
+<text x="389.0" y="348" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#737373" text-anchor="middle">tool calls in the run</text>
+<circle cx="406.9" cy="114.8" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="610.3" cy="276.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="454.8" cy="99.8" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="359.1" cy="99.8" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="353.1" cy="276.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="460.8" cy="96.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="412.9" cy="96.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="442.8" cy="99.8" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="418.9" cy="96.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="448.8" cy="99.8" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="490.7" cy="111.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="412.9" cy="111.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="430.9" cy="96.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="466.7" cy="96.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="478.7" cy="96.0" r="6" fill="#189fdb" stroke="#141414" stroke-width="2"/>
+<circle cx="305.3" cy="96.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="430.9" cy="96.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="365.1" cy="96.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="406.9" cy="96.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<circle cx="532.5" cy="96.0" r="6" fill="#e75c3a" stroke="#141414" stroke-width="2"/>
+<line x1="610.3" y1="264.0" x2="610.3" y2="246.0" stroke="#737373" stroke-width="1"/>
+<text x="610.26" y="238.0" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="11" font-weight="normal" fill="#a3a3a3" text-anchor="middle">87 calls, 14% complete</text>
+</svg>
