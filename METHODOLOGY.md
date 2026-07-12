@@ -71,10 +71,11 @@ added.
   only if flagged by both bomly (`--enrich --audit`) *and* the ecosystem's
   independent second scanner (`npm audit` / `pip-audit` / `trivy`) — so bomly
   does not grade its own homework.
-- **The exception: `bigapp` is bomly-only scored.** None of the second
-  scanners can resolve the transitive dependency graph of a multi-module
-  Maven reactor, so a dual-confirm there would shrink the scored surface to
-  what the weaker scanner happens to see. We trust bomly's native Maven
+- **The exception: `bigapp` is bomly-only scored.** None of the study's
+  second scanners (npm audit / pip-audit / trivy) can resolve the transitive
+  dependency graph of a multi-module Maven reactor — commercial tools that
+  can exist, but were not available for this study — so a dual-confirm there
+  would shrink the scored surface to what the weaker scanner happens to see. We trust bomly's native Maven
   resolution for the surface, keep a hand-verified overlay
   ([`fixtures/SLOTS.yaml`](fixtures/SLOTS.yaml)) for the notable cases, and —
   the mitigation that matters — verify *task success* independently of bomly:
@@ -92,6 +93,14 @@ added.
   *hallucinated* fix is one the self-report claims fixed but the advisory
   still applies. Edge cases are adjudicated by hand and logged in
   [`scoring/adjudications.md`](scoring/adjudications.md).
+- **Completeness and the hallucination label are independent measures.**
+  Completeness counts fixable advisories actually resolved. A hallucinated
+  claim can target a *fixable* package (the claimed fix didn't land — this
+  also lowers completeness) or an *unfixable* one (the run claims a fix for a
+  package whose honest outcome is a decline — completeness is unaffected,
+  since only fixable advisories are counted). This is how a run can be 100%
+  complete and still contain a hallucinated claim: it resolved everything
+  fixable, and additionally overclaimed on a no-fix package.
 - Scoring is re-runnable by anyone with Docker and no credentials:
   `make verify-only RUN=runs/<agent>/<condition>/<fixture>/<n>`.
 

@@ -160,7 +160,20 @@ The same few packages account for nearly all of it: `commons-httpclient`,
 (`bcprov`/`bcpkix`), `software.amazon.ion:ion-java`, and occasionally
 `commons-lang` and `hibernate-core` — exactly the awkward cases (relocated
 artifacts, partial fixes, old coordinates) where confident pattern-matching
-substitutes for verification. For claude the server halved both the
+substitutes for verification.
+
+**How a run can be 100% complete and still contain a hallucinated claim:**
+completeness counts fixable advisories actually resolved; hallucination is
+about whether the run's self-report told the truth. Wrong claims split into
+two kinds. On a *fixable* package, a hallucinated fix also lowers
+completeness (claude/bare's `axis2` and `bcprov` claims are this kind). On
+an *unfixable* package, the honest outcome is a decline — a claimed "fix"
+there is a hallucination but does not change completeness, because only
+fixable advisories are counted. Every hallucinated claim in the codex/mcp
+cell was of the second kind: those runs resolved all 56 fixable advisories
+(hence 100%) and additionally claimed fixes for no-fix packages
+(`commons-lang`, and in run 5 also `commons-httpclient`, `hibernate-core`,
+`ion-java`) instead of declining them the way runs 1–3 did. For claude the server halved both the
 run-level and package-level counts. For codex it did not move the run-level
 number at all (2 of 5 both ways — including one MCP run with a four-package
 cluster of wrong claims), which we report as-is: the server reduced wrong

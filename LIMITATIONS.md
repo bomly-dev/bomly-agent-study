@@ -13,10 +13,12 @@ claim.
    could move the numbers.
 
 2. **`bigapp` is scored by bomly alone.** For the other fixtures every scored
-   package is dual-confirmed by an independent scanner; for `bigapp` no
-   independent scanner can resolve the transitive multi-module Maven graph,
-   so the vulnerable surface is bomly's own resolution plus a hand-verified
-   overlay. A skeptic can fairly note that bomly defines part of the test it
+   package is dual-confirmed by an independent scanner; for `bigapp`, the
+   independent scanners available to this study (npm audit, pip-audit, trivy
+   — all free) cannot resolve the transitive graph of a multi-module Maven
+   reactor. Commercial SCA tools that can do this exist; none were available
+   for this study. The vulnerable surface is therefore bomly's own resolution
+   plus a hand-verified overlay. A skeptic can fairly note that bomly defines part of the test it
    is being evaluated on. Mitigations: the *outcome* of each run (build
    state, which versions changed, whether an advisory still applies) is
    checked from the workspace and diff independently of bomly's scan; the
