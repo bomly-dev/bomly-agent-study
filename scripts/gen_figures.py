@@ -271,62 +271,65 @@ def fig_time(runs, out):
 
 # --------------------------------------------------- fig 5: effort/outcome
 def fig_effort(runs, out):
-    W, H = 720, 380
-    x0, x1 = 90, 688
-    y0, y1 = 96, 306
+    W, H = 720, 420
+    y0, y1 = 130, 330
     tmax = 100
+    panels = [("claude", "Claude Code", 90, 368), ("codex", "Codex CLI", 410, 688)]
     parts = svg_open(W, H, "Tool calls versus completeness per run on bigapp")
     header(
         parts, W,
         "bigapp — tool calls vs. completeness per run",
-        "Both agents, all 20 runs. More effort did not mean a better outcome "
-        "without the list.",
+        "All 20 runs. More effort did not mean a better outcome without the "
+        "list.",
     )
-    legend(parts, x0, 76)
-
-    def X(v):
-        return x0 + (x1 - x0) * v / tmax
+    legend(parts, 90, 76)
 
     def Y(pct):
         return y1 - (y1 - y0) * pct / 100.0
 
-    for pct in (0, 25, 50, 75, 100):
-        gy = Y(pct)
-        parts.append(
-            f'<line x1="{x0}" y1="{gy:.1f}" x2="{x1}" y2="{gy:.1f}" '
-            f'stroke="{GRID}" stroke-width="1"/>'
-        )
-        parts.append(text(x0 - 10, gy + 4, f"{pct}%", 11, TEXT3, anchor="end"))
-    for v in (0, 20, 40, 60, 80, 100):
-        gx = X(v)
-        parts.append(
-            f'<line x1="{gx:.1f}" y1="{y0}" x2="{gx:.1f}" y2="{y1}" '
-            f'stroke="{GRID}" stroke-width="1"/>'
-        )
-        parts.append(text(gx, y1 + 20, str(v), 11, TEXT3, anchor="middle"))
-    parts.append(
-        text((x0 + x1) / 2, y1 + 42, "tool calls in the run", 11, TEXT3,
-             anchor="middle")
-    )
+    for agent, label, px0, px1 in panels:
+        def X(v):
+            return px0 + (px1 - px0) * v / tmax
 
-    marked = None
-    for agent in ("claude", "codex"):
+        parts.append(text((px0 + px1) / 2, 112, label, 12, TEXT,
+                          anchor="middle", weight="600", family=MONO))
+        for pct in (0, 25, 50, 75, 100):
+            gy = Y(pct)
+            parts.append(
+                f'<line x1="{px0}" y1="{gy:.1f}" x2="{px1}" y2="{gy:.1f}" '
+                f'stroke="{GRID}" stroke-width="1"/>'
+            )
+        for v in (0, 25, 50, 75, 100):
+            gx = X(v)
+            parts.append(
+                f'<line x1="{gx:.1f}" y1="{y0}" x2="{gx:.1f}" y2="{y1}" '
+                f'stroke="{GRID}" stroke-width="1"/>'
+            )
+            parts.append(text(gx, y1 + 20, str(v), 11, TEXT3,
+                              anchor="middle"))
+        marked = None
         for cond, color in (("bare", BARE), ("mcp", MCP)):
             for n in range(1, 6):
                 r = runs[(agent, cond, "bigapp", n)]
                 dot(parts, X(r["tools"]), Y(r["comp"] * 100), color)
                 if cond == "bare" and r["tools"] > 80:
                     marked = (X(r["tools"]), Y(r["comp"] * 100))
-    if marked:
-        mx, my = marked
-        parts.append(
-            f'<line x1="{mx:.1f}" y1="{my - 12}" x2="{mx:.1f}" '
-            f'y2="{my - 30}" stroke="{TEXT3}" stroke-width="1"/>'
-        )
-        parts.append(
-            text(mx, my - 38, "87 calls, 14% complete", 11, TEXT2,
-                 anchor="middle")
-        )
+        if marked:
+            mx, my = marked
+            parts.append(
+                f'<line x1="{mx:.1f}" y1="{my - 12}" x2="{mx:.1f}" '
+                f'y2="{my - 30}" stroke="{TEXT3}" stroke-width="1"/>'
+            )
+            parts.append(
+                text(mx + 4, my - 38, "87 calls, 14% complete", 11, TEXT2,
+                     anchor="end")
+            )
+    for pct in (0, 25, 50, 75, 100):
+        parts.append(text(80, Y(pct) + 4, f"{pct}%", 11, TEXT3, anchor="end"))
+    parts.append(
+        text((90 + 688) / 2, y1 + 44, "tool calls in the run", 11, TEXT3,
+             anchor="middle")
+    )
     parts.append("</svg>")
     write(out, parts)
 
