@@ -60,7 +60,9 @@ design. In brief:
   (dual-confirmed by an independent scanner everywhere except bigapp, which
   is bomly-only — see [LIMITATIONS.md](LIMITATIONS.md) #2); per-package
   outcome labels including `HALLUCINATED` (self-report claims fixed, advisory
-  still applies); runs executed 2026-07-10/11, N=5 per cell, human-gated.
+  still applies); runs executed 2026-07-10/11, human-gated; N=5 per cell on
+  `bigapp`, N=1 per cell on the three smaller fixtures (round 1 of a planned
+  N=5 — see §3.1 and [LIMITATIONS.md](LIMITATIONS.md) #1).
 
 ## 3. Results
 
