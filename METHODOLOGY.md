@@ -120,10 +120,13 @@ added.
 
 ## Execution
 
-- **N=5 per cell** (agent × condition × fixture), run as human-gated
-  *fixture-batches*: one batch = both agents × both conditions on one fixture
-  at one run number (4 sessions), with results and remaining usage budget
-  reviewed between batches.
+- **N=5 per cell on `bigapp`; N=1 per cell on the three smaller fixtures.**
+  The design planned N=5 everywhere (agent × condition × fixture), but the
+  smaller fixtures' remaining rounds were dropped after round 1 came back at
+  a ceiling — see deviation 4 below. Runs were human-gated *fixture-batches*:
+  one batch = both agents × both conditions on one fixture at one run number
+  (4 sessions), with results and remaining usage budget reviewed between
+  batches.
 - **Interrupted sessions are never scored.** A session cut off by an external
   usage/rate limit is marked incomplete and re-run after the window resets.
   Deliberately, an agent hitting its own turn ceiling is *not* treated as

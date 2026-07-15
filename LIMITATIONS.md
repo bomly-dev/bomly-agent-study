@@ -6,11 +6,15 @@ threats-to-validity section. Phrasing rule we hold ourselves to: results are
 "in our setup, on these fixtures, on these dates" — never a general benchmark
 claim.
 
-1. **N=5 per cell, one fixture per regime.** Five runs per agent × condition
-   × fixture, and exactly one fixture represents the large-project regime
-   (`bigapp`). The large-project finding is suggestive, not established. A
-   different large project, a different day, or different model versions
-   could move the numbers.
+1. **N=5 per cell on one large fixture; N=1 per cell on the smaller three.**
+   Five runs per agent × condition on `bigapp` — and exactly that one fixture
+   represents the large-project regime. The three smaller fixtures got one
+   run per cell: their remaining planned rounds were dropped after round 1
+   came back at a ceiling (see METHODOLOGY.md, deviation 4), so differences
+   between conditions there cannot be read as an effect at all. The
+   large-project finding is suggestive, not established. A different large
+   project, a different day, or different model versions could move the
+   numbers.
 
 2. **`bigapp` is scored by bomly alone.** For the other fixtures every scored
    package is dual-confirmed by an independent scanner; for `bigapp`, the
